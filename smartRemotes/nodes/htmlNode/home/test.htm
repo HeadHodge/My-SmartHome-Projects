@@ -1,0 +1,15 @@
+HELLO WORLD
+<script>
+alert('hello')
+function keyUp(event) {
+	console.log(`keyUp key: ${event.key}, keyCode: ${event.keyCode}, charCode: ${event.charCode}, code: ${event.code}, repeat: ${event.repeat}, which: ${event.which}`);
+};
+function keyDown(event) {
+	console.log(`keyDown key: ${event.key}, keyCode: ${event.keyCode}, charCode: ${event.charCode}, code: ${event.code}, repeat: ${event.repeat}, which: ${event.which}`);
+	alert(`keyDown key: ${event.key}, keyCode: ${event.keyCode}, charCode: ${event.charCode}, code: ${event.code}, repeat: ${event.repeat}, which: ${event.which}`)
+};
+
+	window.addEventListener("keydown", keyDown);
+	window.addEventListener("keyup", keyUp);
+
+</script>
