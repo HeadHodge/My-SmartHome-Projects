@@ -1,0 +1,9 @@
+[Unit]
+Description=smartRemotes mediaNode
+After=network.target
+
+[Service]
+ExecStart=python3 -u /smartRemotes/nodes/harmonyNode/harmonyNode.py livingRoom
+
+[Install]
+WantedBy=multi-user.target
