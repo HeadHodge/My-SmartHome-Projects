@@ -1,9 +1,0 @@
-[Unit]
-Description=smartRemotes-usbNode
-After=network.target
-
-[Service]
-ExecStart=python3 -u /smartRemotes/nodes/usbNode/usbNode.py livingRoom 9,10,11,12
-
-[Install]
-WantedBy=multi-user.target

@@ -1,9 +1,0 @@
-[Unit]
-Description=smartRemotes-hidNode
-After=network.target
-
-[Service]
-ExecStart=python3 -u /smartRemotes/nodes/hidNode/hidNode.py
-
-[Install]
-WantedBy=multi-user.target
