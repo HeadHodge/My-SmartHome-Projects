@@ -14,7 +14,7 @@ sys.path.append(path)
 path = os.path.join(os.path.dirname(__file__), './zones')
 sys.path.append(path)
 
-import wsClient, noteTool, hidServer, hidOptions
+import wsClient, noteTool, hidKeyboard, hidOptions
 
 _zones = {}
 
@@ -97,7 +97,7 @@ def start():
             #_btTransferOptions['channel'] = options["interruptPort"]
             #threading.Thread(target=btServer.start, args=(_btTransferOptions,)).start()
             
-            threading.Thread(target=hidServer.start, args=(hidOptions.hidServer,)).start()
+            threading.Thread(target=hidKeyboard.start, args=(hidOptions.hidServer,)).start()
         except:
             print('Abort btServer: ', sys.exc_info()[0])
             traceback.print_exc()
