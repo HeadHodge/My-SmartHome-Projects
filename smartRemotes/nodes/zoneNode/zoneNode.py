@@ -30,20 +30,22 @@ _eventNum = 4
 def getTask(keyCode, zone):
 ##########################################
     #print(f'Enter onSelectTask with {keyCode} in zone: {zone}')
+    global _zoneOptions
     task = None
 
-    _zones[zone].isTaskSet = None
-    return _zones[zone].tasks.get(keyCode, None)
+    _zoneOptions[zone].isTaskSet = None
+    return _zoneOptions[zone].tasks.get(keyCode, None)
     
 ##########################################
 def setFocus(keyCode, zone):
 ##########################################
     #print(f'Enter onSelectFocus with {keyCode} in zone {zone}')
 
-    _zones[zone].isFocusSet = None
+    global _zoneOptions
+    _zoneOptions[zone].isFocusSet = None
     
     if(keyCode == 'Menu'):
-        _zones[zone].isTaskSet = True
+        _zoneOptions[zone].isTaskSet = True
         print(f'select task for {zone}')
         return
     
@@ -51,13 +53,13 @@ def setFocus(keyCode, zone):
         print(f'reload selected for {zone}')
         return 'RELOAD'
 
-    def Home()        : return _zones[zone].controllers.get('Home', None)
-    def Louder()      : return _zones[zone].controllers.get('Louder', None)
-    def Softer()      : return _zones[zone].controllers.get('Softer', None)
-    def SoundToggle() : return _zones[zone].controllers.get('SoundToggle', None)
-    def Backward()    : return _zones[zone].controllers.get('Backward', None)
-    def PlayToggle()  : return _zones[zone].controllers.get('PlayToggle', None)
-    def Forward()     : return _zones[zone].controllers.get('Forward', None)
+    def Home()        : return _zoneOptions[zone].controllers.get('Home', None)
+    def Louder()      : return _zoneOptions[zone].controllers.get('Louder', None)
+    def Softer()      : return _zoneOptions[zone].controllers.get('Softer', None)
+    def SoundToggle() : return _zoneOptions[zone].controllers.get('SoundToggle', None)
+    def Backward()    : return _zoneOptions[zone].controllers.get('Backward', None)
+    def PlayToggle()  : return _zoneOptions[zone].controllers.get('PlayToggle', None)
+    def Forward()     : return _zoneOptions[zone].controllers.get('Forward', None)
 
     case = {
         'Home'       : Home,
@@ -71,8 +73,8 @@ def setFocus(keyCode, zone):
     
     selection = case.get(keyCode, None)
     if(selection == None): return
-    _zones[zone].primaryModule = selection()
-    print(f'new controller selected: {_zones[zone].primaryModule}')
+    _zoneOptions[zone].primaryModule = selection()
+    print(f'new controller selected: {_zoneOptions[zone].primaryModule}')
     
 ##########################################
 def transformWord(controlWord, options):
@@ -108,6 +110,7 @@ def transformWord(controlWord, options):
 def translateNote(note):
 #############################################
     try:
+        global _zoneOptions
         controlWord = note['content'].get('controlWord', None)
         zone = note['content'].get('zone', 'home')
         print(f'translateNote controlWord: {controlWord}, zone: {zone}')
