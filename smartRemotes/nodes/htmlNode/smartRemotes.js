@@ -4,7 +4,7 @@ var smartRemotes = {
 //################
 //### Global Variables
 //################
-_server: "ws://192.168.0.164:8080",
+_server: "ws://192.168.0.162:8080",
 _socket: undefined,
 _isConnected: undefined,
 

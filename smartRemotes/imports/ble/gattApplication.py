@@ -63,16 +63,13 @@ class Application(dbus.service.Object):
         if not self.adapter:
             print('GattManager1 interface not found')
             return
-
-  
-    
-    
- 
+            
         self.path = '/'
         self.services = []
         dbus.service.Object.__init__(self, bus, self.path)
         
-        #self.hidService = HIDService(bus, 0)
+        #self.hidService = serviceList[0](bus, 0)
+        self.add_service(serviceList[0](bus, 0))
         #self.deviceService = DeviceInfoService(bus, 1)
         #self.batteryService = BatteryService(bus, 2)
         #self.genericAttributeService = GenericAttributeService(bus, 3)
@@ -80,14 +77,11 @@ class Application(dbus.service.Object):
         #self.add_service(self.deviceService)
         #self.add_service(self.batteryService)
         #self.add_service(self.genericAttributeService)
-        self.add_service(serviceList[0](bus, 0))
         
-        
-
         print('Registering GATT Application...')
         self.service_manager = dbus.Interface(bus.get_object(BLUEZ_SERVICE_NAME, self.adapter), GATT_MANAGER_IFACE)
         self.service_manager.RegisterApplication(self.get_path(), {}, reply_handler=self.register_app_cb, error_handler=self.register_app_error_cb)
- 
+        
     def register_app_cb(self):
         print('GATT Application registered')
 

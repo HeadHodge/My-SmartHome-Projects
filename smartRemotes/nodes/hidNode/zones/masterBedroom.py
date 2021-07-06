@@ -7,7 +7,7 @@ longPress = .5 #seconds
 
 commands = {
 	"Home": [
-		{"controlWord": "Home", "hidCode": 0x223, "hidReport": 2}
+		{"controlWord": "Home", "hidCode": 0x223, "hidReport": 2, "options": "reload"}
 	],
 	
 	"Menu": [
@@ -38,12 +38,20 @@ commands = {
 		{"controlWord": "Ok", "hidCode": 0x41, "hidReport": 2}
 	],
 	
+	"Softer": [
+		{"controlWord": "Softer", "hidCode": 0xEA, "hidReport": 2}
+	],
+	
+	"Louder": [
+		{"controlWord": "Louder", "hidCode": 0xE9, "hidReport": 2}
+	],
+	
 	"Silence": [
-		{"controlWord": "Menu", "hidCode": 0x40, "hidReport": 2}
+		{"controlWord": "Menu", "hidCode": 0xE2, "hidReport": 2}
 	],
 	
 	"Sound": [
-		{"controlWord": "Menu", "hidCode": 0x40, "hidReport": 2}
+		{"controlWord": "Menu", "hidCode": 0xE2, "hidReport": 2}
 	],
 				
 	"SoundToggle": [

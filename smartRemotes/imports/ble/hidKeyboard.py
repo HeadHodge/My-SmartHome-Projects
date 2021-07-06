@@ -74,13 +74,13 @@ class ReportCharacteristic(gattApplication.Characteristic):
               
     def sendKey(self, keyBytes, keyHold):
         #send keyCode
-        print(f' \n***Send report2 keyCode: {[hex(x) for x in keyBytes]}, keyHold: {keyHold}***');
+        print(f' \n***Send report keyCode: {[hex(x) for x in keyBytes]}, keyHold: {keyHold}***');
         #if(self.isConnected == False): print('Abort Report2: Not connected to client'); return
-        self.PropertiesChanged(GATT_CHRC_IFACE, { 'Value': [dbus.Byte(keyBytes[0]),dbus.Byte(keyBytes[1])] }, [])
+        self.PropertiesChanged(gattApplication.GATT_CHRC_IFACE, { 'Value': [dbus.Byte(keyBytes[0]),dbus.Byte(keyBytes[1])] }, [])
         GLib.timeout_add(keyHold, self.sendNull)
         
     def sendNull(self):
-        self.PropertiesChanged(GATT_CHRC_IFACE, { 'Value': [dbus.Byte(0x00),dbus.Byte(0x00)] }, [])
+        self.PropertiesChanged(gattApplication.GATT_CHRC_IFACE, { 'Value': [dbus.Byte(0x00),dbus.Byte(0x00)] }, [])
         return False
                 
     def ReadValue(self, options):
@@ -93,7 +93,7 @@ class ReportCharacteristic(gattApplication.Characteristic):
         #GLib.timeout_add(15000, self.send)
 
     def StopNotify(self):
-        print(f' \n***DISCONNECTED: Report2 Client')
+        print(f' \n***DISCONNECTED: Report Client')
         self.isConnected = False
  
 
@@ -465,7 +465,7 @@ async def receivedCommand(controlCommand):
         elif(hidReport == 2):    
             #Transfer Consumer Input
             keyBytes = hidCode.to_bytes(2, byteorder='little')
-            _keyboard.hidService.report2.sendKey(keyBytes, hidWait)
+            _keyboard.services[0].report.sendKey(keyBytes, hidWait)
             return
         else:
             print(f'Abort transfer, Invalid hidReport: {hidReport}')

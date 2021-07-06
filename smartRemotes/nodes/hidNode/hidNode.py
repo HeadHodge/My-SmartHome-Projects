@@ -41,19 +41,18 @@ async def receivedNote(note, connection):
 
         # validate controlCommand
         controlCommand = _zones[zone].commands.get(controlWord, None)
-        print(f'controlWord: {controlCommand}')
-       
+      
         #controlCommand = options.controlWordMap.get(controlWord, None)
         if(controlCommand == None):
             return print(f'Abort receivedNote, invalid controlCommand for {controlWord}')
          
-        
-        
-        
-        
-        
-        controlCommand = {"controlWord": "Menu", "hidCode": 0x40, "hidReport": 2}               
-        await hidServer.receivedCommand(controlCommand)
+        options = controlCommand[0].get('options', None)
+        if(options == 'reload'):
+            print(f'reload options')        
+            importlib.reload(_zones[zone])
+              
+        #controlCommand = [{"controlWord": "Menu", "hidCode": 0x40, "hidReport": 2}]              
+        await hidKeyboard.receivedCommand(controlCommand[0])
     except:
         print('Abort receivedNote: ', sys.exc_info()[0])
         traceback.print_exc()
@@ -62,6 +61,7 @@ async def receivedNote(note, connection):
 async def hubConnected(connection):
 #############################################
     print(f' \n***hubConnected')
+    
     note = noteTool.publishNote('gattNode', 'subscribe', {
         'title': 'control hidClient request'
     })

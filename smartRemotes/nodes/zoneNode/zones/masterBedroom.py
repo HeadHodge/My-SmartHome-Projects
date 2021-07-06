@@ -24,61 +24,57 @@ commands = {
 
     'Media': {
         "Home": [
-            {'device': 'harmonyHub', 'controlWord': 'Home', 'zone': 'masterBedroom'}
+            {'device': 'hidClient', 'controlWord': 'Home', 'zone': 'masterBedroom'}
         ],
         
         "Menu": [
-            {'device': 'harmonyHub', 'controlWord': 'Menu', 'zone': 'masterBedroom'}
+            {'device': 'hidClient', 'controlWord': 'Menu', 'zone': 'masterBedroom'}
         ],
             
         "Back": [
-            {'device': 'harmonyHub', 'controlWord': 'Back', 'zone': 'masterBedroom'}
+            {'device': 'hidClient', 'controlWord': 'Back', 'zone': 'masterBedroom'}
         ],
         
         "Up": [
-            {'device': 'harmonyHub', 'controlWord': 'Up', 'zone': 'masterBedroom'}
+            {'device': 'hidClient', 'controlWord': 'Up', 'zone': 'masterBedroom'}
         ],
         
         "Down": [
-            {'device': 'harmonyHub', 'controlWord': 'Down', 'zone': 'masterBedroom'}
+            {'device': 'hidClient', 'controlWord': 'Down', 'zone': 'masterBedroom'}
         ],
         
         "Left": [
-            {'device': 'harmonyHub', 'controlWord': 'Left', 'zone': 'masterBedroom'}
+            {'device': 'hidClient', 'controlWord': 'Left', 'zone': 'masterBedroom'}
         ],
         
         "Right": [
-            {'device': 'harmonyHub', 'controlWord': 'Right', 'zone': 'masterBedroom'}
+            {'device': 'hidClient', 'controlWord': 'Right', 'zone': 'masterBedroom'}
         ],
         
         "Ok": [
-            {'device': 'harmonyHub', 'controlWord': 'Ok', 'zone': 'masterBedroom'}
+            {'device': 'hidClient', 'controlWord': 'Ok', 'zone': 'masterBedroom'}
         ],
         
         "Louder": [
-            {'device': 'harmonyHub', 'controlWord': 'Louder', 'zone': 'masterBedroom'}
+            {'device': 'hidClient', 'controlWord': 'Louder', 'zone': 'masterBedroom'}
         ],
         
         "Softer": [
-            {'device': 'harmonyHub', 'controlWord': 'Softer', 'zone': 'masterBedroom'}
+            {'device': 'hidClient', 'controlWord': 'Softer', 'zone': 'masterBedroom'}
         ],
         
         "Forward": [
-            {'device': 'harmonyHub', 'controlWord': 'Forward', 'zone': 'masterBedroom'}
+            {'device': 'hidClient', 'controlWord': 'Forward', 'zone': 'masterBedroom'}
         ],
         
         "Backward": [
-            {'device': 'harmonyHub', 'controlWord': 'Backward', 'zone': 'masterBedroom'}
+            {'device': 'hidClient', 'controlWord': 'Backward', 'zone': 'masterBedroom'}
         ],
-                
-        "On": [
-            {'device': 'harmonyHub', 'controlWord': 'On', 'zone': 'masterBedroom'}
-        ],
-                
-        "Off": [
-            {'device': 'harmonyHub', 'controlWord': 'Off', 'zone': 'masterBedroom'}
-        ],
-                
+        
+        "PlayToggle": [
+            {'device': 'hidClient', 'controlWord': 'PlayToggle', 'zone': 'masterBedroom'}
+        ],                
+               
         "Silence": [
             {'device': 'hidClient', 'controlWord': 'Silence', 'zone': 'masterBedroom'}
         ],
@@ -86,17 +82,21 @@ commands = {
         "Sound": [
             {'device': 'hidClient', 'controlWord': 'Sound', 'zone': 'masterBedroom'}
         ],
-        
-        "PlayToggle": [
-            {'device': 'harmonyHub', 'controlWord': 'PlayToggle', 'zone': 'masterBedroom'}
-        ],                
                 
         "SoundToggle": [
-            {'device': 'harmonyHub', 'controlWord': 'SoundToggle', 'zone': 'masterBedroom'}
+            {'device': 'hidClient', 'controlWord': 'SoundToggle', 'zone': 'masterBedroom'}
         ],
                 
+        "On": [
+            {'device': 'hidClient', 'controlWord': 'On', 'zone': 'masterBedroom'}
+        ],
+                
+        "Off": [
+            {'device': 'hidClient', 'controlWord': 'Off', 'zone': 'masterBedroom'}
+        ],
+                 
         "PowerToggle": [
-            {'device': 'harmonyHub', 'controlWord': 'PowerToggle', 'zone': 'masterBedroom'}
+            {'device': 'hidClient', 'controlWord': 'PowerToggle', 'zone': 'masterBedroom'}
         ],
     },
 

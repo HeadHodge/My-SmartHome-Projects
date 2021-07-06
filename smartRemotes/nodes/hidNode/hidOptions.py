@@ -1,5 +1,5 @@
 wsClient = {
-    "hubNode": "ws://192.168.0.164:8080/",
+    "hubNode": "ws://192.168.0.162:8080/",
 }
 
 hidServer = {
