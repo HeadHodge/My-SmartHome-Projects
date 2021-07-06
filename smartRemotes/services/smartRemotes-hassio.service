@@ -1,0 +1,9 @@
+[Unit]
+Description=smartRemotes hassioNode
+After=network.target
+
+[Service]
+ExecStart=python3 -u /smartRemotes/nodes/hassioNode/hassioNode.py
+
+[Install]
+WantedBy=multi-user.target
