@@ -11,7 +11,7 @@ _parent = sys.modules["__main__"]
 async def deliverPayload(payload, connection):
 ##########################
     try:
-        #print(f' \n***deliverPayload: {payload}')
+        #print(f' \n***deliverPayload: {payload}', connection)
         await connection.send(json.dumps(payload))
     except:
         print('Abort deliverPayload', sys.exc_info()[0])
@@ -29,14 +29,16 @@ async def receivePayloads(options):
                 print(f' \n***ENDPOINT CONNECTED, endpoint: {options["endPoint"]}')
                 #_connection = connection
     
+                options['connection'] = connection
                 onConnect = getattr(_parent, options['onConnection'], None)
                 onReceived = getattr(_parent, options['onReceived'], None)
-                if(onConnect != None): await onConnect(connection)
+                
+                if(onConnect != None): await onConnect()
                 
                 async for payload in connection:
                     try:
                         #print(f' \n*** payload: {payload}')
-                        if(onReceived != None): await onReceived(payload, connection)
+                        if(onReceived != None): await onReceived(payload)
                     except:
                         print('Abort receiveNote', sys.exc_info()[0])
                         traceback.print_exc()

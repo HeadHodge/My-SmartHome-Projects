@@ -80,16 +80,32 @@ def setFocus(keyCode, zone):
 def transformWord(controlWord, options):
 ##########################################
     try:
-        if(controlWord == 'PowerToggle'):
-            if(options.isOn == True):
-                controlWord = 'Off'
-                options.isOn = False
-            else:
-                controlWord = 'On'
-                options.isOn = True
-                
+        if(controlWord == 'PowerToggle' and options.isFocusSet == True):
+            controlWord = 'On'
+            options.isOn = True
+            options.isFocusSet = False
+            print(f'controlWord translated to: {controlWord}')
             return controlWord
-
+            
+        if(controlWord == 'PowerToggle' and options.isFocusSet != True):
+            controlWord = 'Off'
+            options.isOn = False
+            options.isFocusSet = False
+            print(f'controlWord translated to: {controlWord}')
+            return controlWord
+            
+        if(controlWord == 'Softer' and options.isFocusSet == True):
+            controlWord = 'Sleep'
+            options.isFocusSet = False
+            print(f'controlWord translated to: {controlWord}')
+            return controlWord
+            
+        if(controlWord == 'Louder' and options.isFocusSet == True):
+            controlWord = 'Wake'
+            options.isFocusSet = False
+            print(f'controlWord translated to: {controlWord}')
+            return controlWord
+ 
         if(controlWord == 'SoundToggle'):
             if(options.isSilent == True):
                 controlWord = 'Sound'
@@ -98,13 +114,13 @@ def transformWord(controlWord, options):
                 controlWord = 'Silence'
                 options.isSilent = True
                 
+            print(f'controlWord translated to: {controlWord}')
             return controlWord
             
         return controlWord
     except:
         print('Abort translateNote: ', sys.exc_info()[0])
         traceback.print_exc()
-        return transformWord
 
 #############################################
 def translateNote(note):
@@ -116,15 +132,14 @@ def translateNote(note):
         print(f'translateNote controlWord: {controlWord}, zone: {zone}')
 
         #validate zone
-        if(_zoneOptions.get(zone, None) == None): _zoneOptions[zone] = importlib.import_module(zone)
-        if(_zoneOptions.get(zone, None) == None): return print(f'Abort translateNote, invalid zone: {zone}')
+        _zoneOptions[zone] = importlib.import_module(zone)
         options = _zoneOptions[zone]
         controlWord = transformWord(controlWord, options)
         
         if(options.isFocusSet): return setFocus(controlWord, zone)
         if(options.isTaskSet): return getTask(controlWord, zone)
       
-        if(controlWord == 'Focus'): options.isFocusSet = True; return print('Set Focus Flag')
+        if(controlWord == 'Focus'): options.isFocusSet = True; print('Set Focus Flag'); return [] 
     
         return options.commands[options.controller].get(controlWord, [])
     except:

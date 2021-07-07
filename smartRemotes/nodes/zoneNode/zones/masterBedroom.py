@@ -55,14 +55,6 @@ commands = {
             {'device': 'hidClient', 'controlWord': 'Ok', 'zone': 'masterBedroom'}
         ],
         
-        "Louder": [
-            {'device': 'hidClient', 'controlWord': 'Louder', 'zone': 'masterBedroom'}
-        ],
-        
-        "Softer": [
-            {'device': 'hidClient', 'controlWord': 'Softer', 'zone': 'masterBedroom'}
-        ],
-        
         "Forward": [
             {'device': 'hidClient', 'controlWord': 'Forward', 'zone': 'masterBedroom'}
         ],
@@ -74,29 +66,37 @@ commands = {
         "PlayToggle": [
             {'device': 'hidClient', 'controlWord': 'PlayToggle', 'zone': 'masterBedroom'}
         ],                
+        
+        "Louder": [
+            {'device': 'hassioNode', 'controlWord': 'Louder', 'zone': 'masterBedroom'}
+        ],
+        
+        "Softer": [
+            {'device': 'hassioNode', 'controlWord': 'Softer', 'zone': 'masterBedroom'}
+        ],
                
         "Silence": [
-            {'device': 'hidClient', 'controlWord': 'Silence', 'zone': 'masterBedroom'}
+            {'device': 'hassioNode', 'controlWord': 'Silence', 'zone': 'masterBedroom'}
         ],
                 
         "Sound": [
-            {'device': 'hidClient', 'controlWord': 'Sound', 'zone': 'masterBedroom'}
+            {'device': 'hassioNode', 'controlWord': 'Sound', 'zone': 'masterBedroom'}
         ],
                 
         "SoundToggle": [
-            {'device': 'hidClient', 'controlWord': 'SoundToggle', 'zone': 'masterBedroom'}
+            {'device': 'hassioNode', 'controlWord': 'SoundToggle', 'zone': 'masterBedroom'}
         ],
                 
         "On": [
-            {'device': 'hidClient', 'controlWord': 'On', 'zone': 'masterBedroom'}
+            {'device': 'hassioNode', 'controlWord': 'On', 'zone': 'masterBedroom'}
         ],
                 
         "Off": [
-            {'device': 'hidClient', 'controlWord': 'Off', 'zone': 'masterBedroom'}
+            {'device': 'hassioNode', 'controlWord': 'Off', 'zone': 'masterBedroom'}
         ],
                  
         "PowerToggle": [
-            {'device': 'hidClient', 'controlWord': 'PowerToggle', 'zone': 'masterBedroom'}
+            {'device': 'hassioNode', 'controlWord': 'PowerToggle', 'zone': 'masterBedroom'}
         ],
     },
 

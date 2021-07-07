@@ -3,20 +3,18 @@
 #############################################
 print('Load hassioNode')
     
-from gi.repository import GLib
-from multiprocessing import Process
-import os, sys, time, json, traceback, queue, threading, asyncio
+import os, sys, time, json, traceback, queue, threading, asyncio, importlib
 
 path = os.path.join(os.path.dirname(__file__), '../../imports/network')
 sys.path.append(path)
-path = os.path.join(os.path.dirname(__file__), '../../imports/maps')
-sys.path.append(path)
-path = os.path.join(os.path.dirname(__file__), '../../imports/maps/map2hassio.py')
+path = os.path.join(os.path.dirname(__file__), './zones')
 sys.path.append(path)
 
 import wsioClient, hassioOptions, noteTool
 
-_sessionId = 0
+_transactionNum = 0
+
+_zones = {}
 
 # keyCode Input
 _inOptions = {
@@ -38,12 +36,50 @@ _outOptions = {
 }
  
 #############################################
-async def receivedNote(note, connection):
+async def receivedNote(payload):
 #############################################
-    print(f' \n***receivedNote: {note}')
-    global _ioQueue, _sessionId
-    return
+    try:
+        print(f' \n***Received Note: {payload}')    
+        global _zones
+        
+        # validate zone
+        note = noteTool.serial2object(payload)
+        zone = note['content'].get('zone', None)
+        if(zone == None):
+            return print(f'Abort receivedNote, invalid zone: {zone}')
+        
+        # validate controlWord
+        controlWord = note['content'].get('controlWord', None)
+        if(controlWord == None):
+            return print(f'Abort receivedNote, invalid controlWord: {ontrolWord}')
+        
+        #validate hub
+        _zones[zone] = importlib.import_module(zone)
+        
+        deviceCommands = _zones[zone].commands.get(controlWord, None)
+        if(deviceCommands == None):
+            return print(f'Abort receivedNote, no deviceCommands found for {controlWord}')
+
+        for index, deviceCommand in enumerate(deviceCommands):
+            #if(deviceCommand.get('device', None) == None): continue
+            print(f' \n***Deliver deviceCommand: {deviceCommand}')
+            _zones[zone].transactionNum += 1
+            deviceCommand['id'] = _zones[zone].transactionNum
+            payload = deviceCommand
+            await wsioClient.deliverPayload(payload, hassioOptions.hassioNode['connection'])
+
+    except:
+        print('Abort receivedNote: ', sys.exc_info()[0])
+        traceback.print_exc()
     
+    
+    
+    
+    
+    
+    
+    return
+    '''
     keyCode = note.get('keyCode', None)
     zone = note.get('zone', 'home')
     if(keyCode == None): print(f'Abort inPosts, invalid keyCode: {keyCode}'); return
@@ -69,9 +105,29 @@ async def receivedNote(note, connection):
 
         print(f' \n***outTRANSFER: {payload}')
         await _outOptions['transfer'](payload, _outOptions)
-        
+    '''
+ 
 #############################################
-async def receivedConfirmation(confirmation, connection):
+async def hubConnected():
+#############################################
+    try:
+        print(f' \n***hubConnected')
+        
+        note = noteTool.publishNote('zoneNode', 'subscribe', {
+            'title': 'control hassioNode request',
+        })
+        
+        print(f' \n***Deliver Note: {note}')
+        await wsioClient.deliverPayload(note, hassioOptions.hubNode['connection'])
+        
+        print(f' \n***Wait for control device requests...')
+        print(f'**************************************')
+    except:
+        print('Abort hubConnected: ', sys.exc_info()[0])
+        traceback.print_exc()
+    
+#############################################
+async def receivedConfirmation(confirmation):
 #############################################
     print(f' \n***receivedConfirmation: {confirmation}')
 
@@ -84,31 +140,13 @@ async def receivedConfirmation(confirmation, connection):
         }
                       
         print(f' \n***deliverPayload: {payload}')
-        await wsioClient.deliverPayload(payload, connection)
+        await wsioClient.deliverPayload(payload, hassioOptions.hassioNode['connection'])
     
     print(f' \n***Wait for hassio control confirmations...')
     print(f'**********************************************')
- 
-#############################################
-async def hubConnected(connection):
-#############################################
-    try:
-        print(f' \n***hubConnected')
-        
-        note = noteTool.publishNote('zoneNode', 'subscribe', {
-            'title': 'control device request',
-        })
-        
-        await wsioClient.deliverPayload(note, connection)
-        
-        print(f' \n***Wait for control device requests...')
-        print(f'**************************************')
-    except:
-        print('Abort hubConnected: ', sys.exc_info()[0])
-        traceback.print_exc()
 
 #############################################
-async def hassioConnected(connection):
+async def hassioConnected():
 #############################################
     try:
         print(f' \n***hassioConnected')
