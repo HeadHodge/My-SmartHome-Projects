@@ -13,18 +13,6 @@ import time, traceback, queue, threading, asyncio, importlib
 import wsClient, json, noteTool, zoneOptions
 
 _zoneOptions = {}
-#_zone = 'livingRoom'
-#if(len(sys.argv) > 0): _zone = sys.argv[1]
-'''
-_zones = {}
-_focus = 'Up'
-_primaryController = {}
-_primaryModule = None
-_isFocusSet = None
-_isTaskSet = None
-_isSilent = None
-_eventNum = 4
-'''
 
 ##########################################
 def getTask(keyCode, zone):
@@ -37,47 +25,21 @@ def getTask(keyCode, zone):
     return _zoneOptions[zone].tasks.get(keyCode, None)
     
 ##########################################
-def setFocus(keyCode, zone):
+def setFocus(controlWord, zone):
 ##########################################
     #print(f'Enter onSelectFocus with {keyCode} in zone {zone}')
-
     global _zoneOptions
+    
     _zoneOptions[zone].isFocusSet = None
     
-    if(keyCode == 'Menu'):
-        _zoneOptions[zone].isTaskSet = True
-        print(f'select task for {zone}')
-        return
-    
-    if(keyCode == 'Ok'):
-        print(f'reload selected for {zone}')
-        return 'RELOAD'
+    controller = _zoneOptions[zone].focus.get(controlWord, None)
+    if(controller == None): print(f'Abort setFocus, controller not found for controlWord: {controlWord}'); return
 
-    def Home()        : return _zoneOptions[zone].controllers.get('Home', None)
-    def Louder()      : return _zoneOptions[zone].controllers.get('Louder', None)
-    def Softer()      : return _zoneOptions[zone].controllers.get('Softer', None)
-    def SoundToggle() : return _zoneOptions[zone].controllers.get('SoundToggle', None)
-    def Backward()    : return _zoneOptions[zone].controllers.get('Backward', None)
-    def PlayToggle()  : return _zoneOptions[zone].controllers.get('PlayToggle', None)
-    def Forward()     : return _zoneOptions[zone].controllers.get('Forward', None)
-
-    case = {
-        'Home'       : Home,
-        'Louder'     : Louder,
-        'Softer'     : Softer,
-        'SoundToggle': SoundToggle,
-        'Backward'   : Backward,
-        'PlayToggle' : PlayToggle,
-        'Forward'    : Forward
-    }
-    
-    selection = case.get(keyCode, None)
-    if(selection == None): return
-    _zoneOptions[zone].primaryModule = selection()
-    print(f'new controller selected: {_zoneOptions[zone].primaryModule}')
+    _zoneOptions[zone].controller = controller
+    print(f' \n***Focus Set to: {_zoneOptions[zone].controller}')
     
 ##########################################
-def transformWord(controlWord, options):
+def translateWord(controlWord, options):
 ##########################################
     try:
         if(controlWord == 'PowerToggle' and options.isFocusSet == True):
@@ -105,8 +67,14 @@ def transformWord(controlWord, options):
             options.isFocusSet = False
             print(f'controlWord translated to: {controlWord}')
             return controlWord
+            
+        if(controlWord == 'SoundToggle' and options.isFocusSet == True):
+            controlWord = 'Dream'
+            options.isFocusSet = False
+            print(f'controlWord translated to: {controlWord}')
+            return controlWord
  
-        if(controlWord == 'SoundToggle'):
+        if(controlWord == 'SoundToggle' and options.isFocusSet == False):
             if(options.isSilent == True):
                 controlWord = 'Sound'
                 options.isSilent = False
@@ -121,7 +89,7 @@ def transformWord(controlWord, options):
     except:
         print('Abort translateNote: ', sys.exc_info()[0])
         traceback.print_exc()
-
+'''
 #############################################
 def translateNote(note):
 #############################################
@@ -145,14 +113,28 @@ def translateNote(note):
     except:
         print('Abort translateNote: ', sys.exc_info()[0])
         traceback.print_exc()
-
+'''
 #############################################
 async def receivedNote(note, connection):
 #############################################
     try:
         print(f' \n***receivedNote: {note}')
+        global _zoneOptions
         
-        deviceCommands = translateNote(note)
+        #deviceCommands = translateNote(note)
+        
+        controlWord = note['content'].get('controlWord', None)
+        zone = note['content'].get('zone', 'home')
+        _zoneOptions[zone] = importlib.import_module(zone)
+        options = _zoneOptions[zone]
+        controlWord = translateWord(controlWord, options)
+        
+        if(options.isFocusSet): return setFocus(controlWord, zone)
+        #if(options.isTaskSet): return getTask(controlWord, zone)      
+        if(controlWord == 'Focus'): options.isFocusSet = True; print('Set Focus Flag'); return
+    
+        deviceCommands = options.commands[options.controller].get(controlWord, [])
+                
         print(f'publish deviceCommands: {deviceCommands}')
         for index, deviceCommand in enumerate(deviceCommands):
             if(deviceCommand.get('device', None) == None): continue

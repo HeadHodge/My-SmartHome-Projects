@@ -6,97 +6,116 @@ isOn       = None
 
 focus = {
     "Home" 	: "Media",
-    "Up" 	: "Fireplace",
-    "Left"  : "Audio",
-    "Right"	: "Video",
-    "Down"  : "Covers",
+    "Ok" 	: "Task",
+    "Left"  : "Climate",
+    "Up" 	: "Cover",
+    "Right"	: "Light",
+    "Down"  : "Security",
 }
 
 commands = {
-    'Audio': {
+    'Task': {
+    },
+    
+    'Climate': {
     },
 
-    'Video': {
+    'Cover': {
     },
 
-    'Covers': {
+    'Light': {
+    },
+
+    'Security': {
     },
 
     'Media': {
         "Home": [
-            {'device': 'hidClient', 'controlWord': 'Home', 'zone': 'masterBedroom'}
+            {'device': 'hidClient', 'controlWord': 'Home', 'zone': 'masterBedroom', 'focus': 'Media'}
         ],
         
         "Menu": [
-            {'device': 'hidClient', 'controlWord': 'Menu', 'zone': 'masterBedroom'}
+            {'device': 'hidClient', 'controlWord': 'Menu', 'zone': 'masterBedroom', 'focus': 'Media'}
         ],
             
         "Back": [
-            {'device': 'hidClient', 'controlWord': 'Back', 'zone': 'masterBedroom'}
+            {'device': 'hidClient', 'controlWord': 'Back', 'zone': 'masterBedroom', 'focus': 'Media'}
         ],
         
         "Up": [
-            {'device': 'hidClient', 'controlWord': 'Up', 'zone': 'masterBedroom'}
+            {'device': 'hidClient', 'controlWord': 'Up', 'zone': 'masterBedroom', 'focus': 'Media'}
         ],
         
         "Down": [
-            {'device': 'hidClient', 'controlWord': 'Down', 'zone': 'masterBedroom'}
+            {'device': 'hidClient', 'controlWord': 'Down', 'zone': 'masterBedroom', 'focus': 'Media'}
         ],
         
         "Left": [
-            {'device': 'hidClient', 'controlWord': 'Left', 'zone': 'masterBedroom'}
+            {'device': 'hidClient', 'controlWord': 'Left', 'zone': 'masterBedroom', 'focus': 'Media'}
         ],
         
         "Right": [
-            {'device': 'hidClient', 'controlWord': 'Right', 'zone': 'masterBedroom'}
+            {'device': 'hidClient', 'controlWord': 'Right', 'zone': 'masterBedroom', 'focus': 'Media'}
         ],
         
         "Ok": [
-            {'device': 'hidClient', 'controlWord': 'Ok', 'zone': 'masterBedroom'}
+            {'device': 'hidClient', 'controlWord': 'Ok', 'zone': 'masterBedroom', 'focus': 'Media'}
         ],
         
         "Forward": [
-            {'device': 'hidClient', 'controlWord': 'Forward', 'zone': 'masterBedroom'}
+            {'device': 'hidClient', 'controlWord': 'Forward', 'zone': 'masterBedroom', 'focus': 'Media'}
         ],
         
         "Backward": [
-            {'device': 'hidClient', 'controlWord': 'Backward', 'zone': 'masterBedroom'}
+            {'device': 'hidClient', 'controlWord': 'Backward', 'zone': 'masterBedroom', 'focus': 'Media'}
         ],
         
         "PlayToggle": [
-            {'device': 'hidClient', 'controlWord': 'PlayToggle', 'zone': 'masterBedroom'}
+            {'device': 'hidClient', 'controlWord': 'PlayToggle', 'zone': 'masterBedroom', 'focus': 'Media'}
         ],                
         
         "Louder": [
-            {'device': 'hassioNode', 'controlWord': 'Louder', 'zone': 'masterBedroom'}
+            {'device': 'hassioNode', 'controlWord': 'Louder', 'zone': 'masterBedroom', 'focus': 'Media'}
         ],
         
         "Softer": [
-            {'device': 'hassioNode', 'controlWord': 'Softer', 'zone': 'masterBedroom'}
+            {'device': 'hassioNode', 'controlWord': 'Softer', 'zone': 'masterBedroom', 'focus': 'Media'}
         ],
                
         "Silence": [
-            {'device': 'hassioNode', 'controlWord': 'Silence', 'zone': 'masterBedroom'}
+            {'device': 'hassioNode', 'controlWord': 'Silence', 'zone': 'masterBedroom', 'focus': 'Media'}
         ],
                 
         "Sound": [
-            {'device': 'hassioNode', 'controlWord': 'Sound', 'zone': 'masterBedroom'}
+            {'device': 'hassioNode', 'controlWord': 'Sound', 'zone': 'masterBedroom', 'focus': 'Media'}
+        ],
+               
+        "Dream": [
+            {'device': 'hassioNode', 'controlWord': 'Dream', 'zone': 'masterBedroom', 'focus': 'Media'}
+        ],
+               
+        "Sleep": [
+            {'device': 'hassioNode', 'controlWord': 'Sleep', 'zone': 'masterBedroom', 'focus': 'Media'}
+        ],
+                
+        "Wake": [
+            {'device': 'hassioNode', 'controlWord': 'Wake', 'zone': 'masterBedroom', 'focus': 'Media'}
         ],
                 
         "SoundToggle": [
-            {'device': 'hassioNode', 'controlWord': 'SoundToggle', 'zone': 'masterBedroom'}
+            {'device': 'hassioNode', 'controlWord': 'SoundToggle', 'zone': 'masterBedroom', 'focus': 'Media'}
         ],
                 
         "On": [
-            {'device': 'hassioNode', 'controlWord': 'On', 'zone': 'masterBedroom'}
+            {'device': 'hassioNode', 'controlWord': 'On', 'zone': 'masterBedroom', 'focus': 'Media'}
         ],
                 
         "Off": [
-            {'device': 'hassioNode', 'controlWord': 'Off', 'zone': 'masterBedroom'}
+            {'device': 'hassioNode', 'controlWord': 'Off', 'zone': 'masterBedroom', 'focus': 'Media'}
         ],
                  
         "PowerToggle": [
-            {'device': 'hassioNode', 'controlWord': 'PowerToggle', 'zone': 'masterBedroom'}
+            {'device': 'hassioNode', 'controlWord': 'PowerToggle', 'zone': 'masterBedroom', 'focus': 'Media'}
         ],
     },
 
