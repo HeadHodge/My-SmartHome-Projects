@@ -4,7 +4,7 @@ var smartRemotes = {
 //################
 //### Global Variables
 //################
-_server: "ws://192.168.0.162:8080",
+_server: "ws://192.168.0.219:8080",
 _socket: undefined,
 _isConnected: undefined,
 
@@ -21,7 +21,7 @@ console.log("Enter openConnection");
 	
 	//### onopen ###
 	smartRemotes._socket.onopen = function(event) {
-		console.log("**** smartRemotes Server Connected ****");
+		console.log(`**** smartRemotes Server Connected to: ${smartRemotes._server} ****`);
 		smartRemotes._isConnected = true;
 		if(callBack) callBack();
 	};

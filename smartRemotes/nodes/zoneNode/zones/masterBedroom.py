@@ -31,47 +31,47 @@ commands = {
 
     'Media': {
         "Home": [
-            {'device': 'hidClient', 'controlWord': 'Home', 'zone': 'masterBedroom', 'focus': 'Media'}
+            {'device': 'ttyClient', 'controlWord': 'Home', 'zone': 'masterBedroom', 'focus': 'Media'}
         ],
         
         "Menu": [
-            {'device': 'hidClient', 'controlWord': 'Menu', 'zone': 'masterBedroom', 'focus': 'Media'}
+            {'device': 'ttyClient', 'controlWord': 'Menu', 'zone': 'masterBedroom', 'focus': 'Media'}
         ],
             
         "Back": [
-            {'device': 'hidClient', 'controlWord': 'Back', 'zone': 'masterBedroom', 'focus': 'Media'}
+            {'device': 'ttyClient', 'controlWord': 'Back', 'zone': 'masterBedroom', 'focus': 'Media'}
         ],
         
         "Up": [
-            {'device': 'hidClient', 'controlWord': 'Up', 'zone': 'masterBedroom', 'focus': 'Media'}
+            {'device': 'ttyClient', 'controlWord': 'Up', 'zone': 'masterBedroom', 'focus': 'Media'}
         ],
         
         "Down": [
-            {'device': 'hidClient', 'controlWord': 'Down', 'zone': 'masterBedroom', 'focus': 'Media'}
+            {'device': 'ttyClient', 'controlWord': 'Down', 'zone': 'masterBedroom', 'focus': 'Media'}
         ],
         
         "Left": [
-            {'device': 'hidClient', 'controlWord': 'Left', 'zone': 'masterBedroom', 'focus': 'Media'}
+            {'device': 'ttyClient', 'controlWord': 'Left', 'zone': 'masterBedroom', 'focus': 'Media'}
         ],
         
         "Right": [
-            {'device': 'hidClient', 'controlWord': 'Right', 'zone': 'masterBedroom', 'focus': 'Media'}
+            {'device': 'ttyClient', 'controlWord': 'Right', 'zone': 'masterBedroom', 'focus': 'Media'}
         ],
         
         "Ok": [
-            {'device': 'hidClient', 'controlWord': 'Ok', 'zone': 'masterBedroom', 'focus': 'Media'}
+            {'device': 'ttyClient', 'controlWord': 'Ok', 'zone': 'masterBedroom', 'focus': 'Media'}
         ],
         
         "Forward": [
-            {'device': 'hidClient', 'controlWord': 'Forward', 'zone': 'masterBedroom', 'focus': 'Media'}
+            {'device': 'ttyClient', 'controlWord': 'Forward', 'zone': 'masterBedroom', 'focus': 'Media'}
         ],
         
         "Backward": [
-            {'device': 'hidClient', 'controlWord': 'Backward', 'zone': 'masterBedroom', 'focus': 'Media'}
+            {'device': 'ttyClient', 'controlWord': 'Backward', 'zone': 'masterBedroom', 'focus': 'Media'}
         ],
         
         "PlayToggle": [
-            {'device': 'hidClient', 'controlWord': 'PlayToggle', 'zone': 'masterBedroom', 'focus': 'Media'}
+            {'device': 'ttyClient', 'controlWord': 'PlayToggle', 'zone': 'masterBedroom', 'focus': 'Media'}
         ],                
         
         "Louder": [

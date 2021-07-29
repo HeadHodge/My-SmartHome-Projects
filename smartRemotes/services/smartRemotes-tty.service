@@ -1,0 +1,9 @@
+[Unit]
+Description=smartRemotes-ttyNode
+After=network.target
+
+[Service]
+ExecStart=python3 -u /smartRemotes/nodes/ttyNode/ttyNode.py
+
+[Install]
+WantedBy=multi-user.target
