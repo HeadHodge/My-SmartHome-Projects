@@ -39,33 +39,27 @@ async def receivedNote(note, connection):
         if(_zones.get(zone, None) == None): _zones[zone] = importlib.import_module(zone)
         if(_zones.get(zone, None) == None): return print(f'Abort receivedNote, invalid zone: {zone}')
 
-        # validate controlCommand
-        controlOptions = _zones[zone].controlWords.get(controlWord, None)
-        if(controlOptions == None):
-            return print(f'Abort controlOptions, invalid controlOptions for {controlWord}')
+        # validate commandOptions
+        commandOptions = _zones[zone].wordMap.get(controlWord, None)
+        if(commandOptions == None):
+            return print(f'Abort commandOptions, invalid commandOptions for {controlWord}')
         
-        hidReport = controlOptions[0].get("hidReport", 0x01)
-        hidModifier = controlOptions[0].get("hidModifier", 0x00)
-        hidCode = controlOptions[0].get("hidCode", 0x0b).to_bytes(2, "little")
-        
-        controlCommand = [0xff, 0x00, 0x00, 0x00, 0x00, 0x00]
-        controlCommand[1] = hidReport
-        controlCommand[2] = hidModifier
-        controlCommand[3] = hidCode[0]
-        controlCommand[4] = hidCode[1]
+        keyPressSecs = commandOptions[0].get("keyPressSecs", .1)
+        keyDownCommand = commandOptions[0].get("deviceCommand", [0xff, 0x00, 0x00, 0x00, 0x00, 0x00])
+        keyUpCommand = [0xff, keyDownCommand[1], 0x00, 0x00, 0x00, 0x00]
 
         await ttyServer.deliverCommand(
             ttyOptions.ttyServer['connection'],
-            bytearray(controlCommand)
+            bytearray(keyDownCommand)
         )
         
-        controlCommand[2] = 0
-        controlCommand[3] = 0
+        time.sleep(keyPressSecs)
         
         await ttyServer.deliverCommand(
             ttyOptions.ttyServer['connection'],
-            bytearray(controlCommand)
+            bytearray(keyUpCommand)
         )
+        
     except:
         print('Abort receivedNote: ', sys.exc_info()[0])
         traceback.print_exc()

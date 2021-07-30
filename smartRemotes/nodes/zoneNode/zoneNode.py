@@ -64,17 +64,19 @@ def translateWord(controlWord, options):
             
         if(controlWord == 'Louder' and options.isFocusSet == True):
             controlWord = 'Wake'
+            options.isOn = True
             options.isFocusSet = False
             print(f'controlWord translated to: {controlWord}')
             return controlWord
             
         if(controlWord == 'SoundToggle' and options.isFocusSet == True):
             controlWord = 'Dream'
+            options.isOn = False
             options.isFocusSet = False
             print(f'controlWord translated to: {controlWord}')
             return controlWord
  
-        if(controlWord == 'SoundToggle' and options.isFocusSet == False):
+        if(controlWord == 'SoundToggle' and options.isFocusSet != True):
             if(options.isSilent == True):
                 controlWord = 'Sound'
                 options.isSilent = False
@@ -109,13 +111,13 @@ async def receivedNote(note, connection):
         #if(options.isTaskSet): return getTask(controlWord, zone)      
         if(controlWord == 'Focus'): options.isFocusSet = True; print('Set Focus Flag'); return
     
-        deviceCommands = options.commands[options.controller].get(controlWord, [])
+        controlCommands = options.wordMap[options.controller].get(controlWord, [])
                 
-        print(f'publish deviceCommands: {deviceCommands}')
-        for index, deviceCommand in enumerate(deviceCommands):
-            if(deviceCommand.get('device', None) == None): continue
-            note = noteTool.publishNote('zoneNode', 'control ' + deviceCommand['device'] + ' request', deviceCommand)
-            print(f'deliver deviceCommand({index}): {note}')
+        print(f'publish controlCommands: {controlCommands}')
+        for index, controlCommand in enumerate(controlCommands):
+            if(controlCommand.get('device', None) == None): continue
+            note = noteTool.publishNote('zoneNode', 'control ' + controlCommand['device'] + ' request', controlCommand)
+            print(f'deliver controlCommand({index}): {note}')
             await wsClient.deliverNote(note, connection)
     except:
         print('Abort receivedNote: ', sys.exc_info()[0])

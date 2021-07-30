@@ -45,7 +45,7 @@ async def receivedNote(payload):
         # validate zone
         note = noteTool.serial2object(payload)
         zone = note['content'].get('zone', None)
-        focus = note['content'].get('focus', 'Media')
+        controller = note['content'].get('focus', 'Media')
         if(zone == None):
             return print(f'Abort receivedNote, invalid zone: {zone}')
         
@@ -57,12 +57,11 @@ async def receivedNote(payload):
         #validate hub
         _zones[zone] = importlib.import_module(zone)
         
-        deviceCommands = _zones[zone].commands[focus].get(controlWord, None)
+        deviceCommands = _zones[zone].wordMap[controller].get(controlWord, None)
         if(deviceCommands == None):
             return print(f'Abort receivedNote, no deviceCommands found for {controlWord}')
 
         for index, deviceCommand in enumerate(deviceCommands):
-            #if(deviceCommand.get('device', None) == None): continue
             print(f' \n***Deliver deviceCommand: {deviceCommand}')
             _zones[zone].transactionNum += 1
             deviceCommand['id'] = _zones[zone].transactionNum

@@ -111,6 +111,7 @@ static uint8_t report_map[] = {
 
 static uint8_t report_map[] = {
 	//Report Reference Id = 1 (128 key Keyboard)
+	//Modifier Byte: bit 0 is L CTRL, bit 1 is L SHIFT, bit 2 is L ALT, bit 3 is L GUI, bit 4 is R CTRL, bit 5 is R SHIFT, bit 6 is R ALT, and bit 7 is R GUI
 	0x05, 0x01, 	  // Usage Page (Generic Desktop Ctrls)
 	0x09, 0x06, 	  // Usage (Keyboard)
 	0xa1, 0x01, 	  // Collection (Application)
@@ -396,8 +397,8 @@ void sendReport(uint8_t *buffer)
 		break;
 	case 2:
 		//consumer report data
-		consumer_report_data[0] = buffer[3]; // lowbyte Key Code
-		consumer_report_data[1] = buffer[4]; // highbyte Key Code
+		consumer_report_data[0] = buffer[2]; // lowbyte Key Code
+		consumer_report_data[1] = buffer[3]; // highbyte Key Code
 
 		result = bt_gatt_notify(NULL, &hog_svc.attrs[5], consumer_report_data, sizeof(consumer_report_data));
 		sprintf(sprintBuffer, "***Sent Consumer Report2: x%02x, x%02x result: %d", consumer_report_data[0], consumer_report_data[1], result);

@@ -11,7 +11,7 @@ focus = {
     "Down"  : "Covers",
 }
 
-commands = {
+wordMap = {
 
     'Audio': {
     },

@@ -13,7 +13,7 @@ focus = {
     "Down"  : "Security",
 }
 
-commands = {
+wordMap = {
     'Task': {
     },
     
