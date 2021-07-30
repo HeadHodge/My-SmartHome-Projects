@@ -103,15 +103,26 @@ async def receivedNote(note, connection):
 #############################################
 async def hubConnected(connection):
 #############################################
-    print(f' \n***hubConnected')
-    note = noteTool.publishNote('harmonyNode', 'subscribe', {
-        'title': 'control harmonyHub request'
-    })
-    
-    await wsClient.deliverNote(note, connection)
-    
-    print(f' \n***Wait for \'{note["content"]["title"]}\' notes...')
-    print(f'*********************************************************')
+    try:
+        print(f' \n***hubConnected')
+            
+        if hasattr(harmonyOptions, 'noteFilter'):
+            filter = harmonyOptions.noteFilter
+        else:
+            filter = {}
+
+        note = noteTool.publishNote('harmonyNode', 'subscribe', {
+            'title': 'control harmonyHub request',
+            'filter': filter
+        })
+        
+        await wsClient.deliverNote(note, connection)
+        
+        print(f' \n***Wait for \'{note["content"]["title"]}\' notes...')
+        print(f'*********************************************************')
+    except:
+        print('Abort hubConnected: ', sys.exc_info()[0])
+        traceback.print_exc()
     
 #############################################
 ##                MAIN

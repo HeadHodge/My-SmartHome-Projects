@@ -10,3 +10,7 @@ ttyServer = {
     'xonxoff'   : 0,
     'rtscts'    : 1,  
 }
+
+noteFilter = {
+    'zone': 'masterBedroom'
+}

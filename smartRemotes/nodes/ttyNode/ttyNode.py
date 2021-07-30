@@ -47,16 +47,13 @@ async def receivedNote(note, connection):
         hidReport = controlOptions[0].get("hidReport", 0x01)
         hidModifier = controlOptions[0].get("hidModifier", 0x00)
         hidCode = controlOptions[0].get("hidCode", 0x0b).to_bytes(2, "little")
-        #print(f'***code: {hidReport}, byt: {hidCode}')
         
         controlCommand = [0xff, 0x00, 0x00, 0x00, 0x00, 0x00]
         controlCommand[1] = hidReport
         controlCommand[2] = hidModifier
         controlCommand[3] = hidCode[0]
         controlCommand[4] = hidCode[1]
-        #print(f'***code: {controlCommand}')
-        
-        #print(f'use controlCommand: {bytearray(controlCommand)}')
+
         await ttyServer.deliverCommand(
             ttyOptions.ttyServer['connection'],
             bytearray(controlCommand)
@@ -69,8 +66,6 @@ async def receivedNote(note, connection):
             ttyOptions.ttyServer['connection'],
             bytearray(controlCommand)
         )
-        
-        #threading.Thread(target=ttyServer.deliverReports, args=(ttyOptions.ttyServer['connection'],)).start()
     except:
         print('Abort receivedNote: ', sys.exc_info()[0])
         traceback.print_exc()
@@ -78,16 +73,26 @@ async def receivedNote(note, connection):
 #############################################
 async def hubConnected(connection):
 #############################################
-    print(f' \n***hubConnected')
-    
-    note = noteTool.publishNote('gattNode', 'subscribe', {
-        'title': 'control ttyClient request'
-    })
-    
-    await wsClient.deliverNote(note, connection)
-    
-    print(f' \n***Wait for \'{note["content"]["title"]}\' notes...')
-    print(f'*********************************************************')
+    try:
+        print(f' \n***hubConnected')
+        
+        if hasattr(ttyOptions, 'noteFilter'):
+            filter = ttyOptions.noteFilter
+        else:
+            filter = {}
+       
+        note = noteTool.publishNote('gattNode', 'subscribe', {
+            'title' : 'control ttyClient request',
+            'filter': filter
+        })
+        
+        await wsClient.deliverNote(note, connection)
+        
+        print(f' \n***Wait for \'{note["content"]["title"]}\' notes...')
+        print(f'*********************************************************')
+    except:
+        print('Abort hubConnected: ', sys.exc_info()[0])
+        traceback.print_exc()
    
 #############################################
 def start():
@@ -95,14 +100,6 @@ def start():
     print('Start ttyNode')
 
     try:
-        '''
-        # Validate process args
-        if len(sys.argv) < 3: 
-            print('Terminate usb2hassio, missing required zone name and/or event list arguments')
-            print('Example: python3 usb2hassio.py masterBedroom 3,4,5,6')
-            sys.exit()
-        '''
-        
         time.sleep(3)
          
         # Start wsClient module

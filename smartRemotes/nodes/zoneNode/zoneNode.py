@@ -89,31 +89,7 @@ def translateWord(controlWord, options):
     except:
         print('Abort translateNote: ', sys.exc_info()[0])
         traceback.print_exc()
-'''
-#############################################
-def translateNote(note):
-#############################################
-    try:
-        global _zoneOptions
-        controlWord = note['content'].get('controlWord', None)
-        zone = note['content'].get('zone', 'home')
-        print(f'translateNote controlWord: {controlWord}, zone: {zone}')
 
-        #validate zone
-        _zoneOptions[zone] = importlib.import_module(zone)
-        options = _zoneOptions[zone]
-        controlWord = transformWord(controlWord, options)
-        
-        if(options.isFocusSet): return setFocus(controlWord, zone)
-        if(options.isTaskSet): return getTask(controlWord, zone)
-      
-        if(controlWord == 'Focus'): options.isFocusSet = True; print('Set Focus Flag'); return [] 
-    
-        return options.commands[options.controller].get(controlWord, [])
-    except:
-        print('Abort translateNote: ', sys.exc_info()[0])
-        traceback.print_exc()
-'''
 #############################################
 async def receivedNote(note, connection):
 #############################################

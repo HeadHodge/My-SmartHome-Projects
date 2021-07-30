@@ -52,10 +52,8 @@ async def receivedNote(note, connection=None):
                 
         for index, subscriber in enumerate(subscribers):
             try:
-                #if(subscriber == None): continue
                 filter = subscribers[subscriber]["noteFilter"]
                 connection = subscribers[subscriber]["connection"]
-                #receiveNote = subscribers[subscriber]["receiveNote"]
                 print(f'deliver to subscriber{index}: {subscriber}')
                 print(f'apply note filter: {filter}')
                 isValid = True

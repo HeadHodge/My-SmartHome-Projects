@@ -72,41 +72,6 @@ async def receivedNote(payload):
     except:
         print('Abort receivedNote: ', sys.exc_info()[0])
         traceback.print_exc()
-    
-    
-    
-    
-    
-    
-    
-    return
-    '''
-    keyCode = note.get('keyCode', None)
-    zone = note.get('zone', 'home')
-    if(keyCode == None): print(f'Abort inPosts, invalid keyCode: {keyCode}'); return
-    
-    hassioSequence = map2hassio.keyCode2hassio(keyCode, zone)
-    if(hassioSequence == None): print(f'Abort inUserEvent, invalid keyCode: "{keyCode}"'); return
-    
-    for task in hassioSequence:
-        key = list(task.keys())[0]
-        data = task[key]
-        command = key.split('/')
-        if(command[0] == 'sleep'): time.sleep(int(data)); continue
-        
-        _sessionId += 1
-        
-        payload = {
-            "id": _sessionId, 
-            "type": "call_service",	
-            "domain": command[0],
-            "service": command[1],
-            "service_data": data
-        }
-
-        print(f' \n***outTRANSFER: {payload}')
-        await _outOptions['transfer'](payload, _outOptions)
-    '''
  
 #############################################
 async def hubConnected():
@@ -114,9 +79,15 @@ async def hubConnected():
     try:
         print(f' \n***hubConnected')
         
+        if hasattr(hassioOptions, 'noteFilter'):
+            filter = hassioOptions.noteFilter
+        else:
+            filter = {}
+
         note = noteTool.publishNote('zoneNode', 'subscribe', {
             'title': 'control hassioNode request',
-        })
+            'filter': filter
+       })
         
         print(f' \n***Deliver Note: {note}')
         await wsioClient.deliverPayload(note, hassioOptions.hubNode['connection'])
