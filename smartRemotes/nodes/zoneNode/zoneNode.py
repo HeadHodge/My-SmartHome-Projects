@@ -12,17 +12,7 @@ sys.path.append(path)
 import time, traceback, queue, threading, asyncio, importlib
 import wsClient, json, noteTool, zoneOptions
 
-_zoneOptions = {}
-
-##########################################
-def getTask(keyCode, zone):
-##########################################
-    #print(f'Enter onSelectTask with {keyCode} in zone: {zone}')
-    global _zoneOptions
-    task = None
-
-    _zoneOptions[zone].isTaskSet = None
-    return _zoneOptions[zone].tasks.get(keyCode, None)
+_zoneOptions ={}
     
 ##########################################
 def setFocus(controlWord, zone):
@@ -46,34 +36,34 @@ def translateWord(controlWord, options):
             controlWord = 'On'
             options.isOn = True
             options.isFocusSet = False
-            print(f'controlWord translated to: {controlWord}')
+            #print(f'controlWord translated to: {controlWord}')
             return controlWord
             
         if(controlWord == 'PowerToggle' and options.isFocusSet != True):
             controlWord = 'Off'
             options.isOn = False
             options.isFocusSet = False
-            print(f'controlWord translated to: {controlWord}')
+            #print(f'controlWord translated to: {controlWord}')
             return controlWord
             
         if(controlWord == 'Softer' and options.isFocusSet == True):
             controlWord = 'Sleep'
             options.isFocusSet = False
-            print(f'controlWord translated to: {controlWord}')
+            #print(f'controlWord translated to: {controlWord}')
             return controlWord
             
         if(controlWord == 'Louder' and options.isFocusSet == True):
             controlWord = 'Wake'
             options.isOn = True
             options.isFocusSet = False
-            print(f'controlWord translated to: {controlWord}')
+            #print(f'controlWord translated to: {controlWord}')
             return controlWord
             
         if(controlWord == 'SoundToggle' and options.isFocusSet == True):
             controlWord = 'Dream'
             options.isOn = False
             options.isFocusSet = False
-            print(f'controlWord translated to: {controlWord}')
+            #print(f'controlWord translated to: {controlWord}')
             return controlWord
  
         if(controlWord == 'SoundToggle' and options.isFocusSet != True):
@@ -84,7 +74,7 @@ def translateWord(controlWord, options):
                 controlWord = 'Silence'
                 options.isSilent = True
                 
-            print(f'controlWord translated to: {controlWord}')
+            #print(f'controlWord translated to: {controlWord}')
             return controlWord
             
         return controlWord
@@ -93,38 +83,36 @@ def translateWord(controlWord, options):
         traceback.print_exc()
 
 #############################################
-async def receivedNote(note, connection):
+async def receivedNote(note):
 #############################################
     try:
-        print(f' \n***receivedNote: {note}')
+        print(f' \n***Received note: {note}')
         global _zoneOptions
-        
-        #deviceCommands = translateNote(note)
         
         controlWord = note['content'].get('controlWord', None)
         zone = note['content'].get('zone', 'home')
         _zoneOptions[zone] = importlib.import_module(zone)
+        
         options = _zoneOptions[zone]
         controlWord = translateWord(controlWord, options)
-        
         if(options.isFocusSet): return setFocus(controlWord, zone)
-        #if(options.isTaskSet): return getTask(controlWord, zone)      
         if(controlWord == 'Focus'): options.isFocusSet = True; print('Set Focus Flag'); return
-    
         controlCommands = options.wordMap[options.controller].get(controlWord, [])
                 
-        print(f'publish controlCommands: {controlCommands}')
+        #print(f'publish controlCommands: {controlCommands}')
         for index, controlCommand in enumerate(controlCommands):
             if(controlCommand.get('device', None) == None): continue
             note = noteTool.publishNote('zoneNode', 'control ' + controlCommand['device'] + ' request', controlCommand)
-            print(f'deliver controlCommand({index}): {note}')
-            await wsClient.deliverNote(note, connection)
+            print(f'***Deliver note({index}): {note}')
+            await wsClient.deliverPayload(note, zoneOptions.wsClient['connection'])
+        
+        print(f'*********************************************************')
     except:
         print('Abort receivedNote: ', sys.exc_info()[0])
         traceback.print_exc()
 
 #############################################
-async def hubConnected(connection):
+async def hubConnected():
 #############################################
     try:
         print(f' \n***hubConnected')
@@ -132,7 +120,7 @@ async def hubConnected(connection):
             'title': 'control device request',
         })
         
-        await wsClient.deliverNote(note, connection)
+        await wsClient.deliverPayload(note, zoneOptions.wsClient['connection'])
         
         print(f' \n***Wait for \'control device request\' notes...')
         print(f'*********************************************************')

@@ -1,3 +1,5 @@
 wsClient = {
-    "hubNode": "ws://192.168.0.219:8080/",
+    "endPoint"    : "ws://192.168.0.219:8080/",
+    "onConnection": "hubConnected",
+    "onReceived"  : "receivedNote",
 }

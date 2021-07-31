@@ -1,7 +1,7 @@
 #############################################
-##            GLOBAL VARIABLES
+##              usbBridge
 #############################################
-print('Load usbServer')
+print('Load usbBridge')
 
 from evdev import InputDevice, categorize, ecodes
 import sys, time, json, threading, traceback, asyncio
@@ -10,28 +10,16 @@ import noteTool
 _parent = sys.modules["__main__"]
         
 ############################
-def captureInput(channel):
+def captureInput(zone, channel):
 ############################
-    #print(f'captureInput on channel: {channel}')
+    print(f'captureInput on channel: {channel} in zone: {zone}')
     
-    zone = _parent._zone
     lastCode = 0
     lastTime = time.time()
     device = InputDevice(f'/dev/input/event{channel}')
     device.grab()
     postTime = 0
         
-    print(f'grabbed: {device} in zone: {zone}')
-    '''
-    keyData = {
-        "scanTime" : 0,
-        "scanCode" : 0,
-        "keyCode"  : 0,
-        "channel"  : channel,
-        "device"   : device.name,
-        "zone"     : zone
-    }
-    '''    
     startTime = 0
     startCode = 0
             
@@ -47,7 +35,7 @@ def captureInput(channel):
             
             #print(keyEvent)
             
-            note = _parent.noteTool.publishNote('usbServer', 'captured usbInput', {
+            note = _parent.noteTool.publishNote('usbBridge', 'captured usbInput', {
                 "keyCode" : keyEvent.keycode,
                 "scanCode": keyEvent.scancode,
                 "channel" : channel,
@@ -63,22 +51,26 @@ def captureInput(channel):
             traceback.print_exc()
 
 ###################
-# start
+#     start
 ###################
-def start():
-    print('Start usbServer')
+def start(options={}):
+    print('Start usbBridge')
 
     try:
+        time.sleep(3)
         print(' \n***Grab USB Devices:')
+    
+        zone = options.get('zone','home')
+        channels = options.get('channels', '0,1,2,3').split(',')
         
-        for channel in _parent._channels:
-            threading.Thread(target=captureInput, args=(channel,)).start()
+        for channel in channels:
+            threading.Thread(target=captureInput, args=(zone, channel,)).start()
         
         time.sleep(1)
         print(' \n========================================================')
 
     except:
-        print('Abort usbServer', sys.exc_info()[0])
+        print('Abort usbBridge', sys.exc_info()[0])
         traceback.print_exc()
     
 #############################################

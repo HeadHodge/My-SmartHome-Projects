@@ -10,13 +10,8 @@ sys.path.append(path)
 path = os.path.join(os.path.dirname(__file__), '../../imports/network')
 sys.path.append(path)
 
-import wsClient, usbServer, usbOptions, noteTool
+import wsClient, usbBridge, usbOptions, noteTool
 
-# Global Variables
-_zone = 'home'
-_channels = []
-_wsConnection = None
-   
 #############################################
 async def receivedNote(note):
 #############################################
@@ -26,18 +21,19 @@ async def receivedNote(note):
     scanCodeMap = usbOptions.scanCodeMap.get(scanCode, None)
     if(scanCodeMap == None): return print(f'Abort receivedNote, invalid scanCode: {scanCode}')
 
-    note = noteTool.publishNote('usbNode', 'control device request', {'scanCode': scanCode, 'controlWord': scanCodeMap["controlWord"], 'zone': _zone})
-    #print(f'deliver note: {note}')
-    await wsClient.deliverNote(note, _wsConnection)
+    note = noteTool.publishNote('usbNode', 'control device request', {
+        'scanCode': scanCode,
+        'controlWord': scanCodeMap["controlWord"],
+        'zone': usbOptions.usbBridge['zone'],
+    })
+
+    await wsClient.deliverPayload(note, usbOptions.wsClient['connection'])
 
 #############################################
-async def hubConnected(connection):
+async def hubConnected():
 #############################################
     try:
         print(f' \n***hubConnected')
-        global _wsConnection
-        
-        _wsConnection = connection
     except:
         print('Abort hubConnected: ', sys.exc_info()[0])
         traceback.print_exc()
@@ -47,24 +43,15 @@ async def hubConnected(connection):
 #############################################
 try:
     time.sleep(3)
-
-    # Initialize globals from cmd line
-    if len(sys.argv) < 3: 
+   
+    # Start usbBridge Module
+    try:
         print('Terminate usbNode, missing required zone name and/or event list arguments')
         print('Example: python3 usb2hassio.py masterBedroom 3,4,5,6')
         print('Run "python3 -m evdev.evtest" to list valid devices')
-        sys.exit()
-        
-    _zone = sys.argv[1]
-    _channels = sys.argv[2].split(',')
-    
-    time.sleep(1)
-    
-    # Start usbServer Module
-    try:
-        threading.Thread(target=usbServer.start).start()
+        threading.Thread(target=usbBridge.start, args=(usbOptions.usbBridge,)).start()
     except:
-        print('Abort usbServer: ', sys.exc_info()[0])
+        print('Abort usbBridge: ', sys.exc_info()[0])
         traceback.print_exc()
 
     time.sleep(1)

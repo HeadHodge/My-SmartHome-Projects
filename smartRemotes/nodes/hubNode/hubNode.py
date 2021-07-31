@@ -10,9 +10,9 @@ import os, sys
 path = os.path.join(os.path.dirname(__file__), '../../imports/network')
 sys.path.append(path)
 
-#import usbServer, gattServer, httpServer, wsioServer, wsClient, btDevice, btProfile, keyMaps, map2hassio
+#import usbServer, gattServer, httpServer, wsServer, wsClient, btDevice, btProfile, keyMaps, map2hassio
 import time, json, asyncio, traceback, queue, threading, importlib
-import httpServer, wsioServer, noteTool, hubOptions
+import httpServer, wsServer, noteTool, hubOptions
 
 _titles = {}
     
@@ -30,16 +30,16 @@ def subscribeNote(note, connection=None):
     print(f'\'{title}\': subscribed')      
     
 #############################################
-async def receivedNote(note, connection=None):
+async def receivedPayload(connection, note):
 #############################################
     try:
-        print(f' \n***receiveNote: {note}')
+        print(f' \n***receivedNote: {note}')
         title = note.get("title", 'untitled')
         
         #send receipt to client
         if(note.get('deliverReceipt', False) == True or (hasattr('hubOptions', 'deliverReceipts') == True and hubOptions.deliverReceipts == True)):
             receipt = noteTool.publishNote('hubNode', 'note receipt', {'state': 'received', 'title': note['title'], 'time': note['time']})
-            await wsioServer.deliverNote(receipt, connection)
+            await wsServer.deliverPayload(hubOptions.wsServer['connection'], receipt)
         
         #subscribe note
         if(note['title'].casefold() == 'subscribe'):
@@ -68,13 +68,13 @@ async def receivedNote(note, connection=None):
                         break
 
                 if(isValid == False): continue
-                await wsioServer.deliverNote(note, connection)                
+                await wsServer.deliverPayload(connection, note)                
                 print(f'***note delivered: \'{title}\'')
             except:
                 #_titles[title].pop(subscriber)
-                traceback.print_exc()
-                unsubscribeList.append(subscriber)
+                #traceback.print_exc()
                 print(f'***note undelivered: ', sys.exc_info()[0])
+                unsubscribeList.append(subscriber)
                 
         #unsubscribe disconnected subscribers
         for subscriber in unsubscribeList:
@@ -89,35 +89,12 @@ async def receivedNote(note, connection=None):
 #############################################
 def start():
 #############################################
-
-    try:
-        '''
-        #start local nodes
-        try:
-            for node in options.localNodes:
-                print(f'subscribe to: {node["subscribe"]}')
-                path = os.path.join(os.path.dirname(__file__), '../' + node['name'])
-                sys.path.append(path)
-                module = importlib.import_module(node['name'])
-                class clientInfo: pass
-                setattr(clientInfo, 'send_obj', receiveNote)
-                note = noteTool.publishNote('hubNode', 'subscribe', {
-                    'title': node["subscribe"],
-                    'filter': node["filter"]
-                })
-                
-                subscribeNote(note, module.receiveNote, clientInfo)
-                time.sleep(3)
-        except:
-            print('Abort add local subscribers: ', sys.exc_info()[0])
-            traceback.print_exc()
-        '''
-     
-        #Start wsioServer Module
+    try:     
+        #Start wsServer Module
         time.sleep(3)
   
         try:
-            threading.Thread(target=wsioServer.start, args=(hubOptions.wsioServer,)).start()
+            threading.Thread(target=wsServer.start, args=(hubOptions.wsServer,)).start()
         except:
             print('Abort wsServer: ', sys.exc_info()[0])
             traceback.print_exc()

@@ -1,6 +1,12 @@
 wsClient = {
-    "hubNode": "ws://192.168.0.162:8080/",
-    #"hubNode": "ws://192.168.0.222:8080/",
+    "endPoint": "ws://192.168.0.219:8080/",
+    "onConnection": "hubConnected",
+    "onReceived": "receivedNote",
+}
+
+usbBridge = {
+    "zone"    : "masterBedroom",
+    "channels": "0,1,2,3",
 }
 
 scanCodeMap = {

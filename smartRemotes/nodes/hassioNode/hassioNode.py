@@ -10,7 +10,7 @@ sys.path.append(path)
 path = os.path.join(os.path.dirname(__file__), './zones')
 sys.path.append(path)
 
-import wsioClient, hassioOptions, noteTool
+import wsClient, hassioOptions, noteTool
 
 _transactionNum = 0
 
@@ -66,7 +66,7 @@ async def receivedNote(payload):
             _zones[zone].transactionNum += 1
             deviceCommand['id'] = _zones[zone].transactionNum
             payload = deviceCommand
-            await wsioClient.deliverPayload(payload, hassioOptions.hassioNode['connection'])
+            await wsClient.deliverPayload(payload, hassioOptions.hassioNode['connection'])
 
     except:
         print('Abort receivedNote: ', sys.exc_info()[0])
@@ -89,7 +89,7 @@ async def hubConnected():
        })
         
         print(f' \n***Deliver Note: {note}')
-        await wsioClient.deliverPayload(note, hassioOptions.hubNode['connection'])
+        await wsClient.deliverPayload(note, hassioOptions.hubNode['connection'])
         
         print(f' \n***Wait for control device requests...')
         print(f'**************************************')
@@ -111,7 +111,7 @@ async def receivedConfirmation(confirmation):
         }
                       
         print(f' \n***deliverPayload: {payload}')
-        await wsioClient.deliverPayload(payload, hassioOptions.hassioNode['connection'])
+        await wsClient.deliverPayload(payload, hassioOptions.hassioNode['connection'])
     
     print(f' \n***Wait for hassio control confirmations...')
     print(f'**********************************************')
@@ -136,7 +136,7 @@ try:
     
     # Start connect hassioNode
     try:
-        threading.Thread(target=wsioClient.start, args=(hassioOptions.hassioNode,)).start()
+        threading.Thread(target=wsClient.start, args=(hassioOptions.hassioNode,)).start()
     except:
         print('Abort connect hassioNode: ', sys.exc_info()[0])
         traceback.print_exc()
@@ -145,7 +145,7 @@ try:
     
     # Start connect hubNode
     try:
-        threading.Thread(target=wsioClient.start, args=(hassioOptions.hubNode,)).start()
+        threading.Thread(target=wsClient.start, args=(hassioOptions.hubNode,)).start()
     except:
         print('Abort connect hubNode: ', sys.exc_info()[0])
         traceback.print_exc()
