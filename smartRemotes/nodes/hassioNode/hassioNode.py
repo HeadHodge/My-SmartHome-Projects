@@ -36,14 +36,13 @@ _outOptions = {
 }
  
 #############################################
-async def receivedNote(payload):
+async def receivedNote(note):
 #############################################
     try:
-        print(f' \n***Received Note: {payload}')    
+        print(f' \n***Received Note: {note}')    
         global _zones
         
         # validate zone
-        note = noteTool.serial2object(payload)
         zone = note['content'].get('zone', None)
         controller = note['content'].get('focus', 'Media')
         if(zone == None):
@@ -66,7 +65,7 @@ async def receivedNote(payload):
             _zones[zone].transactionNum += 1
             deviceCommand['id'] = _zones[zone].transactionNum
             payload = deviceCommand
-            await wsClient.deliverPayload(payload, hassioOptions.hassioNode['connection'])
+            await wsClient.deliverPayload(hassioOptions.hassioNode['connection'], payload)
 
     except:
         print('Abort receivedNote: ', sys.exc_info()[0])
@@ -89,7 +88,7 @@ async def hubConnected():
        })
         
         print(f' \n***Deliver Note: {note}')
-        await wsClient.deliverPayload(note, hassioOptions.hubNode['connection'])
+        await wsClient.deliverPayload(hassioOptions.hubNode['connection'], note)
         
         print(f' \n***Wait for control device requests...')
         print(f'**************************************')
@@ -102,16 +101,16 @@ async def receivedConfirmation(confirmation):
 #############################################
     print(f' \n***receivedConfirmation: {confirmation}')
 
-    content = json.loads(confirmation)
+    #content = json.loads(confirmation)
     
-    if(content['type'] == "auth_required"):
+    if(confirmation['type'] == "auth_required"):
         payload = {
             "type": "auth",
             "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiI1NmVhNzU3ODkzMDE0MTMzOTJhOTZiYmY3MTZiOWYyOCIsImlhdCI6MTYxNDc1NzQ2OSwiZXhwIjoxOTMwMTE3NDY5fQ.K2WwAh_9OjXZP5ciIcJ4lXYiLcSgLGrC6AgTPeIp8BY"
         }
                       
         print(f' \n***deliverPayload: {payload}')
-        await wsClient.deliverPayload(payload, hassioOptions.hassioNode['connection'])
+        await wsClient.deliverPayload(hassioOptions.hassioNode['connection'], payload)
     
     print(f' \n***Wait for hassio control confirmations...')
     print(f'**********************************************')

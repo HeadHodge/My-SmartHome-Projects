@@ -104,7 +104,7 @@ async def receivedNote(note):
             if(controlCommand.get('device', None) == None): continue
             note = noteTool.publishNote('zoneNode', 'control ' + controlCommand['device'] + ' request', controlCommand)
             print(f'***Deliver note({index}): {note}')
-            await wsClient.deliverPayload(note, zoneOptions.wsClient['connection'])
+            await wsClient.deliverPayload(zoneOptions.wsClient['connection'], note)
         
         print(f'*********************************************************')
     except:
@@ -120,7 +120,7 @@ async def hubConnected():
             'title': 'control device request',
         })
         
-        await wsClient.deliverPayload(note, zoneOptions.wsClient['connection'])
+        await wsClient.deliverPayload(zoneOptions.wsClient['connection'], note)
         
         print(f' \n***Wait for \'control device request\' notes...')
         print(f'*********************************************************')

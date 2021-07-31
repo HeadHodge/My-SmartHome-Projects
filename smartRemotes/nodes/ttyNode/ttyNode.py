@@ -14,12 +14,12 @@ sys.path.append(path)
 path = os.path.join(os.path.dirname(__file__), './zones')
 sys.path.append(path)
 
-import wsClient, ttyServer, ttyOptions, noteTool
+import wsClient, ttyBridge, ttyOptions, noteTool
 
 _zones = {}
 
 #############################################
-async def receivedNote(note, connection):
+async def receivedNote(note):
 #############################################
     try:
         print(f' \n***receivedNote: {note}')
@@ -48,15 +48,15 @@ async def receivedNote(note, connection):
         keyDownCommand = commandOptions[0].get("deviceCommand", [0xff, 0x00, 0x00, 0x00, 0x00, 0x00])
         keyUpCommand = [0xff, keyDownCommand[1], 0x00, 0x00, 0x00, 0x00]
 
-        await ttyServer.deliverCommand(
-            ttyOptions.ttyServer['connection'],
+        await ttyBridge.deliverCommand(
+            ttyOptions.ttyBridge['connection'],
             bytearray(keyDownCommand)
         )
         
         time.sleep(keyPressSecs)
         
-        await ttyServer.deliverCommand(
-            ttyOptions.ttyServer['connection'],
+        await ttyBridge.deliverCommand(
+            ttyOptions.ttyBridge['connection'],
             bytearray(keyUpCommand)
         )
         
@@ -65,7 +65,7 @@ async def receivedNote(note, connection):
         traceback.print_exc()
 
 #############################################
-async def hubConnected(connection):
+async def hubConnected():
 #############################################
     try:
         print(f' \n***hubConnected')
@@ -80,7 +80,7 @@ async def hubConnected(connection):
             'filter': filter
         })
         
-        await wsClient.deliverNote(note, connection)
+        await wsClient.deliverPayload(ttyOptions.wsClient['connection'], note)
         
         print(f' \n***Wait for \'{note["content"]["title"]}\' notes...')
         print(f'*********************************************************')
@@ -105,11 +105,11 @@ def start():
         
         time.sleep(1)
        
-        # Start ttyServer module
+        # Start ttyBridge module
         try:            
-            threading.Thread(target=ttyServer.start, args=(ttyOptions.ttyServer,)).start()
+            threading.Thread(target=ttyBridge.start, args=(ttyOptions.ttyBridge,)).start()
         except:
-            print('Abort ttyServer: ', sys.exc_info()[0])
+            print('Abort ttyBridge: ', sys.exc_info()[0])
             traceback.print_exc()
 
         time.sleep(1)

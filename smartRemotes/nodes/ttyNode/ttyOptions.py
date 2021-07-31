@@ -1,8 +1,10 @@
 wsClient = {
-    "hubNode": "ws://192.168.0.219:8080/",
+    "endPoint": "ws://192.168.0.219:8080/",
+    "onConnection": "hubConnected",
+    "onReceived": "receivedNote",
 }
 
-ttyServer = {
+ttyBridge = {
     'port'      : '/dev/ttyACM0',
     'speed'     : 115200,
     'timeout'   : None,
