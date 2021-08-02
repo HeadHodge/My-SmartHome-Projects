@@ -13,7 +13,8 @@ sys.path.append(path)
 
 from aioharmony.harmonyapi import HarmonyAPI, SendCommandDevice
 from aioharmony.const import ClientCallbackType, WEBSOCKETS, XMPP
-import wsClient, aioharmony.__main__ as harmonyHub, harmonyOptions, noteTool
+import wsClient, noteTool, harmonyOptions
+import aioharmony.__main__ as harmonyHub
 
 _hubOptions = {}
 
@@ -116,7 +117,7 @@ async def hubConnected(connection):
             'filter': filter
         })
         
-        await wsClient.deliverNote(note, connection)
+        await wsClient.deliverNote(connection, note)
         
         print(f' \n***Wait for \'{note["content"]["title"]}\' notes...')
         print(f'*********************************************************')

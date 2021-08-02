@@ -27,7 +27,7 @@ async def receivedNote(note):
         'zone': usbOptions.usbBridge['zone'],
     })
 
-    await wsClient.deliverPayload(note, usbOptions.wsClient['connection'])
+    await wsClient.deliverPayload(usbOptions.wsClient['connection'], note)
 
 #############################################
 async def hubConnected():

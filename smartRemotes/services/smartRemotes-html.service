@@ -1,9 +1,0 @@
-[Unit]
-Description=smartRemotes hub
-After=network.target
-
-[Service]
-ExecStart=python3 -u /smartRemotes/nodes/htmlNode/htmlNode.py
-
-[Install]
-WantedBy=multi-user.target

@@ -305,7 +305,6 @@ class ProtocolModeCharacteristic(gattApplication.Characteristic):
         print(f'Write ProtocolMode {value}')
         self.value = value
         
-'''
 #sourceId="org.bluetooth.characteristic.hid_control_point" uuid="2A4C"
 class ControlPointCharacteristic(gattApplication.Characteristic):
 
@@ -324,109 +323,6 @@ class ControlPointCharacteristic(gattApplication.Characteristic):
     def WriteValue(self, value, options):
         print(f'Write ControlPoint {value}')
         self.value = value
-
-
-#id="report" name="Report" sourceId="org.bluetooth.characteristic.report" uuid="2A4D"        
-class Report1Characteristic(gattApplication.Characteristic):
-
-    CHARACTERISTIC_UUID = '2A4D'
-
-    def __init__(self, bus, index, service):
-        gattApplication.Characteristic.__init__(
-                self, bus, index,
-                self.CHARACTERISTIC_UUID,
-                ['read', 'notify'],
-                service)
-                
-'''
-'''
-        <Field name="Report Value">
-        <Requirement>Mandatory</Requirement>
-        <Format>uint8</Format>
-        <Repeated>true</Repeated>
-        </Field>
-        
-        Use standard key codes: https://www.usb.org/sites/default/files/documents/hut1_12v2.pdf
-'''
-'''
-        
-        self.add_descriptor(Report1ReferenceDescriptor(bus, 1, self))
-        
-        self.isConnected = False
-        self.value = [dbus.Byte(0x00),dbus.Byte(0x00)]
-        #print(f'***Report value***: {self.value}')
-       
-    def sendKey(self, keyBytes, keyHold):
-        #send keyCode
-        print(f' \n***Send report1 keyCode: {[hex(x) for x in keyBytes]}, keyHold: {keyHold}***');
-        #if(self.isConnected == False): print('Abort Report1: Not connected to client'); return
-        #self.PropertiesChanged(GATT_CHRC_IFACE, { 'Value': [dbus.Byte(0x02),dbus.Byte(0x10)] }, [])
-        self.PropertiesChanged(GATT_CHRC_IFACE, { 'Value': [dbus.Byte(keyBytes[0]),dbus.Byte(keyBytes[1])] }, [])
-        GLib.timeout_add(keyHold, self.sendNull)
-        
-    def sendNull(self):
-        self.PropertiesChanged(GATT_CHRC_IFACE, { 'Value': [dbus.Byte(0x00),dbus.Byte(0x00)] }, [])
-        return False
-                
-    def ReadValue(self, options):
-        print(f'Read Report: {self.value}')
-        return self.value
-
-    def StartNotify(self):
-        print(f' \n***CONNECTED: Report1 Client')
-        self.isConnected = True
-        #GLib.timeout_add(10000, self.send)
-
-    def StopNotify(self):
-        print(f' \n***DISCONNECTED: Report1 Client')
-        self.isConnected = False
-
-
-#type="org.bluetooth.descriptor.report_reference" uuid="2908"
-class Report1ReferenceDescriptor(gattApplication.Descriptor):
-
-    DESCRIPTOR_UUID = '2908'
-
-    def __init__(self, bus, index, characteristic):
-        gattApplication.Descriptor.__init__(
-                self, bus, index,
-                self.DESCRIPTOR_UUID,
-                ['read'],
-                characteristic)
-                
-'''
-'''
-        <Field name="Report ID">
-            <Requirement>Mandatory</Requirement>
-            <Format>uint8</Format>
-            <Minimum>0</Minimum>
-            <Maximum>255</Maximum>
-        </Field>
-        
-        <Field name="Report Type">
-            <Requirement>Mandatory</Requirement>
-            <Format>uint8</Format>
-            <Minimum>1</Minimum>
-            <Maximum>3</Maximum>
-            <Enumerations>
-                <Enumeration value="Input Report" key="1"/>
-                <Enumeration value="Output report" key="2"/>
-                <Enumeration value="Feature Report" key="3"/>
-                <ReservedForFutureUse start="4" end="255"/>
-                <ReservedForFutureUse1 start1="0" end1="0"/>
-            </Enumerations>
-        </Field>
-'''
-'''
-        # This report uses ReportId 1 as defined in the ReportMap characteristic
-        self.value = dbus.Array(bytearray.fromhex('0101'), signature=dbus.Signature('y'))
-        #print(f'***ReportReference***: {self.value}')
-
-    def ReadValue(self, options):
-        print(f'Read ReportReference: {self.value}')
-        return self.value
-'''
-
 
 #############################################
 def onConnectSignal(interface, changed, data=[]):
@@ -447,7 +343,7 @@ def onConnectSignal(interface, changed, data=[]):
     os.system("hcitool -i hci0 cmd 0x08 0x000a 01")
 
 ####################################
-async def receivedCommand(controlCommand):
+async def deliverCommand(controlCommand):
 ####################################
     try:
         #controlCommand = {"controlWord": "Menu", "hidCode": 0x40, "hidReport": 2}               

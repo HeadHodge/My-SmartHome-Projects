@@ -3,3 +3,8 @@ wsClient = {
     "onConnection": "hubConnected",
     "onReceived"  : "receivedNote",
 }
+
+hidServer = {
+    'controlPort'  : 17,
+    'interruptPort': 19,
+}

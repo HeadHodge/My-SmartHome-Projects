@@ -1,0 +1,9 @@
+[Unit]
+Description=smartRemotes-hogNode
+After=network.target
+
+[Service]
+ExecStart=python3 -u /smartRemotes/nodes/hogNode/hogNode.py
+
+[Install]
+WantedBy=multi-user.target

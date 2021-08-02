@@ -1,0 +1,9 @@
+[Unit]
+Description=smartRemotes http
+After=network.target
+
+[Service]
+ExecStart=python3 -u -m http.server 80 --directory /smartRemotes/nodes/httpNode
+
+[Install]
+WantedBy=multi-user.target

@@ -1,20 +1,20 @@
 #############################################
-##            gattNode
+##                 hogNode
 #############################################
-print('Load gattNode')
+print('Load hogNode')
 
 from multiprocessing import Process
 from dbus.mainloop.glib import DBusGMainLoop
 import os, sys, time, json, asyncio, traceback, queue, threading, importlib
 
-path = os.path.join(os.path.dirname(__file__), '../../imports/ble')
+path = os.path.join(os.path.dirname(__file__), '../../imports/bt-le')
 sys.path.append(path)
 path = os.path.join(os.path.dirname(__file__), '../../imports/network')
 sys.path.append(path)
 path = os.path.join(os.path.dirname(__file__), './zones')
 sys.path.append(path)
 
-import wsClient, noteTool, hidKeyboard, hidOptions
+import wsClient, noteTool, hogBridge, hogOptions
 
 _zones = {}
 
@@ -52,7 +52,7 @@ async def receivedNote(note, connection):
             importlib.reload(_zones[zone])
               
         #controlCommand = [{"controlWord": "Menu", "hidCode": 0x40, "hidReport": 2}]              
-        await hidKeyboard.receivedCommand(controlCommand[0])
+        await hogBridge.receivedCommand(controlCommand[0])
     except:
         print('Abort receivedNote: ', sys.exc_info()[0])
         traceback.print_exc()
@@ -63,17 +63,17 @@ async def hubConnected(connection):
     try:
         print(f' \n***hubConnected')
             
-        if hasattr(hidOptions, 'noteFilter'):
-            filter = hidOptions.noteFilter
+        if hasattr(hogOptions, 'noteFilter'):
+            filter = hogOptions.noteFilter
         else:
             filter = {}
         
-        note = noteTool.publishNote('gattNode', 'subscribe', {
+        note = noteTool.publishNote('hogNode', 'subscribe', {
             'title': 'control hidClient request',
             'filter': filter
         })
         
-        await wsClient.deliverNote(note, connection)
+        await wsClient.deliverNote(connection, note)
         
         print(f' \n***Wait for \'{note["content"]["title"]}\' notes...')
         print(f'*********************************************************')
@@ -84,30 +84,14 @@ async def hubConnected(connection):
 #############################################
 def start():
 #############################################
-    print('Start gattNode')
+    print('Start hogNode')
 
-    try:
-        '''
-        # Validate process args
-        if len(sys.argv) < 3: 
-            print('Terminate usb2hassio, missing required zone name and/or event list arguments')
-            print('Example: python3 usb2hassio.py masterBedroom 3,4,5,6')
-            sys.exit()
-        '''
-        
+    try:        
         time.sleep(3)
         
         # Start gattServer module
         try:            
-            #_btControlOptions['userEvent'] = btControlEvent
-            #_btControlOptions['channel'] = options["controlPort"]
-            #threading.Thread(target=btServer.start, args=(_btControlOptions,)).start()
-
-            #_btTransferOptions['userEvent'] = btTransferEvent
-            #_btTransferOptions['channel'] = options["interruptPort"]
-            #threading.Thread(target=btServer.start, args=(_btTransferOptions,)).start()
-            
-            threading.Thread(target=hidKeyboard.start, args=(hidOptions.hidServer,)).start()
+            threading.Thread(target=hogBridge.start, args=(hogOptions.hidServer,)).start()
         except:
             print('Abort btServer: ', sys.exc_info()[0])
             traceback.print_exc()
@@ -116,14 +100,14 @@ def start():
         
         # Start wsClient module
         try:            
-            threading.Thread(target=wsClient.start, args=(hidOptions.wsClient,)).start()
+            threading.Thread(target=wsClient.start, args=(hogOptions.wsClient,)).start()
 
             time.sleep(1)
         except:
             print('Abort btServer: ', sys.exc_info()[0])
             traceback.print_exc()           
     except:
-        print('Abort gattNode: ', sys.exc_info()[0])
+        print('Abort hogNode: ', sys.exc_info()[0])
         traceback.print_exc()
   
 #############################################
