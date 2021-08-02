@@ -14,5 +14,5 @@ ttyBridge = {
 }
 
 noteFilter = {
-    'zone': 'masterBedroom'
+    'zone': 'livingRoom'
 }

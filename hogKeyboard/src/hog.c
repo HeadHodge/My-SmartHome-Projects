@@ -169,7 +169,7 @@ static uint8_t report_map[] = {
     0x05, 0x01,       //     Usage Page (Generic Desktop Ctrls)
     0x09, 0x30,       //     Usage (X)
     0x09, 0x31,       //     Usage (Y)
-    0x15, 0x81,       //     Logical Minimum (129)
+    0x15, 0x81,       //     Logical Minimum (-127)
     0x25, 0x7F,       //     Logical Maximum (127)
     0x75, 0x08,       //     Report Size (8)
     0x95, 0x02,       //     Report Count (2)
@@ -411,8 +411,8 @@ void sendReport(uint8_t *buffer)
 		mouse_report_data[1] = buffer[3]; // Key Code
 		mouse_report_data[2] = buffer[4]; // Key Code
 
- 		result = bt_gatt_notify(NULL, &hog_svc.attrs[8], mouse_report_data, sizeof(mouse_report_data));
-		sprintf(sprintBuffer, "***Sent Mouse Report3: x%02x, x%02x, x%02x result: %d", mouse_report_data[0], mouse_report_data[1], mouse_report_data[2], result);
+ 		result = bt_gatt_notify(NULL, &hog_svc.attrs[9], mouse_report_data, sizeof(mouse_report_data));
+		sprintf(sprintBuffer, "***Sent Mouse Report3: x%02x, x%02x, x%02x, result: %d", mouse_report_data[0], mouse_report_data[1], mouse_report_data[2], result);
 		log(sprintBuffer);
 		
 		break;

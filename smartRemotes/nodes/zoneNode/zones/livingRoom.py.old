@@ -1,122 +1,112 @@
-controller = 'Media'
+controller ='Media'
 isFocusSet = None
 isTaskSet  = None
 isSilent   = None
-isOn       = None
 
 focus = {
     "Home" 	: "Media",
-    "Ok" 	: "Task",
-    "Left"  : "Climate",
-    "Up" 	: "Cover",
-    "Right"	: "Light",
-    "Down"  : "Security",
+    "Up" 	: "Fireplace",
+    "Left"  : "Audio",
+    "Right"	: "Video",
+    "Down"  : "Covers",
 }
 
 wordMap = {
-    'Task': {
-    },
-    
-    'Climate': {
+
+    'Audio': {
     },
 
-    'Cover': {
+    'Video': {
     },
 
-    'Light': {
-    },
-
-    'Security': {
+    'Covers': {
     },
 
     'Media': {
         "Home": [
-            {'device': 'ttyClient', 'controlWord': 'Home', 'zone': 'livingRoom', 'focus': 'Media'}
+            {'device': 'harmonyHub', 'controlWord': 'Home', 'zone': 'livingRoom'}
         ],
         
         "Menu": [
-            {'device': 'ttyClient', 'controlWord': 'Menu', 'zone': 'livingRoom', 'focus': 'Media'}
+            {'device': 'harmonyHub', 'controlWord': 'Menu', 'zone': 'livingRoom'}
         ],
             
         "Back": [
-            {'device': 'ttyClient', 'controlWord': 'Back', 'zone': 'livingRoom', 'focus': 'Media'}
+            {'device': 'harmonyHub', 'controlWord': 'Back', 'zone': 'livingRoom'}
         ],
         
         "Up": [
-            {'device': 'ttyClient', 'controlWord': 'Up', 'zone': 'livingRoom', 'focus': 'Media'}
+            {'device': 'harmonyHub', 'controlWord': 'Up', 'zone': 'livingRoom'}
         ],
         
         "Down": [
-            {'device': 'ttyClient', 'controlWord': 'Down', 'zone': 'livingRoom', 'focus': 'Media'}
+            {'device': 'harmonyHub', 'controlWord': 'Down', 'zone': 'livingRoom'}
         ],
         
         "Left": [
-            {'device': 'ttyClient', 'controlWord': 'Left', 'zone': 'livingRoom', 'focus': 'Media'}
+            {'device': 'harmonyHub', 'controlWord': 'Left', 'zone': 'livingRoom'}
         ],
         
         "Right": [
-            {'device': 'ttyClient', 'controlWord': 'Right', 'zone': 'livingRoom', 'focus': 'Media'}
+            {'device': 'harmonyHub', 'controlWord': 'Right', 'zone': 'livingRoom'}
         ],
         
         "Ok": [
-            {'device': 'ttyClient', 'controlWord': 'Ok', 'zone': 'livingRoom', 'focus': 'Media'}
+            {'device': 'harmonyHub', 'controlWord': 'Ok', 'zone': 'livingRoom'}
         ],
-        
-        "Forward": [
-            {'device': 'ttyClient', 'controlWord': 'Forward', 'zone': 'livingRoom', 'focus': 'Media'}
-        ],
-        
-        "Backward": [
-            {'device': 'ttyClient', 'controlWord': 'Backward', 'zone': 'livingRoom', 'focus': 'Media'}
-        ],
-        
-        "PlayToggle": [
-            {'device': 'ttyClient', 'controlWord': 'PlayToggle', 'zone': 'livingRoom', 'focus': 'Media'}
-        ],                
         
         "Louder": [
-            {'device': 'hassioNode', 'controlWord': 'Louder', 'zone': 'livingRoom', 'focus': 'Media'}
+            {'device': 'harmonyHub', 'controlWord': 'Louder', 'zone': 'livingRoom'}
         ],
         
         "Softer": [
-            {'device': 'hassioNode', 'controlWord': 'Softer', 'zone': 'livingRoom', 'focus': 'Media'}
+            {'device': 'harmonyHub', 'controlWord': 'Softer', 'zone': 'livingRoom'}
         ],
-               
+                
         "Silence": [
-            {'device': 'hassioNode', 'controlWord': 'Silence', 'zone': 'livingRoom', 'focus': 'Media'}
+            {'device': 'hidClient', 'controlWord': 'Silence', 'zone': 'livingRoom'}
         ],
                 
         "Sound": [
-            {'device': 'hassioNode', 'controlWord': 'Sound', 'zone': 'livingRoom', 'focus': 'Media'}
-        ],
-               
-        "Dream": [
-            {'device': 'hassioNode', 'controlWord': 'Dream', 'zone': 'livingRoom', 'focus': 'Media'}
-        ],
-               
-        "Sleep": [
-            {'device': 'hassioNode', 'controlWord': 'Sleep', 'zone': 'livingRoom', 'focus': 'Media'}
-        ],
-                
-        "Wake": [
-            {'device': 'hassioNode', 'controlWord': 'Wake', 'zone': 'livingRoom', 'focus': 'Media'}
+            {'device': 'hidClient', 'controlWord': 'Sound', 'zone': 'livingRoom'}
         ],
                 
         "SoundToggle": [
-            {'device': 'hassioNode', 'controlWord': 'SoundToggle', 'zone': 'livingRoom', 'focus': 'Media'}
+            {'device': 'hidClient', 'controlWord': 'SoundToggle', 'zone': 'livingRoom'}
+        ],
+        
+        "Forward": [
+            {'device': 'harmonyHub', 'controlWord': 'Forward', 'zone': 'livingRoom'}
+        ],
+        
+        "Backward": [
+            {'device': 'harmonyHub', 'controlWord': 'Backward', 'zone': 'livingRoom'}
+        ],
+        
+        "PlayToggle": [
+            {'device': 'harmonyHub', 'controlWord': 'PlayToggle', 'zone': 'livingRoom'}
         ],
                 
         "On": [
-            {'device': 'hassioNode', 'controlWord': 'On', 'zone': 'livingRoom', 'focus': 'Media'}
+            {'device': 'harmonyHub', 'controlWord': 'On', 'zone': 'livingRoom'}
         ],
                 
         "Off": [
-            {'device': 'hassioNode', 'controlWord': 'Off', 'zone': 'livingRoom', 'focus': 'Media'}
+            {'device': 'harmonyHub', 'controlWord': 'Off', 'zone': 'livingRoom'}
         ],
-                 
+             
         "PowerToggle": [
-            {'device': 'hassioNode', 'controlWord': 'PowerToggle', 'zone': 'livingRoom', 'focus': 'Media'}
-        ],
+            #Turn off TV
+            {"script/publish_post": {"post": {"keyCode": "OnToggle", "hidCode": 0x30, "hidReport": 2}}},
+            {"remote/send_command" : {"entity_id": "remote.broadlink_ir_hub_upstairs_remote", "device": "Vizio", "command": "On/Off"}},
+            {"sleep": 2},
+
+            #Turn on Sleep Timer with Music
+            {"sonos/unjoin": {"entity_id": "media_player.bathroom"}},
+            {"media_player/select_source": {"entity_id": "media_player.master_bedroom", "source": "Blues"}},
+            {"media_player/volume_set": {"entity_id": "media_player.master_bedroom", "volume_level": 0.18}},
+            {"sonos/set_sleep_timer": {"entity_id": "media_player.master_bedroom", "sleep_time": 3600}}
+        ]
     },
 
     'Fireplace': {
@@ -222,4 +212,3 @@ wordMap = {
         ]
     },
 }
-    

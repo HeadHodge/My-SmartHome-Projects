@@ -1,73 +1,83 @@
 #############################################
-##     gatt livingRoom controlCommands
+##    Load masterBedroom wordMap
 #############################################
-print('Load gatt livingRoom controlCommands')
+print('Load masterBedroom wordMap')
 
-longPress = .5 #seconds
-
-#hidCode highbyte for hidReport1: bit 0 is L CTRL, bit 1 is L SHIFT, bit 2 is L ALT, bit 3 is L GUI, bit 4 is R CTRL, bit 5 is R SHIFT, bit 6 is R ALT, and bit 7 is R GUI
+#########################################################################################################################################################################################################################################################################################
+#keyboard report1: byte 1:static 0xff, 2:reportId 0x01, 3: modifier byte: bit 0 is L CTRL, bit 1 is L SHIFT, bit 2 is L ALT, bit 3 is L GUI, bit 4 is R CTRL, bit 5 is R SHIFT, bit 6 is R ALT, and bit 7 is R GUI, 4: low byte of consumer keyCode, 5: reserved 0x00, 6: reserved 0x00
+#consumer report2: byte 1:static 0xff, 2:reportId 0x02, 3: low byte of consumer keyCode, 4: high byte of consumer keyCode, 5: reserved 0x00, 6: reserved 0x00
+#mouse report3   : byte 1:static 0xff, 2:reportId 0x03, 3: modifier byte: bit 0 is left Click, bit 1 middle Click, bit 2 is right Click, , 4: x-axis offset, 5: y-axis offset, 6: reserved 0x00
+#########################################################################################################################################################################################################################################################################################
 wordMap = {
 	"Home": [
-		{"controlWord": "Home", "hidCode": 0x223, "hidReport": 2}
+		{"deviceCommand": [0xff, 0x02, 0x23, 0x02, 0x00, 0x00], "controlWord": "Home", "hidCode": 0x223, "options": "reload"}
 	],
 	
 	"Menu": [
-		{"controlWord": "Menu", "hidCode": 0x40, "hidReport": 2}
+		{"deviceCommand": [0xff, 0x02, 0x40, 0x00, 0x00, 0x00], "controlWord": "Menu", "hidCode": 0x40}
 	],
 		
 	"Back": [
-		{"controlWord": "Back", "hidCode": 0x46, "hidReport": 2}
+		{"deviceCommand": [0xff, 0x02, 0x46, 0x00, 0x00, 0x00], "controlWord": "Back", "hidCode": 0x46}
 	],
 	
 	"Up": [
-		{"controlWord": "Up", "hidCode": 0x42, "hidReport": 2}
+		{"deviceCommand": [0xff, 0x02, 0x42, 0x00, 0x00, 0x00]}
 	],
 	
 	"Down": [
-		{"controlWord": "Down", "hidCode": 0x43, "hidReport": 2}
+		{"deviceCommand": [0xff, 0x02, 0x43, 0x00, 0x00, 0x00]}
 	],
 	
 	"Left": [
-		{"controlWord": "Left", "hidCode": 0x44, "hidReport": 2}
+		{"deviceCommand": [0xff, 0x02, 0x44, 0x00, 0x00, 0x00]}
 	],
 	
 	"Right": [
-		{"controlWord": "Right", "hidCode": 0x45, "hidReport": 2}
+		{"deviceCommand": [0xff, 0x02, 0x45, 0x00, 0x00, 0x00]}
 	],
 	
 	"Ok": [
-		{"controlWord": "Ok", "hidCode": 0x41, "hidReport": 2}
-	],
-	
-	"Louder": [
-		{"controlWord": "Louder", "hidCode": 0xE9, "hidReport": 2}
+		{"deviceCommand": [0xff, 0x02, 0x41, 0x00, 0x00, 0x00]}
 	],
 	
 	"Softer": [
-		{"controlWord": "Softer", "hidCode": 0xEA, "hidReport": 2}
+		{"deviceCommand": [0xff, 0x02, 0xEA, 0x00, 0x00, 0x00]}
+	],
+	
+	"Louder": [
+		{"deviceCommand": [0xff, 0x02, 0xE9, 0x00, 0x00, 0x00]}
 	],
 	
 	"Silence": [
-		{"controlWord": "Menu", "hidCode": 0x40, "hidReport": 2}
+		{"deviceCommand": [0xff, 0x02, 0xE2, 0x00, 0x00, 0x00]}
 	],
 	
 	"Sound": [
-		{"controlWord": "Menu", "hidCode": 0x40, "hidReport": 2}
+		{"deviceCommand": [0xff, 0x02, 0xE2, 0x00, 0x00, 0x00]}
 	],
-    
+				
 	"SoundToggle": [
-		{"controlWord": "SoundToggle", "hidCode": 0xE2, "hidReport": 2}
+		{"deviceCommand": [0xff, 0x02, 0xE2, 0x00, 0x00, 0x00]}
 	],
-		
+				
 	"Forward": [
-		{"controlWord": "Forward", "hidCode": 0xB3, "hidReport": 2, "hidWait": longPress, "hidRepeat": 1}
+		{"deviceCommand": [0xff, 0x02, 0xB3, 0x00, 0x00, 0x00], "keyPressSecs": .5}
 	],
 	
 	"Backward": [
-		{"controlWord": "Backward", "hidCode": 0xB4, "hidReport": 2, "hidWait": longPress, "hidRepeat": 1}
+		{"deviceCommand": [0xff, 0x02, 0xB4, 0x00, 0x00, 0x00], "keyPressSecs": .5}
 	],
-
+	
 	"PlayToggle": [
-		{"controlWord": "PlayToggle", "hidCode": 0xCD, "hidReport": 2}
+		{"deviceCommand": [0xff, 0x02, 0xCD, 0x00, 0x00, 0x00]}
 	],
+	
+	"On": [
+		{"deviceCommand": [0xff, 0x02, 0x23, 0x02, 0x00, 0x00]},
+	],
+		
+	"OnToggle": [
+		{"deviceCommand": [0xff, 0x02, 0x30, 0x00, 0x00, 0x00]},
+	]
 }
