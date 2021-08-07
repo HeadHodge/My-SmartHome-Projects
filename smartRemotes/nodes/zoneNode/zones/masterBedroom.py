@@ -75,19 +75,19 @@ wordMap = {
         ],                
         
         "Louder": [
-            {'device': 'hassioNode', 'controlWord': 'Louder', 'zone': 'masterBedroom', 'focus': 'Media'}
+            {'device': 'irNode', 'controlWord': 'Louder', 'zone': 'masterBedroom', 'focus': 'Media'}
         ],
         
         "Softer": [
-            {'device': 'hassioNode', 'controlWord': 'Softer', 'zone': 'masterBedroom', 'focus': 'Media'}
+            {'device': 'irNode', 'controlWord': 'Softer', 'zone': 'masterBedroom', 'focus': 'Media'}
         ],
                
         "Silence": [
-            {'device': 'hassioNode', 'controlWord': 'Silence', 'zone': 'masterBedroom', 'focus': 'Media'}
+            {'device': 'irNode', 'controlWord': 'Silence', 'zone': 'masterBedroom', 'focus': 'Media'}
         ],
                 
         "Sound": [
-            {'device': 'hassioNode', 'controlWord': 'Sound', 'zone': 'masterBedroom', 'focus': 'Media'}
+            {'device': 'irNode', 'controlWord': 'Sound', 'zone': 'masterBedroom', 'focus': 'Media'}
         ],
                
         "Dream": [
@@ -103,19 +103,19 @@ wordMap = {
         ],
                 
         "SoundToggle": [
-            {'device': 'hassioNode', 'controlWord': 'SoundToggle', 'zone': 'masterBedroom', 'focus': 'Media'}
+            {'device': 'irNode', 'controlWord': 'SoundToggle', 'zone': 'masterBedroom', 'focus': 'Media'}
         ],
                 
         "On": [
-            {'device': 'hassioNode', 'controlWord': 'On', 'zone': 'masterBedroom', 'focus': 'Media'}
+            {'device': 'irNode', 'controlWord': 'On', 'zone': 'masterBedroom', 'focus': 'Media'}
         ],
                 
         "Off": [
-            {'device': 'hassioNode', 'controlWord': 'Off', 'zone': 'masterBedroom', 'focus': 'Media'}
+            {'device': 'irNode', 'controlWord': 'Off', 'zone': 'masterBedroom', 'focus': 'Media'}
         ],
                  
         "PowerToggle": [
-            {'device': 'hassioNode', 'controlWord': 'PowerToggle', 'zone': 'masterBedroom', 'focus': 'Media'}
+            {'device': 'irNode', 'controlWord': 'PowerToggle', 'zone': 'masterBedroom', 'focus': 'Media'}
         ],
     },
 

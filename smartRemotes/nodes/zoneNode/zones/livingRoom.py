@@ -75,19 +75,19 @@ wordMap = {
         ],                
         
         "Louder": [
-            {'device': 'hassioNode', 'controlWord': 'Louder', 'zone': 'livingRoom', 'focus': 'Media'}
+            {'device': 'irNode', 'controlWord': 'Louder', 'zone': 'livingRoom', 'focus': 'Media'}
         ],
         
         "Softer": [
-            {'device': 'hassioNode', 'controlWord': 'Softer', 'zone': 'livingRoom', 'focus': 'Media'}
+            {'device': 'irNode', 'controlWord': 'Softer', 'zone': 'livingRoom', 'focus': 'Media'}
         ],
                
         "Silence": [
-            {'device': 'hassioNode', 'controlWord': 'Silence', 'zone': 'livingRoom', 'focus': 'Media'}
+            {'device': 'irNode', 'controlWord': 'Silence', 'zone': 'livingRoom', 'focus': 'Media'}
         ],
                 
         "Sound": [
-            {'device': 'hassioNode', 'controlWord': 'Sound', 'zone': 'livingRoom', 'focus': 'Media'}
+            {'device': 'irNode', 'controlWord': 'Sound', 'zone': 'livingRoom', 'focus': 'Media'}
         ],
                
         "Dream": [
@@ -107,15 +107,15 @@ wordMap = {
         ],
                 
         "On": [
-            {'device': 'hassioNode', 'controlWord': 'On', 'zone': 'livingRoom', 'focus': 'Media'}
+            {'device': 'irNode', 'controlWord': 'On', 'zone': 'livingRoom', 'focus': 'Media'}
         ],
                 
         "Off": [
-            {'device': 'hassioNode', 'controlWord': 'Off', 'zone': 'livingRoom', 'focus': 'Media'}
+            {'device': 'irNode', 'controlWord': 'Off', 'zone': 'livingRoom', 'focus': 'Media'}
         ],
                  
         "PowerToggle": [
-            {'device': 'hassioNode', 'controlWord': 'PowerToggle', 'zone': 'livingRoom', 'focus': 'Media'}
+            {'device': 'irNode', 'controlWord': 'PowerToggle', 'zone': 'livingRoom', 'focus': 'Media'}
         ],
     },
 

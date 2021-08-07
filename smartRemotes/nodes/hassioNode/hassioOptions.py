@@ -14,6 +14,6 @@ hassioNode = {
     "onReceived": "receivedConfirmation",
 }
 
-noteFilter = {
-    'zone': 'masterBedroom'
-}
+#noteFilter = {
+#    'zone': 'masterBedroom'
+#}

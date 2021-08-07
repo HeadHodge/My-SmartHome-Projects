@@ -1,0 +1,9 @@
+[Unit]
+Description=smartRemotes-irNode
+After=network.target
+
+[Service]
+ExecStart=python3 -u /smartRemotes/nodes/irNode/irNode.py
+
+[Install]
+WantedBy=multi-user.target
