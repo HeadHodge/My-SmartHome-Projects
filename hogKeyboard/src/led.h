@@ -12,9 +12,8 @@
 extern "C" {
 #endif
 
-void usbStart(void);
-void log(char*);
-extern char logBuffer[];
+void setConnectState(int);
+void setAdvertiseState(int);
 
 #ifdef __cplusplus
 }

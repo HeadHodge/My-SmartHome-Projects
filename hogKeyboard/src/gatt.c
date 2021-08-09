@@ -25,6 +25,7 @@
 
 #include "hog.h"
 #include "usb.h"
+#include "led.h"
 
 int isConnected = 0;
 
@@ -33,6 +34,33 @@ static const struct bt_data ad[] = {
 	BT_DATA_BYTES(BT_DATA_FLAGS, (BT_LE_AD_GENERAL | BT_LE_AD_NO_BREDR)),
 	BT_DATA_BYTES(BT_DATA_UUID16_ALL, BT_UUID_16_ENCODE(BT_UUID_HIDS_VAL), BT_UUID_16_ENCODE(BT_UUID_BAS_VAL)),
 };
+
+static void bt_ready(int err)
+{
+	if (err) {
+		printk("Bluetooth init failed (err %d)\n", err);
+		return;
+	}
+
+	//printk("Bluetooth initialized\n");
+	log("Bluetooth initialized");
+
+	//hog_init();
+
+	if(IS_ENABLED(CONFIG_SETTINGS)) settings_load();
+
+	err = bt_le_adv_start(BT_LE_ADV_CONN_NAME, ad, ARRAY_SIZE(ad), NULL, 0);
+	
+	if (err) {
+		//printk("Advertising failed to start (err %d)\n", err);
+		log("Advertising failed to start");
+		return;
+	}
+
+	setConnectState(3);
+	setAdvertiseState(3);
+	log("Advertising successfully started");
+}
 
 static void connected(struct bt_conn *conn, uint8_t err)
 {
@@ -45,6 +73,8 @@ static void connected(struct bt_conn *conn, uint8_t err)
 		return;
 	}
 
+	setConnectState(1);
+	setAdvertiseState(1);
 	log("Connected!");
 	isConnected = 1;
 	
@@ -61,29 +91,24 @@ static void disconnected(struct bt_conn *conn, uint8_t reason)
 	bt_addr_le_to_str(bt_conn_get_dst(conn), addr, sizeof(addr));
 
 	//printk("Disconnected from %s (reason 0x%02x)\n", addr, reason);
+	setConnectState(3);
+	setAdvertiseState(3);
 	log("Disconnected");
 	isConnected = 0;
 }
 
 static void security_changed(struct bt_conn *conn, bt_security_t level, enum bt_security_err err)
 {
-	char snum[128];
 	char addr[BT_ADDR_LE_STR_LEN];
 
 	bt_addr_le_to_str(bt_conn_get_dst(conn), addr, sizeof(addr));
 
 	if (!err) {
-		//printk("Security changed: %s level %u\n", addr, level);
-		//log("Security changed");
-		// convert 123 to string [buf]
-		sprintf(snum, "Security changed: L%d", level);
-		log(snum);
+		sprintf(logBuffer, "Security changed: L%d", level);
+		log(logBuffer);
 	} else {
-		//printk("Security failed: %s level %u err %d\n", addr, level, err);
-		//log("Security change failed");
-		// convert 123 to string [buf]
-		sprintf(snum, "Security change failed, level: %d, err: %d", level, err);
-		log(snum);
+		sprintf(logBuffer, "Security change failed, level: %d, err: %d", level, err);
+		log(logBuffer);
 	}
 }
 
@@ -93,83 +118,14 @@ static struct bt_conn_cb conn_callbacks = {
 	.security_changed = security_changed,
 };
 
-static void bt_ready(int err)
-{
-	if (err) {
-		printk("Bluetooth init failed (err %d)\n", err);
-		return;
-	}
-
-	//printk("Bluetooth initialized\n");
-	log("Bluetooth initialized");
-
-	hog_init();
-
-	if (IS_ENABLED(CONFIG_SETTINGS)) {
-		settings_load();
-	}
-	
-	//bt_unpair(BT_ID_DEFAULT, BT_ADDR_LE_ANY);
-	
-	//bt_passkey_set(123456);
-
-	err = bt_le_adv_start(BT_LE_ADV_CONN_NAME, ad, ARRAY_SIZE(ad), NULL, 0);
-	if (err) {
-		//printk("Advertising failed to start (err %d)\n", err);
-		log("Advertising failed to start");
-		return;
-	}
-
-	//printk("Advertising successfully started\n");
-	log("Advertising successfully started");
-}
-
-static void auth_passkey_display(struct bt_conn *conn, unsigned int passkey)
-{
-	char snum[128];
-	char addr[BT_ADDR_LE_STR_LEN];
-
-	bt_addr_le_to_str(bt_conn_get_dst(conn), addr, sizeof(addr));
-
-	// convert 123 to string [buf]
-	sprintf(snum, "Display Passkey: %d", passkey);
-	log(snum);
-}
-
-static void auth_passkey_confirm(struct bt_conn *conn, unsigned int passkey)
-{
-	int reply;
-	char snum[128];
-	
-	reply = bt_conn_auth_passkey_confirm(conn);
-	
-	/* Wait 1 sec for the host to do all settings */
-	k_busy_wait(5000000);
-	
-	sprintf(snum, "Confirm Passkey: %d, result: %d", passkey, reply);
-	log(snum);
-}
-
 static void auth_pairing_confirm(struct bt_conn *conn)
 {
 	int reply;
-	char snum[128];
-	
-	//sprintf(snum, "Confirm Pairing");
-	//log(snum);
 	
 	reply = bt_conn_auth_pairing_confirm(conn);
 	
-	sprintf(snum, "Confirm Pairing, result: %d", reply);
-	log(snum);
-}
-
-static void auth_passkey_enter(struct bt_conn *conn)
-{
-	char snum[128];
-	
-	sprintf(snum, "Enter displayed passkey");
-	log(snum);
+	sprintf(logBuffer, "Confirm Pairing, result: %d", reply);
+	log(logBuffer);
 }
 
 static void auth_cancel(struct bt_conn *conn)
@@ -183,9 +139,6 @@ static void auth_cancel(struct bt_conn *conn)
 }
 
 static struct bt_conn_auth_cb auth_cb_display = {
-	//.passkey_display = auth_passkey_display,
-	//.passkey_entry = auth_passkey_enter,
-	//.passkey_confirm = auth_passkey_confirm,
 	.pairing_confirm = auth_pairing_confirm,
 	.cancel = auth_cancel,
 };

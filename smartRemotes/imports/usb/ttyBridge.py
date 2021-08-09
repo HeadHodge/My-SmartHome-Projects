@@ -20,7 +20,7 @@ async def deliverCommand(connection, command):
         traceback.print_exc()
         
 ##########################
-def deliverReports(connection):
+def receiveReports(connection):
 ##########################
     try:
         print(f' \n***deliverReports')
@@ -28,7 +28,7 @@ def deliverReports(connection):
         while True:
             report = connection.readline()
             if(len(report) == 0): break
-            print(f'***{report}')        
+            print(f'***{report[0:-2]}')        
     except:
         print('Abort deliverReports', sys.exc_info()[0])
         traceback.print_exc()
@@ -51,7 +51,7 @@ def start(options={}):
 
         if(options['connection'].is_open == False): print('Abort: open serial port failed'); return;
         
-        deliverReports(options['connection'])
+        receiveReports(options['connection'])
     except:
         print('Abort ttyBridge', sys.exc_info()[0])
         traceback.print_exc()
