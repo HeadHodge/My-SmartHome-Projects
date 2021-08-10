@@ -75,19 +75,19 @@ wordMap = {
         ],                
         
         "Louder": [
-            {'device': 'irNode', 'controlWord': 'Louder', 'zone': 'livingRoom', 'focus': 'Media'}
+            {'device': 'hassioNode', 'controlWord': 'Louder', 'zone': 'livingRoom', 'focus': 'Media'}
         ],
         
         "Softer": [
-            {'device': 'irNode', 'controlWord': 'Softer', 'zone': 'livingRoom', 'focus': 'Media'}
+            {'device': 'hassioNode', 'controlWord': 'Softer', 'zone': 'livingRoom', 'focus': 'Media'}
         ],
                
         "Silence": [
-            {'device': 'irNode', 'controlWord': 'Silence', 'zone': 'livingRoom', 'focus': 'Media'}
+            {'device': 'hassioNode', 'controlWord': 'Silence', 'zone': 'livingRoom', 'focus': 'Media'}
         ],
                 
         "Sound": [
-            {'device': 'irNode', 'controlWord': 'Sound', 'zone': 'livingRoom', 'focus': 'Media'}
+            {'device': 'hassioNode', 'controlWord': 'Sound', 'zone': 'livingRoom', 'focus': 'Media'}
         ],
                
         "Dream": [

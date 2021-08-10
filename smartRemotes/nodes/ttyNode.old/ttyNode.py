@@ -33,7 +33,7 @@ async def receivedNote(note):
         # validate controlWord
         controlWord = note['content'].get('controlWord', None)
         if(controlWord == None):
-            return print(f'Abort receivedNote, invalid controlWord: {controlWord}')
+            return print(f'Abort receivedNote, invalid controlWord: {ontrolWord}')
         
         # validate controlMap
         if(_zones.get(zone, None) == None): _zones[zone] = importlib.import_module(zone)
@@ -52,8 +52,6 @@ async def receivedNote(note):
             ttyOptions.ttyBridge['connection'],
             bytearray(keyDownCommand)
         )
-        
-        if(keyDownCommand[1] == 3): return
         
         time.sleep(keyPressSecs)
         
@@ -88,64 +86,6 @@ async def hubConnected():
         print(f'*********************************************************')
     except:
         print('Abort hubConnected: ', sys.exc_info()[0])
-        traceback.print_exc()
-    
-#############################################
-async def receivedNotice(notice):
-#############################################
-    try:
-        global _zones
-       
-        if(notice['type'] == "auth_required"):
-            print(f'*** receivedNotice: "auth_required"')
-            
-            payload = {
-                "type": "auth",
-                "access_token": ttyOptions.hassioEvents["access_token"] 
-            }
-                          
-            print(f' \n***deliverPayload: {payload}')
-            await wsClient.deliverPayload(ttyOptions.wsClient['connection'], payload)
-        
-        elif(notice['type'] == "auth_ok"):
-            print(f'*** receivedNotice: "auth_ok"')
-            
-            payload = {
-                "id"        : 100,
-                "type"      : "subscribe_events",
-                "event_type": ttyOptions.hassioEvents["event_type"]    
-            }
-            
-            print(f' \n***deliverPayload: {payload}')
-            await wsClient.deliverPayload(ttyOptions.wsClient['connection'], payload)
-        
-        elif(notice['type'] == "result"):
-            print(f'*** receivedNotice: "result" {notice}')
-        
-        elif(notice['type'] == "event"):
-            note = notice["event"]["data"]["note"]
-            print(f'*** receivedNotice: "notePublished" {note}')
-            await receivedNote(note)
-
-        else:
-            print(f'*** receivedNotice: {notice}')
-           
-        print(f' \n***Wait for hassio notices...')
-        print(f'**********************************************')
-    except:
-        print('Abort receivedNotice: ', sys.exc_info()[0])
-        traceback.print_exc()
-
-#############################################
-async def hassioConnected():
-#############################################
-    try:
-        print(f' \n***hassioConnected')
-        
-        print(f' \n***Wait for hassio control confirmations...')
-        print(f'**********************************************')
-    except:
-        print('Abort hassioConnected: ', sys.exc_info()[0])
         traceback.print_exc()
    
 #############################################

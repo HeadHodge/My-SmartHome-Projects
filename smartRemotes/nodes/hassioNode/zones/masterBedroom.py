@@ -1,9 +1,7 @@
 #############################################
 ##       hassioNode commandWord map
 #############################################
-print('Load hassioNode commandWord map')
-
-transactionNum = 0
+print('Load hassioNode masterBedroom commandWord map')
 
 wordMap = {
     "Media": {

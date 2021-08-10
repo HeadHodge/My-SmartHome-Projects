@@ -1,7 +1,7 @@
 #############################################
-##    Load livingRoom wordMap
+##    Load masterBedroom wordMap
 #############################################
-print('Load livingRoom wordMap')
+print('Load masterBedroom wordMap')
 
 #########################################################################################################################################################################################################################################################################################
 #keyboard report1: byte 1:static 0xff, 2:reportId 0x01, 3: modifier byte: bit 0 is L CTRL, bit 1 is L SHIFT, bit 2 is L ALT, bit 3 is L GUI, bit 4 is R CTRL, bit 5 is R SHIFT, bit 6 is R ALT, and bit 7 is R GUI, 4: low byte of consumer keyCode, 5: reserved 0x00, 6: reserved 0x00
@@ -62,11 +62,11 @@ wordMap = {
 	],
 				
 	"Forward": [
-		{"deviceCommand": [0xff, 0x02, 0xB3, 0x00, 0x00, 0x00], "keyPressSecs": .25}
+		{"deviceCommand": [0xff, 0x02, 0xB3, 0x00, 0x00, 0x00], "keyPressSecs": .5}
 	],
 	
 	"Backward": [
-		{"deviceCommand": [0xff, 0x02, 0xB4, 0x00, 0x00, 0x00], "keyPressSecs": .25}
+		{"deviceCommand": [0xff, 0x02, 0xB4, 0x00, 0x00, 0x00], "keyPressSecs": .5}
 	],
 	
 	"PlayToggle": [

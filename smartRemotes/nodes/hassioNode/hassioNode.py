@@ -12,8 +12,6 @@ sys.path.append(path)
 
 import wsClient, hassioOptions, noteTool
 
-_transactionNum = 0
-
 _zones = {}
 
 # keyCode Input
@@ -53,20 +51,22 @@ async def receivedNote(note):
         if(controlWord == None):
             return print(f'Abort receivedNote, invalid controlWord: {ontrolWord}')
         
-        #validate hub
-        _zones[zone] = importlib.import_module(zone)
-        
+        #validate map
+        if(_zones.get(zone, None) == None):
+            _zones[zone] = importlib.import_module(zone)
+            _zones[zone].transNum = 0
+            
         deviceCommands = _zones[zone].wordMap[controller].get(controlWord, None)
         if(deviceCommands == None):
             return print(f'Abort receivedNote, no deviceCommands found for {controlWord}')
 
         for index, deviceCommand in enumerate(deviceCommands):
+            _zones[zone].transNum += 1
+            deviceCommand['id'] = _zones[zone].transNum
             print(f' \n***Deliver deviceCommand: {deviceCommand}')
-            _zones[zone].transactionNum += 1
-            deviceCommand['id'] = _zones[zone].transactionNum
+ 
             payload = deviceCommand
             await wsClient.deliverPayload(hassioOptions.hassioNode['connection'], payload)
-
     except:
         print('Abort receivedNote: ', sys.exc_info()[0])
         traceback.print_exc()

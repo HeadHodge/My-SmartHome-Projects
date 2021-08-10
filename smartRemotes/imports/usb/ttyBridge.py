@@ -23,14 +23,14 @@ async def deliverCommand(connection, command):
 def receiveReports(connection):
 ##########################
     try:
-        print(f' \n***deliverReports')
+        print(f' \n***receiveReports')
         
         while True:
             report = connection.readline()
             if(len(report) == 0): break
-            print(f'***{report[0:-2]}')        
+            print(f'{report[0:-2]}')        
     except:
-        print('Abort deliverReports', sys.exc_info()[0])
+        print('Abort receiveReports', sys.exc_info()[0])
         traceback.print_exc()
 
 ###################
