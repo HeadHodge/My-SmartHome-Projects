@@ -1,7 +1,7 @@
 #############################################
 ##       Load livingRoom wordMap
 #############################################
-print('Load livingRoom wordMap')
+print('Load irNode livingRoom wordMap')
 
 rawFiles = '/smartRemotes/nodes/irNode/zones/masterBedroom/'
 
@@ -25,6 +25,14 @@ wordMap = {
 	
 	"SoundToggle": [
 		{"controlWord": "SoundToggle", "rawFile": rawFiles + "soundToggle.raw", "deviceCommand": "necx:0x80d98c"}
+	],
+    
+	"Sleep": [
+		{"controlWord": "Sleep", "rawFile": rawFiles + "powerToggle.raw", "deviceCommand": "necx:0x86050f"}
+	],
+    
+	"Wake": [
+		{"controlWord": "Wake", "rawFile": rawFiles + "powerToggle.raw", "deviceCommand": "necx:0x86050f"}
 	],
     
 	"Off": [

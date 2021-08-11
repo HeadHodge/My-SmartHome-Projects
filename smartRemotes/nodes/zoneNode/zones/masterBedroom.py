@@ -95,6 +95,7 @@ wordMap = {
         ],
                
         "Sleep": [
+            {'device': 'irNode', 'controlWord': 'Sleep', 'zone': 'masterBedroom', 'focus': 'Media'},
             {'device': 'hassioNode', 'controlWord': 'Sleep', 'zone': 'masterBedroom', 'focus': 'Media'}
         ],
                 

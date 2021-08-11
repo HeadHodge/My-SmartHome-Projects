@@ -26,7 +26,7 @@ wordMap = {
         ],
         
         "Sleep": [
-            {"type": "call_service", "domain": "remote", "service": "send_command", "service_data": {"entity_id": "remote.broadlink_ir_hub_upstairs_remote", "device": "Vizio", "command": "On/Off"}},
+            {"type": "wait", "waitSecs": 5},
             {"type": "call_service", "domain": "sonos", "service": "unjoin", "service_data": {"entity_id": "media_player.bathroom"}},
             {"type": "call_service", "domain": "media_player", "service": "select_source", "service_data": {"entity_id": "media_player.master_bedroom", "source": "Blues"}},
             {"type": "call_service", "domain": "media_player", "service": "volume_set", "service_data": {"entity_id": "media_player.master_bedroom", "volume_level": 0.14}},
@@ -35,22 +35,16 @@ wordMap = {
         ],
                 
         "Wake": [
-            {"type": "call_service", "domain": "remote", "service": "send_command", "service_data": {"entity_id": "remote.broadlink_ir_hub_upstairs_remote", "device": "Vizio", "command": "On/Off"}},
             {"type": "call_service", "domain": "sonos", "service": "unjoin", "service_data": {"entity_id": "media_player.bathroom"}},
             {"type": "call_service", "domain": "media_player", "service": "select_source", "service_data": {"entity_id": "media_player.master_bedroom", "source": "Rock"}},
             {"type": "call_service", "domain": "media_player", "service": "volume_mute", "service_data": {"entity_id": "media_player.master_bedroom", "is_volume_muted": False}},
             {"type": "call_service", "domain": "media_player", "service": "volume_set", "service_data": {"entity_id": "media_player.master_bedroom", "volume_level": 0.4}},
-        ],
-         
-        "On": [
-        #Turn on TV
-            {"type": "call_service", "domain": "remote", "service": "send_command", "service_data": {"entity_id": "remote.broadlink_ir_hub_upstairs_remote", "device": "Vizio", "command": "On/Off"}},
-            {"type": "call_service", "domain": "media_player", "service": "select_source", "service_data": {"entity_id": "media_player.master_bedroom", "source": "TV"}},
-        ],
-        
-        "Off": [
-        #Turn off TV
-            {"type": "call_service", "domain": "remote", "service": "send_command", "service_data": {"entity_id": "remote.broadlink_ir_hub_upstairs_remote", "device": "Vizio", "command": "On/Off"}},
-        ],
+            {"type": "call_service", "domain": "cover", "service": "close_cover", "service_data": {"entity_id": "cover.somfy_unknown_type_5a52_id_5401_level"}},
+            {"type": "wait", "waitSecs": 10},
+            {"type": "call_service", "domain": "cover", "service": "open_cover", "service_data": {"entity_id": "cover.somfy_unknown_type_5a52_id_5401_level"}},
+            {"type": "wait", "waitSecs": 7.5},
+            {"type": "call_service", "domain": "cover", "service": "stop_cover", "service_data": {"entity_id": "cover.somfy_unknown_type_5a52_id_5401_level"}},
+        ],       
     }
 }
+

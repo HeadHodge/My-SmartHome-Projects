@@ -12,6 +12,7 @@ sys.path.append(path)
 
 import wsClient, hassioOptions, noteTool
 
+_transNum = 0
 _zones = {}
 
 # keyCode Input
@@ -38,7 +39,7 @@ async def receivedNote(note):
 #############################################
     try:
         print(f' \n***Received Note: {note}')    
-        global _zones
+        global _zones, _transNum
         
         # validate zone
         zone = note['content'].get('zone', None)
@@ -52,19 +53,22 @@ async def receivedNote(note):
             return print(f'Abort receivedNote, invalid controlWord: {ontrolWord}')
         
         #validate map
-        if(_zones.get(zone, None) == None):
-            _zones[zone] = importlib.import_module(zone)
-            _zones[zone].transNum = 0
+        if(_zones.get(zone, None) == None): _zones[zone] = importlib.import_module(zone)
             
         deviceCommands = _zones[zone].wordMap[controller].get(controlWord, None)
         if(deviceCommands == None):
             return print(f'Abort receivedNote, no deviceCommands found for {controlWord}')
 
         for index, deviceCommand in enumerate(deviceCommands):
-            _zones[zone].transNum += 1
-            deviceCommand['id'] = _zones[zone].transNum
+            _transNum += 1
+            deviceCommand['id'] = _transNum
             print(f' \n***Deliver deviceCommand: {deviceCommand}')
- 
+            
+            if(deviceCommand['type'] == 'wait'):
+                print(f'Wait: {deviceCommand["waitSecs"]}')
+                time.sleep(deviceCommand['waitSecs'])
+                continue
+                
             payload = deviceCommand
             await wsClient.deliverPayload(hassioOptions.hassioNode['connection'], payload)
     except:
