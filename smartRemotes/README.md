@@ -18,15 +18,15 @@ The use of any available node is optional and independent of all other nodes **e
 
 ### **Current Node List:**
 
-- **hub Node:** listens for published controlWord messages and routes them to all nodes that have subscribed to that published message
-- **usb Node:**
-- **http Node:**
-- **hog Node:**
-- **tty Node:**
-- **ir Node:**
-- **haemony Node:**
-- **hasssio Node:**
-- **zone Node:**
+- **hub Node:** a router node that listens for published controlWord messages and routes them to all nodes that have subscribed to that published message
+- **usb Node:** an input node that 
+- **http Node:** an input node that 
+- **hog Node:** an output node that 
+- **tty Node:** an output node that 
+- **ir Node:** an output node that 
+- **haemony Node:** an output node that 
+- **hasssio Node:** an output node that 
+- **zone Node:** an output node that 
 
 
 
