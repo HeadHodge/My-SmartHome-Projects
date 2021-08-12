@@ -33,6 +33,8 @@ The main 'bridges' I've written and use are:
   - ip based interaces to control various ip based devices, i.e. Sonos, Huntington shades, Wimo outlets, Hassio Hub
   - low power (ble) bluetooth peripheral servers to emulate HID keyboards, mice, and consumer control devices via 'HoG' (HID over Gatt) to control bluetooth based devices, i.e. FireTV stick
 
+## **my 'hogKeyboard' project:**
 
+My 1st endeavor into programming embedded mcu devices. I bought a Nordic semiconductors nRF52840 usb Dongle for $10 and used it to create a low power (ble) bluetooth peripheral on a stick to emulate HID keyboards, mice, and consumer control devices via 'HoG' (HID over Gatt)
 
 
