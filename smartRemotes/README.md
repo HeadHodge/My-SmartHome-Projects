@@ -1,6 +1,10 @@
-                    **** smartRemotes ****
+# **my smartRemotes Project**
 
-<b>Overview:</b>
+### **Overview:**
+
+smartRemotes is a simple framework to control all the devices around my home with a variety of input control devices. It's to control many devices i.e. tv, stereo, shades, fireplace, lights, etc. with a single input control device, like a wireless usb remote control. Conversely it's to control a single device, like a fireplace, with a variety of input control devices, i.e. remote control, keyboard, wall mounted control panel, web page, etc.
+
+### **How it Works:**
 
 smartRemotes is a collection of modules to capture remote key codes and scan codes and interface the input to applications that need control input. The 1st interface written to date, captures key codes from usb hid devices (i.e. wireless usb keyboards) and interfaces the input to the Home-Assistant service bus to control smart home devices.
 
