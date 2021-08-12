@@ -6,7 +6,7 @@ smartRemotes is a simple framework to control all the devices around my home wit
 
 ### **How it Works:**
 
-smartRemotes is a collection of python coded modules called 'nodes'. Each node performs a single task and is designed to be easily loaded and run indepently of all other nodes.
+smartRemotes is a collection of python coded modules called 'nodes'. Each node performs a single task and is designed to be easily loaded and run independently of all other nodes.
 
 A node performs only one of these three tasks:
 
