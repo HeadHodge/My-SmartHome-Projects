@@ -10,6 +10,10 @@ My current projects mostly focus on creating bridges to convert data from one fo
 
 ## **my 'smartRemotes' project:**
 
+The objective is to capture input from a variety of sources and use the input to control a variety of my home devices (mainly, but not totally, entertainment equipment).
+
+**Main Features:**
+
 
 
 
