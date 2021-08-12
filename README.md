@@ -30,7 +30,7 @@ The main 'bridges' I've written and use are:
   - usb HID input data capture from any HID compliant device, i.e. wired/wireless keyboards, mice, and remote controls
   - Ird data capture from IR remotes and keypads
   - Ird blasters to transmit Ird to control IR controlled devices
-  - ip based interaces to control various ip based devices, i.e. Sonos, Huntington shades, Wimo outlets
+  - ip based interaces to control various ip based devices, i.e. Sonos, Huntington shades, Wimo outlets, Hassio Hub
   - low power (ble) bluetooth peripheral servers to emulate HID keyboards, mice, and consumer control devices via 'HoG' (HID over Gatt) to control bluetooth based devices, i.e. FireTV stick
 
 
