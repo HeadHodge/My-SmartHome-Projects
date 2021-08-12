@@ -14,6 +14,15 @@ The objective is to capture input from a variety of sources and use the input to
 
 **Main Features:**
 
+Currently I capture input from:
+  - web pages
+  - wired and wireless mice, keyboards, and remote controls
+  - any HID compliant input device
+  - wireless and other ip based data input.
+
+I use web sockets to transport this input around the home to the devices the input is intended to control.
+
+I use 'bridges' to convert captured input from a variety of input devices to ip packets which are routed to other 'bridges' that convert the packets to formats required to control the intended device. 
 
 
 
