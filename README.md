@@ -41,5 +41,6 @@ My 1st endeavor into programming embedded mcu devices. I bought a Nordic semicon
 
 <img src="https://www.rutronik.com/fileadmin//Rutronik/News/Knowledge/Produktmeldungen/09_SEP18-Nordic_Dongle_SOURCE_NORDIC.jpg" width="350">
 
+more details: https://github.com/HeadHodge/smartHome-Projects-Main/tree/main/hogKeyboard
 
 
