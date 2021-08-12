@@ -19,14 +19,14 @@ The use of any available node is optional and independent of all other nodes **e
 ### **Current Node List:**
 
 - **hub Node:** a router node that listens for published controlWord messages and routes them to all nodes that have subscribed to that published message
-- **usb Node:** an input node that 
-- **http Node:** an input node that 
-- **hog Node:** an output node that 
-- **tty Node:** an output node that 
-- **ir Node:** an output node that 
-- **haemony Node:** an output node that 
-- **hasssio Node:** an output node that 
-- **zone Node:** an output node that 
+- **usb Node:** an input node that captures input from any connected usb HID device, i.e. wired/wireless keyboards and remote controls
+- **http Node:** an input node that serves web pages to capture user control input
+- **hog Node:** an output node that controls bluetooth devices via a HID over Gatt ble keyboard/media control/mouse peripheral 
+- **tty Node:** an output node that does same thing as the hogNode except requires a Nordic nRF52840 usb dongle
+- **ir Node:** an output node that controls Ir devices by blasting Ir codes to them
+- **harmony Node:** an output node that controls Harmony Hubs via ip
+- **hasssio Node:** an output node that  controls Hassio Hubs via ip
+- **zone Node:** an output node that interprets published controlWords and re-publishes one or more new controlWords to effectively control multiple devices in a co-ordinated fashion
 
 
 
