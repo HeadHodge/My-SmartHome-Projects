@@ -108,7 +108,8 @@ wordMap = {
         ],
                 
         "On": [
-            {'device': 'irNode', 'controlWord': 'On', 'zone': 'masterBedroom', 'focus': 'Media'}
+            {'device': 'irNode', 'controlWord': 'On', 'zone': 'masterBedroom', 'focus': 'Media'},
+            {'device': 'hassioNode', 'controlWord': 'On', 'zone': 'masterBedroom', 'focus': 'Media'}
         ],
                 
         "Off": [
