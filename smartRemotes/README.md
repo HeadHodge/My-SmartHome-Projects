@@ -6,7 +6,15 @@ smartRemotes is a simple framework to control all the devices around my home wit
 
 ### **How it Works:**
 
-smartRemotes is a collection of modules to capture remote key codes and scan codes and interface the input to applications that need control input. The 1st interface written to date, captures key codes from usb hid devices (i.e. wireless usb keyboards) and interfaces the input to the Home-Assistant service bus to control smart home devices.
+smartRemotes is a collection of python coded modules called 'nodes'. Each node performs a single task and is designed to be easily loaded and run indepently of all other nodes.
+
+A node performs only one of these three tasks:
+
+ - Capture input control data from an input device, assign the input a single controlWord that represents the 'intent' of the input control data, then publish the controlWord to the home network via a websockets message.
+ - Subscribe to one or more websocket messages and use the controlWord contained in the message to control a specified device.
+ - Take published messages created by input nodes and route them to output nodes that have subscribed to the message to control a sprcific device.  
+
+to capture remote key codes and scan codes and interface the input to applications that need control input. The 1st interface written to date, captures key codes from usb hid devices (i.e. wireless usb keyboards) and interfaces the input to the Home-Assistant service bus to control smart home devices.
 
 The main modules are loosely coupled to each other via network communications using websockets. This is a stateful communications protocol that is efficient for continuous data flow and is available on practically any platform you can think of. The ubiquitos nature of websockets along with the JSON standard for object serializaton, makes for an easy convient way to communicate between diverse systems.
 
