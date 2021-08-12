@@ -12,7 +12,7 @@ A node performs only one of these three tasks:
 
  - Capture input control data from an input device, assign the input a single controlWord that represents the 'intent' of the input control data, then publish the controlWord to the home network via a websockets message.
  - Subscribe to one or more websocket messages and use the controlWord contained in the message to control a specified device.
- - Take published messages created by input nodes and route them to output nodes that have subscribed to the message to control a sprcific device.  
+ - Take published messages created by input nodes and route them to output nodes that have subscribed to the message to control a specific device.  
 
 to capture remote key codes and scan codes and interface the input to applications that need control input. The 1st interface written to date, captures key codes from usb hid devices (i.e. wireless usb keyboards) and interfaces the input to the Home-Assistant service bus to control smart home devices.
 
