@@ -46,9 +46,6 @@ try:
    
     # Start usbBridge Module
     try:
-        print('Terminate usbNode, missing required zone name and/or event list arguments')
-        print('Example: python3 usb2hassio.py masterBedroom 3,4,5,6')
-        print('Run "python3 -m evdev.evtest" to list valid devices')
         threading.Thread(target=usbBridge.start, args=(usbOptions.usbBridge,)).start()
     except:
         print('Abort usbBridge: ', sys.exc_info()[0])

@@ -10,13 +10,13 @@ smartRemotes is a collection of python coded modules called 'nodes'. Each node p
 
 A node performs only one of these three tasks:
 
- - Capture input control data from an input device, assign the input a single controlWord that represents the 'intent' of the input control data, then publish the controlWord to the home network via a websockets message.
- - Subscribe to one or more websocket messages and use the controlWord contained in the message to control a specified device.
- - Take published messages created by input nodes and route them to output nodes that have subscribed to the message to control a specific device.
+ - Capture input control data from an input device, assign the input a single controlWord that represents the 'intent' of the input control data, then publish the controlWord to the home network via a websockets message.
+ - Subscribe to one or more websocket messages and use the controlWord contained in the message to control a specified device.
+ - Take published messages created by input nodes and route them to output nodes that have subscribed to the message to control a specific device.
 
 The use of any available node is optional and independent of all other nodes **except** at least one router node must be running for the publish and subscribe of controlWord messages to work properly.
 
-Nodes are loosely coupled to each other via your home network using websockets. This is a stateful communications protocol that is efficient for continuous data flow and is available on practically any platform you can think of. The ubiquitos nature of websockets along with the JSON standard for object serializaton, makes for an easy convient way to communicate between diverse systems.
+Nodes are loosely coupled to each other via your home network using websockets. This is a stateful communications protocol that is efficient for continuous data flow and is available on practically any platform you can think of. The ubiquitous nature of websockets along with the JSON standard for object serialization, makes for an easy convenient way to communicate between diverse systems.
 
 ### **Current Node List:**
 
@@ -27,16 +27,16 @@ Nodes are loosely coupled to each other via your home network using websockets. 
 - **tty Node:** an output node that does same thing as the hogNode except requires a Nordic nRF52840 usb dongle
 - **ir Node:** an output node that controls Ir devices by blasting Ir codes to them
 - **harmony Node:** an output node that controls Harmony Hubs via ip
-- **hasssio Node:** an output node that  controls Hassio Hubs via ip
-- **zone Node:** an output node that interprets published controlWords and re-publishes one or more new controlWords to effectively control multiple devices in a co-ordinated fashion
+- **hasssio Node:** an output node that  controls Hassio Hubs via ip
+- **zone Node:** an output node that interprets published controlWords and re-publishes one or more new controlWords to effectively control multiple devices in a coordinated fashion
 
 ### **Using smartRemotes:**
 
 Using smartRemotes should hopefully be relatively painless... :)
 
 - Copy smartRemotes to your linux box (I'm always logged in as 'root' to avoid security issues)
-- From the /smartRemotes/services directory, pick the nodes you want to use and copy it's service file to the /etc/systemctld/service directory.
+- From the /smartRemotes/services directory, pick the nodes you want to use and copy its service file to the /etc/systemctld/service directory.
 - use systemctl control command to start the node.
 - From the /smartRemotes/scripts directory execute the .sh file that will display the status of the running node or use systemctl status command to do the same
 - Each node has a configuration file in the /smartRemotes/nodes/xxxNode directory. Adjust settings and install missing python support modules as needed until the node is running properly
-- **Note:** the hubNode is the only required Node, so make that your first Node to use 
+- **Note:** the hubNode is the only required Node, so make that your first Node to use

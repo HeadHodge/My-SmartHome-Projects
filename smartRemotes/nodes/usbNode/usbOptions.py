@@ -1,13 +1,22 @@
+# Run "python3 -m evdev.evtest" to list valid device channels
+
+# Example:
+# 0   /dev/input/event0    Anycon AirMouse Remote              usb-0000:01:00.0-1.4/input0
+# 1   /dev/input/event1    Anycon AirMouse Remote Mouse        usb-0000:01:00.0-1.4/input1
+# 2   /dev/input/event2    Anycon AirMouse Remote System Control usb-0000:01:00.0-1.4/input1
+# 3   /dev/input/event3    Anycon AirMouse Remote Consumer Control usb-0000:01:00.0-1.4/input1
+
+usbBridge = {
+    "zone"    : "masterBedroom",
+    "channels": "0,1,2,3",
+}
+
 wsClient = {
     "endPoint": "ws://192.168.0.102:8080/",
     "onConnection": "hubConnected",
     "onReceived": "receivedNote",
 }
 
-usbBridge = {
-    "zone"    : "masterBedroom",
-    "channels": "0,1,2,3",
-}
 
 scanCodeMap = {
     1  : {"controlWord": "Back"},
