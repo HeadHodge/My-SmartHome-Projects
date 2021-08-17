@@ -8,49 +8,49 @@
 #   Licensed works, modifications, and larger works may be distributed under different terms and without source code.
 #
 ####################################################################################################################
-print("Load hidKeyboard")
+
+###########################################
+#              HOG KEYBOARD
+###########################################
+print("Load hogKeyboard")
 
 from gi.repository import GLib
 from dbus.mainloop.glib import DBusGMainLoop
 import os, sys, time, traceback, json, threading
-import dbus, gattApplication
+import dbus, gattService
 
 _mainloop = None
 _keyboard = None
 
-#######################################################
-#                HID KEYBOARD
-#######################################################
-
 #name="Human Interface Device" sourceId="org.bluetooth.service.human_interface_device" type="primary" uuid="1812"
-class HIDService(gattApplication.Service):
+class HIDService(gattService.Service):
     SERVICE_UUID = '1812'
    
     def __init__(self, bus, index):
-        gattApplication.Service.__init__(self, bus, index, self.SERVICE_UUID, True)
+        gattService.Service.__init__(self, bus, index, self.SERVICE_UUID, True)
         
         self.report = ReportCharacteristic(bus, 0, self)
         self.reportMap = ReportMapCharacteristic(bus, 1, self)
         self.hidInfo = HIDInfoCharacteristic(bus, 2, self)
         self.protocolMode = ProtocolModeCharacteristic(bus, 3, self)
-        #self.controlPoint = ControlPointCharacteristic(bus, 4, self)
+        self.controlPoint = ControlPointCharacteristic(bus, 4, self)
         #self.report1 = Report1Characteristic(bus, 5, self)
         
         self.add_characteristic(self.report)
         self.add_characteristic(self.reportMap)
         self.add_characteristic(self.hidInfo)
         self.add_characteristic(self.protocolMode)
+        self.add_characteristic(self.controlPoint)
         #self.add_characteristic(self.report1)
-        #self.add_characteristic(self.controlPoint)
-
+    
 
 #id="report" name="Report" sourceId="org.bluetooth.characteristic.report" uuid="2A4D"        
-class ReportCharacteristic(gattApplication.Characteristic):
+class ReportCharacteristic(gattService.Characteristic):
 
     CHARACTERISTIC_UUID = '2A4D'
 
     def __init__(self, bus, index, service):
-        gattApplication.Characteristic.__init__(
+        gattService.Characteristic.__init__(
                 self, bus, index,
                 self.CHARACTERISTIC_UUID,
                 ['read', 'notify'],
@@ -98,12 +98,12 @@ class ReportCharacteristic(gattApplication.Characteristic):
  
 
 #type="org.bluetooth.descriptor.report_reference" uuid="2908"
-class ReportReferenceDescriptor(gattApplication.Descriptor):
+class ReportReferenceDescriptor(gattService.Descriptor):
 
     DESCRIPTOR_UUID = '2908'
 
     def __init__(self, bus, index, characteristic):
-        gattApplication.Descriptor.__init__(
+        gattService.Descriptor.__init__(
                 self, bus, index,
                 self.DESCRIPTOR_UUID,
                 ['read'],
@@ -141,12 +141,12 @@ class ReportReferenceDescriptor(gattApplication.Descriptor):
         return self.value
 
 #sourceId="org.bluetooth.characteristic.report_map" uuid="2A4B"
-class ReportMapCharacteristic(gattApplication.Characteristic):
+class ReportMapCharacteristic(gattService.Characteristic):
 
     CHARACTERISTIC_UUID = '2A4B'
 
     def __init__(self, bus, index, service):
-        gattApplication.Characteristic.__init__(
+        gattService.Characteristic.__init__(
                 self, bus, index,
                 self.CHARACTERISTIC_UUID,
                 ['read'],
@@ -214,12 +214,12 @@ class ReportMapCharacteristic(gattApplication.Characteristic):
         return self.value
 
 #id="hid_information" name="HID Information" sourceId="org.bluetooth.characteristic.hid_information" uuid="2A4A"
-class HIDInfoCharacteristic(gattApplication.Characteristic):
+class HIDInfoCharacteristic(gattService.Characteristic):
 
     CHARACTERISTIC_UUID = '2A4A'
 
     def __init__(self, bus, index, service):
-        gattApplication.Characteristic.__init__(
+        gattService.Characteristic.__init__(
                 self, bus, index,
                 self.CHARACTERISTIC_UUID,
                 ['read'],
@@ -269,13 +269,13 @@ class HIDInfoCharacteristic(gattApplication.Characteristic):
         return self.value
         
 #name="Protocol Mode" sourceId="org.bluetooth.characteristic.protocol_mode" uuid="2A4E"
-class ProtocolModeCharacteristic(gattApplication.Characteristic):
+class ProtocolModeCharacteristic(gattService.Characteristic):
 
     CHARACTERISTIC_UUID = '2A4E'
 
     def __init__(self, bus, index, service):
         
-        gattApplication.Characteristic.__init__(
+        gattService.Characteristic.__init__(
                 self, bus, index,
                 self.CHARACTERISTIC_UUID,
                 ["read", "write-without-response"],
@@ -305,13 +305,14 @@ class ProtocolModeCharacteristic(gattApplication.Characteristic):
         print(f'Write ProtocolMode {value}')
         self.value = value
         
+
 #sourceId="org.bluetooth.characteristic.hid_control_point" uuid="2A4C"
-class ControlPointCharacteristic(gattApplication.Characteristic):
+class ControlPointCharacteristic(gattService.Characteristic):
 
     CHARACTERISTIC_UUID = '2A4C'
 
     def __init__(self, bus, index, service):
-        gattApplication.Characteristic.__init__(
+        gattService.Characteristic.__init__(
                 self, bus, index,
                 self.CHARACTERISTIC_UUID,
                 ["write-without-response"],
@@ -328,7 +329,6 @@ class ControlPointCharacteristic(gattApplication.Characteristic):
 def onConnectSignal(interface, changed, data=[]):
 #############################################
     if(changed.get("Connected", None) == None): return    
-    #print(f'onConnectSignal, interface: {interface}, changed: {changed}')
     print(f'****CONNECTION ALERT****, interface: {interface}, connected: {changed.get("Connected", 1)}')
         
     #start advertising if not connected to host device
@@ -337,16 +337,11 @@ def onConnectSignal(interface, changed, data=[]):
     if(changed["Connected"] == True): return
     return
     
-    #start advertising
-    print(' \n***ADVERTISE: Host device not connected');
-    os.system("hcitool -i hci0 cmd 0x08 0x0006 50 00 50 00 00 00 00 00 00 00 00 00 00 07 00")
-    os.system("hcitool -i hci0 cmd 0x08 0x000a 01")
 
 ####################################
-async def deliverCommand(controlCommand):
+async def receivedCommand(controlCommand):
 ####################################
     try:
-        #controlCommand = {"controlWord": "Menu", "hidCode": 0x40, "hidReport": 2}               
         hidReport = controlCommand.get('hidReport', 1)
         hidCode = controlCommand.get('hidCode', 0)
         hidMod = controlCommand.get('hidMod', 0)
@@ -376,8 +371,13 @@ def start(options={}):
         print("Start hidKeyboard")
         global _mainloop, _keyboard
         
-        _keyboard = gattApplication.Application([HIDService])
- 
+        _keyboard = gattService.Application([HIDService])
+
+        #start advertising
+        #print(' \n***ADVERTISE: Host device not connected');
+        #os.system("hcitool -i hci0 cmd 0x08 0x0006 50 00 50 00 00 00 00 00 00 00 00 00 00 07 00")
+        #os.system("hcitool -i hci0 cmd 0x08 0x000a 01")
+        
         # Enable ConnectSignal
         #threading.Thread(target=btDevice.enableConnectSignal, args=(onConnectSignal,)).start()
         #btleDevice.enableConnectSignal(onConnectSignal)
@@ -385,11 +385,11 @@ def start(options={}):
         #onConnectSignal('org.bluez.Device1', {'Connected': btDevice.isConnected()})
         
         # Start btOutput event loop
-        #print('start hidKeyboard mainLoop')
+        #print('start hogKeyboard mainLoop')
         _mainloop = GLib.MainLoop()
         _mainloop.run()
     except:
-        print('Abort hidKeyboard: ', sys.exc_info()[0])
+        print('Abort hogKeyboard: ', sys.exc_info()[0])
         traceback.print_exc()
 
 ##########################

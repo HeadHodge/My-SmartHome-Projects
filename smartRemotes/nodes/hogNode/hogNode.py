@@ -1,5 +1,5 @@
 #############################################
-##                 hogNode
+##               hogNode
 #############################################
 print('Load hogNode')
 
@@ -7,19 +7,19 @@ from multiprocessing import Process
 from dbus.mainloop.glib import DBusGMainLoop
 import os, sys, time, json, asyncio, traceback, queue, threading, importlib
 
-path = os.path.join(os.path.dirname(__file__), '../../imports/bt-le')
+path = os.path.join(os.path.dirname(__file__), '../../imports/bt-ble')
 sys.path.append(path)
 path = os.path.join(os.path.dirname(__file__), '../../imports/network')
 sys.path.append(path)
 path = os.path.join(os.path.dirname(__file__), './zones')
 sys.path.append(path)
 
-import wsClient, noteTool, hogBridge, hogOptions
+import wsClient, hogKeyboard, pairAgent, pairAdvertise, noteTool, hogOptions
 
 _zones = {}
 
 #############################################
-async def receivedNote(note, connection):
+async def receivedNote(note):
 #############################################
     try:
         print(f' \n***receivedNote: {note}')
@@ -52,28 +52,25 @@ async def receivedNote(note, connection):
             importlib.reload(_zones[zone])
               
         #controlCommand = [{"controlWord": "Menu", "hidCode": 0x40, "hidReport": 2}]              
-        await hogBridge.receivedCommand(controlCommand[0])
+        await hogKeyboard.receivedCommand(controlCommand[0])
     except:
         print('Abort receivedNote: ', sys.exc_info()[0])
         traceback.print_exc()
 
 #############################################
-async def hubConnected(connection):
+async def hubConnected():
 #############################################
     try:
         print(f' \n***hubConnected')
-            
-        if hasattr(hogOptions, 'noteFilter'):
-            filter = hogOptions.noteFilter
-        else:
-            filter = {}
         
-        note = noteTool.publishNote('hogNode', 'subscribe', {
-            'title': 'control hidClient request',
+        filter = getattr(hogOptions, 'noteFilter', {'zone': 'livingRoom'})
+       
+        note = noteTool.publishNote('irNode', 'subscribe', {
+            'title' : 'control hidNode request',
             'filter': filter
         })
         
-        await wsClient.deliverNote(connection, note)
+        await wsClient.deliverPayload(hogOptions.wsClient['connection'], note)
         
         print(f' \n***Wait for \'{note["content"]["title"]}\' notes...')
         print(f'*********************************************************')
@@ -86,18 +83,36 @@ def start():
 #############################################
     print('Start hogNode')
 
-    try:        
+    try:
         time.sleep(3)
         
-        # Start gattServer module
+        # Start hogKeyboard module
         try:            
-            threading.Thread(target=hogBridge.start, args=(hogOptions.hidServer,)).start()
+            threading.Thread(target=hogKeyboard.start, args=(hogOptions.hidKeyboard,)).start()
         except:
-            print('Abort btServer: ', sys.exc_info()[0])
+            print('Abort hogKeyboard: ', sys.exc_info()[0])
+            traceback.print_exc()
+
+        time.sleep(1)
+      
+        # Start pairAgent module
+        try:            
+            threading.Thread(target=pairAgent.start, args=(hogOptions.pairAgent,)).start()
+        except:
+            print('Abort pairAgent: ', sys.exc_info()[0])
             traceback.print_exc()
 
         time.sleep(1)
         
+        # Start pairAdvertise module
+        try:            
+            threading.Thread(target=pairAdvertise.start, args=(hogOptions.pairAdvertise,)).start()
+        except:
+            print('Abort pairAdvertise: ', sys.exc_info()[0])
+            traceback.print_exc()
+
+        time.sleep(1)
+            
         # Start wsClient module
         try:            
             threading.Thread(target=wsClient.start, args=(hogOptions.wsClient,)).start()
