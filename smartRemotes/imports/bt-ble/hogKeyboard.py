@@ -17,17 +17,17 @@ print("Load hogKeyboard")
 from gi.repository import GLib
 from dbus.mainloop.glib import DBusGMainLoop
 import os, sys, time, traceback, json, threading
-import dbus, gattService
+import dbus, gattBridge
 
 _mainloop = None
 _keyboard = None
 
 #name="Human Interface Device" sourceId="org.bluetooth.service.human_interface_device" type="primary" uuid="1812"
-class HIDService(gattService.Service):
+class HIDService(gattBridge.Service):
     SERVICE_UUID = '1812'
    
     def __init__(self, bus, index):
-        gattService.Service.__init__(self, bus, index, self.SERVICE_UUID, True)
+        gattBridge.Service.__init__(self, bus, index, self.SERVICE_UUID, True)
         
         self.report = ReportCharacteristic(bus, 0, self)
         self.reportMap = ReportMapCharacteristic(bus, 1, self)
@@ -45,12 +45,12 @@ class HIDService(gattService.Service):
     
 
 #id="report" name="Report" sourceId="org.bluetooth.characteristic.report" uuid="2A4D"        
-class ReportCharacteristic(gattService.Characteristic):
+class ReportCharacteristic(gattBridge.Characteristic):
 
     CHARACTERISTIC_UUID = '2A4D'
 
     def __init__(self, bus, index, service):
-        gattService.Characteristic.__init__(
+        gattBridge.Characteristic.__init__(
                 self, bus, index,
                 self.CHARACTERISTIC_UUID,
                 ['read', 'notify'],
@@ -98,12 +98,12 @@ class ReportCharacteristic(gattService.Characteristic):
  
 
 #type="org.bluetooth.descriptor.report_reference" uuid="2908"
-class ReportReferenceDescriptor(gattService.Descriptor):
+class ReportReferenceDescriptor(gattBridge.Descriptor):
 
     DESCRIPTOR_UUID = '2908'
 
     def __init__(self, bus, index, characteristic):
-        gattService.Descriptor.__init__(
+        gattBridge.Descriptor.__init__(
                 self, bus, index,
                 self.DESCRIPTOR_UUID,
                 ['read'],
@@ -141,12 +141,12 @@ class ReportReferenceDescriptor(gattService.Descriptor):
         return self.value
 
 #sourceId="org.bluetooth.characteristic.report_map" uuid="2A4B"
-class ReportMapCharacteristic(gattService.Characteristic):
+class ReportMapCharacteristic(gattBridge.Characteristic):
 
     CHARACTERISTIC_UUID = '2A4B'
 
     def __init__(self, bus, index, service):
-        gattService.Characteristic.__init__(
+        gattBridge.Characteristic.__init__(
                 self, bus, index,
                 self.CHARACTERISTIC_UUID,
                 ['read'],
@@ -214,12 +214,12 @@ class ReportMapCharacteristic(gattService.Characteristic):
         return self.value
 
 #id="hid_information" name="HID Information" sourceId="org.bluetooth.characteristic.hid_information" uuid="2A4A"
-class HIDInfoCharacteristic(gattService.Characteristic):
+class HIDInfoCharacteristic(gattBridge.Characteristic):
 
     CHARACTERISTIC_UUID = '2A4A'
 
     def __init__(self, bus, index, service):
-        gattService.Characteristic.__init__(
+        gattBridge.Characteristic.__init__(
                 self, bus, index,
                 self.CHARACTERISTIC_UUID,
                 ['read'],
@@ -269,13 +269,13 @@ class HIDInfoCharacteristic(gattService.Characteristic):
         return self.value
         
 #name="Protocol Mode" sourceId="org.bluetooth.characteristic.protocol_mode" uuid="2A4E"
-class ProtocolModeCharacteristic(gattService.Characteristic):
+class ProtocolModeCharacteristic(gattBridge.Characteristic):
 
     CHARACTERISTIC_UUID = '2A4E'
 
     def __init__(self, bus, index, service):
         
-        gattService.Characteristic.__init__(
+        gattBridge.Characteristic.__init__(
                 self, bus, index,
                 self.CHARACTERISTIC_UUID,
                 ["read", "write-without-response"],
@@ -307,12 +307,12 @@ class ProtocolModeCharacteristic(gattService.Characteristic):
         
 
 #sourceId="org.bluetooth.characteristic.hid_control_point" uuid="2A4C"
-class ControlPointCharacteristic(gattService.Characteristic):
+class ControlPointCharacteristic(gattBridge.Characteristic):
 
     CHARACTERISTIC_UUID = '2A4C'
 
     def __init__(self, bus, index, service):
-        gattService.Characteristic.__init__(
+        gattBridge.Characteristic.__init__(
                 self, bus, index,
                 self.CHARACTERISTIC_UUID,
                 ["write-without-response"],
@@ -371,7 +371,7 @@ def start(options={}):
         print("Start hidKeyboard")
         global _mainloop, _keyboard
         
-        _keyboard = gattService.Application([HIDService])
+        _keyboard = gattBridge.Application([HIDService])
 
         #start advertising
         #print(' \n***ADVERTISE: Host device not connected');
