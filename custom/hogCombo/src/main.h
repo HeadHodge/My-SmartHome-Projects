@@ -12,8 +12,9 @@
 extern "C" {
 #endif
 
-void setConnectState(int);
-void setAdvertiseState(int);
+void printLog(char *);
+extern char logBuffer[];
+extern struct ring_buf ringbuf;
 
 #ifdef __cplusplus
 }

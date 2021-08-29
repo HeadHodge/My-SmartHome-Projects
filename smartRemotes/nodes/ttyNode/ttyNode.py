@@ -48,18 +48,20 @@ async def receivedNote(note):
         keyDownCommand = commandOptions[0].get("deviceCommand", [0xff, 0x00, 0x00, 0x00, 0x00, 0x00])
         keyUpCommand = [0xff, keyDownCommand[1], 0x00, 0x00, 0x00, 0x00]
 
+        #print(f'** Deliver: {keyDownCommand}')
         await ttyBridge.deliverCommand(
             ttyOptions.ttyBridge['connection'],
-            bytearray(keyDownCommand)
+            bytes(keyDownCommand)
         )
         
         if(keyDownCommand[1] == 3): return
         
         time.sleep(keyPressSecs)
         
+        #print(f'** Deliver: {keyUpCommand}')
         await ttyBridge.deliverCommand(
             ttyOptions.ttyBridge['connection'],
-            bytearray(keyUpCommand)
+            bytes(keyUpCommand)
         )
         
     except:
@@ -83,6 +85,7 @@ async def hubConnected():
         })
         
         await wsClient.deliverPayload(ttyOptions.wsClient['connection'], note)
+        await ttyBridge.deliverCommand(ttyOptions.ttyBridge['connection'], bytes([0xaa]))
         
         print(f' \n***Wait for \'{note["content"]["title"]}\' notes...')
         print(f'*********************************************************')
@@ -116,7 +119,7 @@ async def receivedNotice(notice):
                 "event_type": ttyOptions.hassioEvents["event_type"]    
             }
             
-            print(f' \n***deliverPayload: {payload}')
+            print(f' \n**deliver: {payload}')
             await wsClient.deliverPayload(ttyOptions.wsClient['connection'], payload)
         
         elif(notice['type'] == "result"):
@@ -155,16 +158,17 @@ def start():
 
     try:
         time.sleep(3)
-         
-        # Start wsClient module
+        '''
+        # Start posixBridge module
         try:            
-            threading.Thread(target=wsClient.start, args=(ttyOptions.wsClient,)).start()
+            threading.Thread(target=posixBridge.start, args=(ttyOptions.posixBridge,)).start()
         except:
-            print('Abort wsClient: ', sys.exc_info()[0])
+            print('Abort posixBridge: ', sys.exc_info()[0])
             traceback.print_exc()
         
         time.sleep(1)
-       
+        '''
+        
         # Start ttyBridge module
         try:            
             threading.Thread(target=ttyBridge.start, args=(ttyOptions.ttyBridge,)).start()
@@ -173,6 +177,16 @@ def start():
             traceback.print_exc()
 
         time.sleep(1)
+
+        # Start wsClient module
+        try:            
+            threading.Thread(target=wsClient.start, args=(ttyOptions.wsClient,)).start()
+        except:
+            print('Abort wsClient: ', sys.exc_info()[0])
+            traceback.print_exc()
+        
+        time.sleep(1)
+        
     except:
         print('Abort ttyNode: ', sys.exc_info()[0])
         traceback.print_exc()

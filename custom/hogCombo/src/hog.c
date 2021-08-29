@@ -23,8 +23,9 @@
 #include <bluetooth/uuid.h>
 #include <bluetooth/gatt.h>
 
-#include "usb.h"
+#include "main.h"
 #include "gatt.h"
+#include "uart.h"
 
 enum {
     HIDS_REMOTE_WAKE = BIT(0),
@@ -129,7 +130,7 @@ static ssize_t read_info(struct bt_conn *conn,
               const struct bt_gatt_attr *attr, void *buf,
               uint16_t len, uint16_t offset)
 {
-    log("hog: read_info");
+    console("hog: read_info");
     return bt_gatt_attr_read(conn, attr, buf, len, offset, attr->user_data,
                  sizeof(struct hids_info));
 }
@@ -138,7 +139,7 @@ static ssize_t read_report_map(struct bt_conn *conn,
                    const struct bt_gatt_attr *attr, void *buf,
                    uint16_t len, uint16_t offset)
 {
-    log("hog: read_report_map");
+    console("hog: read_report_map");
     return bt_gatt_attr_read(conn, attr, buf, len, offset, report_map,
                  sizeof(report_map));
 }
@@ -147,7 +148,7 @@ static ssize_t read_report(struct bt_conn *conn,
                  const struct bt_gatt_attr *attr, void *buf,
                  uint16_t len, uint16_t offset)
 {
-    log("hog: read_report");
+    console("hog: read_report");
 	
 	static uint8_t report_data[] = {
 		0x00,	  // Modifer Code
@@ -166,7 +167,7 @@ static ssize_t read_keyboard_report_reference(struct bt_conn *conn,
 		.type = HIDS_INPUT,
 	};
     
-	log("hog: read_keyboard_report_reference");
+	console("hog: read_keyboard_report_reference");
     return bt_gatt_attr_read(conn, attr, buf, len, offset, &report_reference, sizeof(report_reference));
 }
 
@@ -179,7 +180,7 @@ static ssize_t read_consumer_report_reference(struct bt_conn *conn,
 		.type = HIDS_INPUT,
 	};
     
-	log("hog: read_consumer_report_reference");
+	console("hog: read_consumer_report_reference");
     return bt_gatt_attr_read(conn, attr, buf, len, offset, &report_reference, sizeof(report_reference));
 }
 
@@ -192,7 +193,7 @@ static ssize_t read_mouse_report_reference(struct bt_conn *conn,
 		.type = HIDS_INPUT,
 	};
     
-	log("hog: read_mouse_report_reference");
+	console("hog: read_mouse_report_reference");
     return bt_gatt_attr_read(conn, attr, buf, len, offset, &report_reference, sizeof(report_reference));
 }
 
@@ -200,7 +201,7 @@ static ssize_t read_protocol_mode(struct bt_conn *conn,
                  const struct bt_gatt_attr *attr, void *buf,
                  uint16_t len, uint16_t offset)
 {
-    log("hog: read_protocol_mode");
+    console("hog: read_protocol_mode");
 	
 	static uint8_t report_data[] = {
 		0x01,	  // input report mode
@@ -214,14 +215,14 @@ static ssize_t write_protocol_mode(struct bt_conn *conn,
                 const void *buf, uint16_t len, uint16_t offset,
                 uint8_t flags)
 {
-    log("hog: write_protocol_mode");
+    console("hog: write_protocol_mode");
 
     uint8_t *value = attr->user_data;
 	
 	char snum[10];
 	
 	sprintf(snum, "%d", value[0]);
-	log(snum);
+	console(snum);
 
     return len;
 }
@@ -233,7 +234,7 @@ volatile bool notify_enable;
 	//ARG_UNUSED(attr);
 	notify_enable = (value == BT_GATT_CCC_NOTIFY);
     sprintf(logBuffer, "hog: input_ccc_changed: %s", notify_enable ? "enabled" : "disabled");
-	log(logBuffer);
+	console(logBuffer);
 }
 
 static ssize_t write_ctrl_point(struct bt_conn *conn,
@@ -243,7 +244,7 @@ static ssize_t write_ctrl_point(struct bt_conn *conn,
 {
     uint8_t *value = attr->user_data;
 
-    log("hog: write_ctrl_point");
+    console("hog: write_ctrl_point");
     
     if (offset + len > sizeof(ctrl_point)) {
         return BT_GATT_ERR(BT_ATT_ERR_INVALID_OFFSET);
@@ -310,7 +311,7 @@ BT_GATT_SERVICE_DEFINE(hog_svc,
 
 void sendReport(uint8_t *buffer)
 {
-	int8_t result;
+	int8_t result=0;
 	uint8_t keyboard_report_data[2];
 	uint8_t consumer_report_data[2];
 	uint8_t mouse_report_data[3];
@@ -318,7 +319,8 @@ void sendReport(uint8_t *buffer)
 		
 	if(isConnected == 0) {
 		sprintf(logBuffer, "Abort: Peer not connected.");
-		log(logBuffer);
+		console(logBuffer);
+		startAdvertising();
 		return;
 	}
 	
@@ -331,7 +333,7 @@ void sendReport(uint8_t *buffer)
 		
 		result = bt_gatt_notify(NULL, &hog_svc.attrs[2], keyboard_report_data, sizeof(keyboard_report_data));
 		sprintf(logBuffer, "***Sent Keyboard Report1: x%02x, x%02x result: %d", keyboard_report_data[0], keyboard_report_data[1], result);
-		log(logBuffer);
+		console(logBuffer);
 		
 		break;
 	case 2:
@@ -341,7 +343,7 @@ void sendReport(uint8_t *buffer)
 
 		result = bt_gatt_notify(NULL, &hog_svc.attrs[5], consumer_report_data, sizeof(consumer_report_data));
 		sprintf(logBuffer, "***Sent Consumer Report2: x%02x, x%02x result: %d", consumer_report_data[0], consumer_report_data[1], result);
-		log(logBuffer);
+		console(logBuffer);
 		
 		break;
 	case 3:
@@ -352,16 +354,16 @@ void sendReport(uint8_t *buffer)
 
  		result = bt_gatt_notify(NULL, &hog_svc.attrs[9], mouse_report_data, sizeof(mouse_report_data));
 		sprintf(logBuffer, "***Sent Mouse Report3: x%02x, x%02x, x%02x, result: %d", mouse_report_data[0], mouse_report_data[1], mouse_report_data[2], result);
-		log(logBuffer);
+		console(logBuffer);
 		
 		break;
 	default :
 		sprintf(logBuffer, "Invalid reportId: %d", reportId);
-		log(logBuffer);
+		console(logBuffer);
 	}
 }
 
 void hog_init(void)
 {
-    log("hog: hog_init");
+    console("hog: hog_init");
 }

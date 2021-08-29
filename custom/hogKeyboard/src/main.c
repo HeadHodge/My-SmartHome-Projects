@@ -8,12 +8,11 @@
 
 #include "gatt.h"
 #include "usb.h"
-#include "led.h"
 
 void main(void)
 {
 	usbStart();
 	
-	log("start HoG Combo");
+	log("start keyboard");
 	gattStart();
 }

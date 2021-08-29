@@ -10,15 +10,19 @@ wsHassio = {
     "onReceived": "receivedNotice",
 }
 
-wsClient = wsHassio
+wsClient = wsHub
 
 ttyBridge = {
-    'port'      : '/dev/ttyACM0',
+    'port'      : '/dev/pts/2',
     'speed'     : 115200,
     'timeout'   : None,
     'parity'    : 'N', #None
     'xonxoff'   : 0,
-    'rtscts'    : 1,  
+    'rtscts'    : 0,  
+}
+
+posixBridge = {
+    'osCommand' : '/smartRemote/nodes/ttyNode/runPosix.sh',
 }
 
 noteFilter = {

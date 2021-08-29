@@ -12,9 +12,9 @@
 extern "C" {
 #endif
 
-void usbStart(void);
-void log(char*);
-extern char logBuffer[];
+void uartStart(void);
+void console(char *);
+extern char consoleBuffer[];
 
 #ifdef __cplusplus
 }

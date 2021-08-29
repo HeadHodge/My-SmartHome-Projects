@@ -24,64 +24,95 @@
 #include <bluetooth/gatt.h>
 
 #include "hog.h"
-#include "usb.h"
-#include "led.h"
+#include "main.h"
+#include "uart.h"
 
 int isConnected = 0;
+int isAdvertising = 0;
 
 static const struct bt_data ad[] = {
 	BT_DATA_BYTES(BT_DATA_GAP_APPEARANCE, 0xc1, 0x03),
-	BT_DATA_BYTES(BT_DATA_FLAGS, (BT_LE_AD_GENERAL | BT_LE_AD_NO_BREDR)),
+	BT_DATA_BYTES(BT_DATA_FLAGS, (BT_LE_AD_GENERAL | BT_GAP_NO_TIMEOUT | BT_LE_AD_NO_BREDR)),
 	BT_DATA_BYTES(BT_DATA_UUID16_ALL, BT_UUID_16_ENCODE(BT_UUID_HIDS_VAL), BT_UUID_16_ENCODE(BT_UUID_BAS_VAL)),
 };
+
+void startAdvertising()
+{
+	int err=0;
+	
+	if(isAdvertising != 0) {
+		console("Abort startAdvertising: Already advertising");
+		return;
+	}
+	
+	err = bt_le_adv_start(BT_LE_ADV_CONN_NAME, ad, ARRAY_SIZE(ad), NULL, 0);
+	
+	if(err) {
+		sprintf(logBuffer, "Abort startAdvertising, err: %d", err);
+		console(logBuffer);
+		return;
+	}
+	
+	printk("Advertising started\n");
+	console("Advertising started");
+	isAdvertising = 1;
+	//setAdvertiseState(3); //flash advertise led
+}
 
 static void bt_ready(int err)
 {
 	if (err) {
-		printk("Bluetooth init failed (err %d)\n", err);
+		console("Bluetooth init failed");
 		return;
 	}
 
-	//printk("Bluetooth initialized\n");
-	log("Bluetooth initialized");
-
-	//hog_init();
-
 	if(IS_ENABLED(CONFIG_SETTINGS)) settings_load();
 
+	/*
 	err = bt_le_adv_start(BT_LE_ADV_CONN_NAME, ad, ARRAY_SIZE(ad), NULL, 0);
 	
 	if (err) {
 		//printk("Advertising failed to start (err %d)\n", err);
-		log("Advertising failed to start");
+		console("Advertising failed to start");
 		return;
 	}
+	*/
 
-	setConnectState(3);
-	setAdvertiseState(3);
-	log("Advertising successfully started");
+	printk("Bluetooth started\n");
+	console("Bluetooth started");
+	
+	isConnected = 0;
+	//setConnectState(3); //flash connect led
+	
+	isAdvertising = 0;
+	//setAdvertiseState(1); //solid advertise led
+	
+	startAdvertising();
 }
 
-static void connected(struct bt_conn *conn, uint8_t err)
+static void connected(struct bt_conn *conn, uint8_t status)
 {
-	char addr[BT_ADDR_LE_STR_LEN];
+	//char addr[BT_ADDR_LE_STR_LEN];
 
-	bt_addr_le_to_str(bt_conn_get_dst(conn), addr, sizeof(addr));
+	//bt_addr_le_to_str(bt_conn_get_dst(conn), addr, sizeof(addr));
+	
+	sprintf(logBuffer, "Connected status: %d", status);
+	console(logBuffer);
 
-	if (err) {
-		log("Failed to connect");
+	if(status) {
+		console("Failed to connect");
 		return;
 	}
-
-	setConnectState(1);
-	setAdvertiseState(1);
-	log("Connected!");
-	isConnected = 1;
 	
-	if (bt_conn_set_security(conn, BT_SECURITY_L2)) {
-		//printk("Failed to set security\n");
-		log("Failed to set security on connection");
-	}
+	//if (bt_conn_set_security(conn, BT_SECURITY_L2)) {
+	//	console("Failed to set security on connection");
+	//}
+
+	isConnected = 1;
+	//setConnectState(1); //solid connect led
+	
+	isAdvertising = 0;
+	//setAdvertiseState(1); //solid advertise led
 }
 
 static void disconnected(struct bt_conn *conn, uint8_t reason)
@@ -91,10 +122,14 @@ static void disconnected(struct bt_conn *conn, uint8_t reason)
 	bt_addr_le_to_str(bt_conn_get_dst(conn), addr, sizeof(addr));
 
 	//printk("Disconnected from %s (reason 0x%02x)\n", addr, reason);
-	setConnectState(3);
-	setAdvertiseState(3);
-	log("Disconnected");
+	sprintf(logBuffer, "Disconnected reason: %d", reason);
+	console(logBuffer);
+	
 	isConnected = 0;
+	//setConnectState(3); //flash connect led
+	
+	isAdvertising = 0;
+	//setAdvertiseState(1); //solid advertise led
 }
 
 static void security_changed(struct bt_conn *conn, bt_security_t level, enum bt_security_err err)
@@ -105,10 +140,10 @@ static void security_changed(struct bt_conn *conn, bt_security_t level, enum bt_
 
 	if (!err) {
 		sprintf(logBuffer, "Security changed: L%d", level);
-		log(logBuffer);
+		console(logBuffer);
 	} else {
 		sprintf(logBuffer, "Security change failed, level: %d, err: %d", level, err);
-		log(logBuffer);
+		console(logBuffer);
 	}
 }
 
@@ -125,7 +160,7 @@ static void auth_pairing_confirm(struct bt_conn *conn)
 	reply = bt_conn_auth_pairing_confirm(conn);
 	
 	sprintf(logBuffer, "Confirm Pairing, result: %d", reply);
-	log(logBuffer);
+	console(logBuffer);
 }
 
 static void auth_cancel(struct bt_conn *conn)
@@ -135,7 +170,7 @@ static void auth_cancel(struct bt_conn *conn)
 	bt_addr_le_to_str(bt_conn_get_dst(conn), addr, sizeof(addr));
 
 	//printk("Pairing cancelled: %s\n", addr);
-	log("Pairing cancel");
+	console("Pairing cancel");
 }
 
 static struct bt_conn_auth_cb auth_cb_display = {
@@ -143,13 +178,15 @@ static struct bt_conn_auth_cb auth_cb_display = {
 	.cancel = auth_cancel,
 };
 
-void gattStart(void)
+void gattStart()
 {
+	printk("gattStart\n");
+	console("gattStart");
 	int err;
 
 	err = bt_enable(bt_ready);
 	if (err) {
-		log("Bluetooth init failed");
+		console("Bluetooth init failed");
 		return;
 	}
 	
