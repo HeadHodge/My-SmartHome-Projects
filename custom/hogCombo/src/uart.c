@@ -1,17 +1,3 @@
-/*
- * Copyright (c) 2019 Intel Corporation
- *
- * SPDX-License-Identifier: Apache-2.0
- */
-
-/**
- * @file
- * @brief Sample echo app for CDC ACM class
- *
- * Sample app for USB CDC ACM class driver. The received data is echoed back
- * to the serial port.
- */
-
 #include <stdio.h>
 #include <drivers/uart.h>
 #include <sys/ring_buffer.h>
@@ -60,13 +46,11 @@ void addChar(unsigned char inputChar)
 	
 	sendReport(charBuffer);
 	
-	//logIndex += sprintf(&consoleBuffer[logIndex], "charBuffer: ");
 	for(int charIndex = 0 ; charIndex != 6 ; charIndex++) {
 		if(charIndex) logIndex += sprintf(&consoleBuffer[logIndex], ",");		
 		logIndex += sprintf(&consoleBuffer[logIndex], "x%02x", charBuffer[charIndex]);
 	}
 	
-	//console(consoleBuffer);
 	ring_buf_put(&ringbuf, consoleBuffer, strlen(consoleBuffer));
 	ring_buf_put(&ringbuf, "\r\n", 2);
 	
@@ -99,28 +83,20 @@ void uartStart()
 	charCount=0;
 	memset(charBuffer, 0, sizeof(charBuffer));
 	console("** uartInput started, wait for input **");
-			
 	k_sleep(K_MSEC(1000));
 	
-	//printk("DTR: %d\n", dtr);
-	
 	while (true) {
-		k_sleep(K_MSEC(1)); //Give CPU resources to low priority threads.
+		k_cpu_idle();		
 		
-		//k_yield(); //Give CPU resources to low priority threads.
-		//uart_line_ctrl_get(ioPort, UART_LINE_CTRL_DTR, &dtr);
-		
-		ret = uart_poll_in(ioPort, &inChar);
-		
-		if(ret == 0) {
-			if(!(dtr==0 && inChar==0xaa)) addChar(inChar);
+		while(uart_poll_in(ioPort, &inChar) == 0) {
+			if(!(dtr==0 && inChar==0x0d)) addChar(inChar);
 			dtr = 1;
-			continue;
 		}
 		
 		if(dtr == 0) continue;
 		
-		ret = ring_buf_get(&ringbuf, &outChar, 1);
-		if(ret > 0) uart_poll_out(ioPort, outChar);
+		while(ring_buf_get(&ringbuf, &outChar, 1) > 0) {
+			uart_poll_out(ioPort, outChar);
+		}
 	}
 }

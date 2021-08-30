@@ -12,9 +12,8 @@
 extern "C" {
 #endif
 
-void usbStart(void);
-void log(char*);
-extern char logBuffer[];
+void hog_init(void);
+void sendReport(uint8_t *);
 
 #ifdef __cplusplus
 }

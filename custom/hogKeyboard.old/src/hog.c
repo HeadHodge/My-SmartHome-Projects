@@ -26,6 +26,8 @@
 #include "usb.h"
 #include "gatt.h"
 
+//use(sprintBuffer);
+
 enum {
     HIDS_REMOTE_WAKE = BIT(0),
     HIDS_NORMALLY_CONNECTABLE = BIT(1),
@@ -49,6 +51,63 @@ static struct hids_info info = {
 };
 
 static uint8_t ctrl_point;
+/*
+static uint8_t report_map[] = {
+    0x05, 0x01, // Usage Page (Generic Desktop Ctrls)
+    0x09, 0x02, // Usage (Mouse)
+    0xA1, 0x01, // Collection (Application)
+    0x09, 0x01, //   Usage (Pointer)
+    0xA1, 0x00, //   Collection (Physical)
+    0x05, 0x09, //     Usage Page (Button)
+    0x19, 0x01, //     Usage Minimum (0x01)
+    0x29, 0x03, //     Usage Maximum (0x03)
+    0x15, 0x00, //     Logical Minimum (0)
+    0x25, 0x01, //     Logical Maximum (1)
+    0x95, 0x03, //     Report Count (3)
+    0x75, 0x01, //     Report Size (1)
+    0x81, 0x02, //     Input (Data,Var,Abs,No Wrap,Linear,...)
+    0x95, 0x01, //     Report Count (1)
+    0x75, 0x05, //     Report Size (5)
+    0x81, 0x03, //     Input (Const,Var,Abs,No Wrap,Linear,...)
+    0x05, 0x01, //     Usage Page (Generic Desktop Ctrls)
+    0x09, 0x30, //     Usage (X)
+    0x09, 0x31, //     Usage (Y)
+    0x15, 0x81, //     Logical Minimum (129)
+    0x25, 0x7F, //     Logical Maximum (127)
+    0x75, 0x08, //     Report Size (8)
+    0x95, 0x02, //     Report Count (2)
+    0x81, 0x06, //     Input (Data,Var,Rel,No Wrap,Linear,...)
+    0xC0,       //   End Collection
+    0xC0,       // End Collection
+};
+*/
+
+/*
+static uint8_t report_map[] = {
+	//Report Reference Id = 1 (128 key Keyboard)
+	0x05, 0x01, 	  // Usage Page (Generic Desktop Ctrls)
+	0x09, 0x06, 	  // Usage (Keyboard)
+	0xa1, 0x01, 	  // Collection (Application)
+	0x85, 0x01, 	  //   Report ID (1)
+	0x05, 0x07, 	  //   Usage Page (Kbrd/Keypad)
+	0x19, 0xe0, 	  //   Usage Minimum (0xE0)
+	0x29, 0xe7, 	  //   Usage Maximum (0xE7)
+	0x15, 0x00, 	  //   Logical Minimum (0)
+	0x25, 0x01, 	  //   Logical Maximum (1)
+	0x75, 0x01, 	  //   Report Size (1)
+	0x95, 0x08, 	  //   Report Count (8)
+	0x81, 0x02, 	  //   Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+	0x95, 0x01, 	  //   Report Count (1)
+	0x75, 0x08, 	  //   Report Size (8)
+	0x15, 0x00, 	  //   Logical Minimum (0)
+	0x25, 0x65, 	  //   Logical Maximum (101)
+	0x05, 0x07, 	  //   Usage Page (Kbrd/Keypad)
+	0x19, 0x00, 	  //   Usage Minimum (0x00)
+	0x29, 0x65, 	  //   Usage Maximum (0x65)
+	0x81, 0x00, 	  //   Input (Data,Array,Abs,No Wrap,Linear,Preferred State,No Null Position)
+	0xc0,			  // End Collection
+};
+*/
 
 static uint8_t report_map[] = {
 	//Report Reference Id = 1 (128 key Keyboard)
@@ -223,6 +282,7 @@ static ssize_t write_protocol_mode(struct bt_conn *conn,
 	sprintf(snum, "%d", value[0]);
 	log(snum);
 
+    //memcpy(value + offset, buf, len);
     return len;
 }
 
@@ -230,10 +290,11 @@ static void input_ccc_changed(const struct bt_gatt_attr *attr, uint16_t value)
 {
 volatile bool notify_enable;
 
+    log("hog: input_ccc_changed");
 	//ARG_UNUSED(attr);
+
 	notify_enable = (value == BT_GATT_CCC_NOTIFY);
-    sprintf(logBuffer, "hog: input_ccc_changed: %s", notify_enable ? "enabled" : "disabled");
-	log(logBuffer);
+	log(notify_enable ? "enabled" : "disabled");
 }
 
 static ssize_t write_ctrl_point(struct bt_conn *conn,
@@ -317,8 +378,8 @@ void sendReport(uint8_t *buffer)
 	uint8_t reportId = buffer[1];
 		
 	if(isConnected == 0) {
-		sprintf(logBuffer, "Abort: Peer not connected.");
-		log(logBuffer);
+		sprintf(sprintBuffer, "Abort: Peer not connected.");
+		log(sprintBuffer);
 		return;
 	}
 	
@@ -330,8 +391,8 @@ void sendReport(uint8_t *buffer)
 		keyboard_report_data[1] = buffer[3]; // Key Code
 		
 		result = bt_gatt_notify(NULL, &hog_svc.attrs[2], keyboard_report_data, sizeof(keyboard_report_data));
-		sprintf(logBuffer, "***Sent Keyboard Report1: x%02x, x%02x result: %d", keyboard_report_data[0], keyboard_report_data[1], result);
-		log(logBuffer);
+		sprintf(sprintBuffer, "***Sent Keyboard Report1: x%02x, x%02x result: %d", keyboard_report_data[0], keyboard_report_data[1], result);
+		log(sprintBuffer);
 		
 		break;
 	case 2:
@@ -340,8 +401,8 @@ void sendReport(uint8_t *buffer)
 		consumer_report_data[1] = buffer[3]; // highbyte Key Code
 
 		result = bt_gatt_notify(NULL, &hog_svc.attrs[5], consumer_report_data, sizeof(consumer_report_data));
-		sprintf(logBuffer, "***Sent Consumer Report2: x%02x, x%02x result: %d", consumer_report_data[0], consumer_report_data[1], result);
-		log(logBuffer);
+		sprintf(sprintBuffer, "***Sent Consumer Report2: x%02x, x%02x result: %d", consumer_report_data[0], consumer_report_data[1], result);
+		log(sprintBuffer);
 		
 		break;
 	case 3:
@@ -351,13 +412,13 @@ void sendReport(uint8_t *buffer)
 		mouse_report_data[2] = buffer[4]; // Key Code
 
  		result = bt_gatt_notify(NULL, &hog_svc.attrs[9], mouse_report_data, sizeof(mouse_report_data));
-		sprintf(logBuffer, "***Sent Mouse Report3: x%02x, x%02x, x%02x, result: %d", mouse_report_data[0], mouse_report_data[1], mouse_report_data[2], result);
-		log(logBuffer);
+		sprintf(sprintBuffer, "***Sent Mouse Report3: x%02x, x%02x, x%02x, result: %d", mouse_report_data[0], mouse_report_data[1], mouse_report_data[2], result);
+		log(sprintBuffer);
 		
 		break;
 	default :
-		sprintf(logBuffer, "Invalid reportId: %d", reportId);
-		log(logBuffer);
+		sprintf(sprintBuffer, "Invalid reportId: %d", reportId);
+		log(sprintBuffer);
 	}
 }
 

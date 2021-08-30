@@ -14,7 +14,7 @@ extern "C" {
 
 void usbStart(void);
 void log(char*);
-extern char logBuffer[];
+extern char sprintBuffer[];
 
 #ifdef __cplusplus
 }

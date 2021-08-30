@@ -17,7 +17,8 @@
 #define STACKSIZE 1024
 
 /* scheduling priority used by each thread */
-#define PRIORITY 7
+#define GATT_PRIORITY 0
+#define UART_PRIORITY 7
 
 char logBuffer[128];
 uint8_t ring_buffer[RING_BUF_SIZE];
@@ -33,9 +34,7 @@ void main(void)
 	ring_buf_init(&ringbuf, sizeof(ring_buffer), ring_buffer);
 	printk("start HoG Combo\n");
 	console("start HoG Combo");
-	
-	//gattStart();
 }
 
-K_THREAD_DEFINE(uartStartId, STACKSIZE, uartStart, NULL, NULL, NULL, PRIORITY, 0, 0);
-K_THREAD_DEFINE(gattStartId, STACKSIZE, gattStart, NULL, NULL, NULL, PRIORITY, 0, 0);
+K_THREAD_DEFINE(uartStartId, STACKSIZE, uartStart, NULL, NULL, NULL, UART_PRIORITY, 0, 0);
+K_THREAD_DEFINE(gattStartId, STACKSIZE, gattStart, NULL, NULL, NULL, GATT_PRIORITY, 0, 0);
