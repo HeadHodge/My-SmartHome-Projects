@@ -1,0 +1,11 @@
+[Unit]
+Description=smartRemotes-posix-Node
+After=network.target
+After=bluetooth.service
+Requires=bluetooth.service
+
+[Service]
+ExecStart=/smartRemotes/imports/bt-ble/hogCombo.exe --bt-dev=hci0
+
+[Install]
+WantedBy=multi-user.target

@@ -17,13 +17,15 @@ sys.path.append(path)
 import wsClient, ttyBridge, ttyOptions, noteTool
 
 _zones = {}
+_isIdle = True
 
 #############################################
 async def receivedNote(note):
 #############################################
     try:
         print(f' \n***receivedNote: {note}')
-        global _zones
+        global _zones, _isIdle
+        _isIdle = False
         
         # validate zone
         zone = note['content'].get('zone', None)
@@ -85,7 +87,7 @@ async def hubConnected():
         })
         
         await wsClient.deliverPayload(ttyOptions.wsClient['connection'], note)
-        await ttyBridge.deliverCommand(ttyOptions.ttyBridge['connection'], bytes([0xaa]))
+        #await ttyBridge.deliverCommand(ttyOptions.ttyBridge['connection'], bytes([0x0d]))
         
         print(f' \n***Wait for \'{note["content"]["title"]}\' notes...')
         print(f'*********************************************************')
@@ -150,7 +152,30 @@ async def hassioConnected():
     except:
         print('Abort hassioConnected: ', sys.exc_info()[0])
         traceback.print_exc()
-   
+
+#############################################
+async def ttyConnected():
+#############################################
+    try:
+        print(f' \n***ttyConnected')
+        global _isIdle
+        keyUpCommand = [0xff, 0x01, 0x00, 0x00, 0x00, 0x00]
+        return
+        
+        while True:
+            _isIdle = True
+            await asyncio.sleep(5)
+            if(_isIdle == False): continue
+            
+            print('ping')
+            await ttyBridge.deliverCommand(
+                ttyOptions.ttyBridge['connection'],
+                bytes(keyUpCommand)
+            )
+    except:
+        print('Abort ttyConnected: ', sys.exc_info()[0])
+        traceback.print_exc()
+    
 #############################################
 def start():
 #############################################
@@ -170,7 +195,8 @@ def start():
         '''
         
         # Start ttyBridge module
-        try:            
+        try:   
+            ttyOptions.ttyBridge['onConnection'] = ttyConnected
             threading.Thread(target=ttyBridge.start, args=(ttyOptions.ttyBridge,)).start()
         except:
             print('Abort ttyBridge: ', sys.exc_info()[0])

@@ -318,7 +318,6 @@ void sendReport(uint8_t *buffer)
 	uint8_t reportId = buffer[1];
 		
 	if(isConnected == 0) {
-		printk("Abort: Peer not connected.\n");
 		sprintf(logBuffer, "Abort: Peer not connected.");
 		console(logBuffer);
 		startAdvertising();

@@ -6,8 +6,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-//#include <stdio.h>                                                              
-//#include <sys/printk.h>
+#include <sys/printk.h>
 #include <sys/ring_buffer.h>
 #include "gatt.h"
 #include "uart.h"
@@ -25,19 +24,16 @@ char logBuffer[128];
 uint8_t ring_buffer[RING_BUF_SIZE];
 struct ring_buf ringbuf;
 
-/*
 void printLog(char *msg)
 {
 	printk("%s\n", msg);
 }
-*/
 
 void main(void)
 {
 	ring_buf_init(&ringbuf, sizeof(ring_buffer), ring_buffer);
-	//printk("start HoG Combo printk\n");
-	//printf("start HoG Combo printf\n");
-	console("Start hogCombo Posix");
+	printk("start HoG Combo\n");
+	console("start HoG Combo");
 }
 
 K_THREAD_DEFINE(uartStartId, STACKSIZE, uartStart, NULL, NULL, NULL, UART_PRIORITY, 0, 0);

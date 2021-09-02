@@ -13,12 +13,16 @@ wsHassio = {
 wsClient = wsHub
 
 ttyBridge = {
-    'port'      : '/dev/pts/2',
-    'speed'     : 115200,
-    'timeout'   : None,
-    'parity'    : 'N', #None
-    'xonxoff'   : 0,
-    'rtscts'    : 0,  
+    "onReceived": None,
+    "onConnection": None,
+    "connection" : {
+        'port'      : '/dev/pts/0',
+        'speed'     : 115200,
+        'timeout'   : None,
+        'parity'    : 'N', #None
+        'xonxoff'   : 0,
+        'rtscts'    : 0,  
+    }
 }
 
 posixBridge = {

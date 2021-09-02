@@ -37,20 +37,22 @@ def receiveReports(connection):
 #     start
 ###################
 def start(options={}):
-    print(f'Start ttyBridge: {options["port"]}')
+    print(f'Start ttyBridge: {options["connection"]["port"]}')
 
     try:    
         options['connection'] = serial.Serial(
-            options['port'],
-            options['speed'], 
-            timeout=options['timeout'],
-            parity=options['parity'], 
-            xonxoff=options['xonxoff'], 
-            rtscts=options['rtscts']
+            options['connection']['port'],
+            options['connection']['speed'], 
+            timeout=options['connection']['timeout'],
+            parity=options['connection']['parity'], 
+            xonxoff=options['connection']['xonxoff'], 
+            rtscts=options['connection']['rtscts']
         )
 
         if(options['connection'].is_open == False): print('Abort: open serial port failed'); return;
         
+        onConnect = options.get('onConnection', None)
+        if(onConnect != None): asyncio.run(onConnect())
         receiveReports(options['connection'])
     except:
         print('Abort ttyBridge', sys.exc_info()[0])

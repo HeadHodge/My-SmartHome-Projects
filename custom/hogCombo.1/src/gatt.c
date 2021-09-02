@@ -32,7 +32,7 @@ int isAdvertising = 0;
 
 static const struct bt_data ad[] = {
 	BT_DATA_BYTES(BT_DATA_GAP_APPEARANCE, 0xc1, 0x03),
-	BT_DATA_BYTES(BT_DATA_FLAGS, (BT_LE_AD_GENERAL | BT_GAP_NO_TIMEOUT | BT_DATA_TX_POWER | BT_LE_AD_NO_BREDR)),
+	BT_DATA_BYTES(BT_DATA_FLAGS, (BT_LE_AD_GENERAL | BT_GAP_NO_TIMEOUT | BT_LE_AD_NO_BREDR)),
 	BT_DATA_BYTES(BT_DATA_UUID16_ALL, BT_UUID_16_ENCODE(BT_UUID_HIDS_VAL), BT_UUID_16_ENCODE(BT_UUID_BAS_VAL)),
 };
 
@@ -53,7 +53,7 @@ void startAdvertising()
 		return;
 	}
 	
-	//printk("Advertising started\n");
+	printk("Advertising started\n");
 	console("Advertising started");
 	isAdvertising = 1;
 }
@@ -67,7 +67,7 @@ static void bt_ready(int err)
 
 	if(IS_ENABLED(CONFIG_SETTINGS)) settings_load();
 
-	//printk("Bluetooth started\n");
+	printk("Bluetooth started\n");
 	console("Bluetooth started");
 	
 	isConnected = 0;
@@ -84,8 +84,6 @@ static void connected(struct bt_conn *conn, uint8_t status)
 		console("Failed to connect");
 		return;
 	}
-
-	//bt_conn_le_param_update(conn, BT_LE_CONN_PARAM(0, 1, 3, 300));
 
 	isConnected = 1;
 	isAdvertising = 0;

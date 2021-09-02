@@ -23,8 +23,8 @@ char consoleBuffer[128];
 
 void console(char *message)
 {
-	printf("%s\n", message);
-	return;
+	//printk("%s\n", message);
+	//return;
 	
 	ring_buf_put(&ringbuf, message, strlen(message));
 	ring_buf_put(&ringbuf, "\r\n", 2);
@@ -60,15 +60,15 @@ void addChar(unsigned char inputChar)
 
 void uartStart()
 {
-	//printk("uartStart\n");
+	printk("uartStart\n");
 	console("uartStart");
 	unsigned char inChar = 0x00, outChar = 0x00;
 	int ret;
 	
-	ioPort = device_get_binding("UART_1");
+	ioPort = device_get_binding("UART_0");
 	
 	if (!ioPort){
-		sprintf(consoleBuffer, "UART_1 binding failed, ioPort: %p", ioPort);
+		sprintf(consoleBuffer, "UART_0 binding failed, ioPort: %p", ioPort);
 		console(consoleBuffer);
 		return;
 	}
