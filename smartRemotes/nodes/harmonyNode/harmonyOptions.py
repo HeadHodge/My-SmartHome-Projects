@@ -1,7 +1,5 @@
 wsClient = {
-    "endPoint"    : "ws://192.168.0.102:8080/",
-    "onConnection": "hubConnected",
-    "onReceived"  : "receivedNote",
+    "hubNode": "ws://192.168.0.162:8080/",
 }
 
 hubs = {
@@ -30,7 +28,7 @@ hubs = {
     },
     
     'bedRoom': {
-        'ip': '192.168.0.204',
+        'ip': '192.168.0.250',
         'controlWords': {
             'Ok'         : {'command': 'OK',             'deviceID': 'Amazon Fire TV', 'repeatNum': 1, 'holdSecs': 0, 'delaySecs': 0},
             'Up'         : {'command': 'DirectionUp',    'deviceID': 'Amazon Fire TV', 'repeatNum': 1, 'holdSecs': 0, 'delaySecs': 0},

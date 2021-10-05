@@ -56,7 +56,8 @@ async def receivedNote(note):
             bytes(keyDownCommand)
         )
         
-        if(keyDownCommand[1] == 3): return
+        #if(keyDownCommand[1] == 3): return
+        return
         
         time.sleep(keyPressSecs)
         
@@ -82,7 +83,7 @@ async def hubConnected():
             filter = {}
        
         note = noteTool.publishNote('gattNode', 'subscribe', {
-            'title' : 'control ttyClient request',
+            'title' : 'control ttyNode request',
             'filter': filter
         })
         

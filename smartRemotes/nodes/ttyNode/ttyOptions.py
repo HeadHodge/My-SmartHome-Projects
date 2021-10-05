@@ -1,11 +1,11 @@
 wsHub = {
-    "endPoint": "ws://192.168.0.102:8080/",
+    "endPoint": "ws://192.168.0.163:8080/",
     "onConnection": "hubConnected",
     "onReceived": "receivedNote",
 }
 
 wsHassio = {
-    "endPoint": "ws://192.168.0.160:8123/api/websocket",
+    "endPoint": "ws://192.168.0.163:8123/api/websocket",
     "onConnection": "hassioConnected",
     "onReceived": "receivedNotice",
 }

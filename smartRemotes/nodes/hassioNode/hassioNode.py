@@ -15,25 +15,6 @@ import wsClient, hassioOptions, noteTool
 _transNum = 0
 _zones = {}
 
-# keyCode Input
-_inOptions = {
-    "port": "8080",
-    "firstPost": "User",
-    "userEvent" : None,
-    "agentEvent" : None
-   }
-
-# hassio service events Output
-_outOptions = {
-    "endpoint": "ws://192.168.0.160:8123/api/websocket",
-    "address": "192.168.0.160",
-    "port": "8123",
-    "path": "/api/websocket",
-    "firstPost": "User",
-    "userEvent" : None,
-    "agentEvent" : None
-}
- 
 #############################################
 async def receivedNote(note):
 #############################################
@@ -79,7 +60,7 @@ async def receivedNote(note):
 async def hubConnected():
 #############################################
     try:
-        print(f' \n***hubConnected')
+        print(f' \n***Hub connected: {hassioOptions.hubNode["endPoint"]}')
         
         if hasattr(hassioOptions, 'noteFilter'):
             filter = hassioOptions.noteFilter
@@ -91,11 +72,8 @@ async def hubConnected():
             'filter': filter
        })
         
-        print(f' \n***Deliver Note: {note}')
+        print(f' \n***Deliver note: {note}')
         await wsClient.deliverPayload(hassioOptions.hubNode['connection'], note)
-        
-        print(f' \n***Wait for control device requests...')
-        print(f'**************************************')
     except:
         print('Abort hubConnected: ', sys.exc_info()[0])
         traceback.print_exc()
@@ -103,30 +81,22 @@ async def hubConnected():
 #############################################
 async def receivedConfirmation(confirmation):
 #############################################
-    print(f' \n***receivedConfirmation: {confirmation}')
-
-    #content = json.loads(confirmation)
-    
     if(confirmation['type'] == "auth_required"):
         payload = {
             "type": "auth",
-            "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiI1NmVhNzU3ODkzMDE0MTMzOTJhOTZiYmY3MTZiOWYyOCIsImlhdCI6MTYxNDc1NzQ2OSwiZXhwIjoxOTMwMTE3NDY5fQ.K2WwAh_9OjXZP5ciIcJ4lXYiLcSgLGrC6AgTPeIp8BY"
+            "access_token": hassioOptions.accessToken
         }
                       
-        print(f' \n***deliverPayload: {payload}')
+        print(f' \n***deliver access token: {payload}')
         await wsClient.deliverPayload(hassioOptions.hassioNode['connection'], payload)
-    
-    print(f' \n***Wait for hassio control confirmations...')
-    print(f'**********************************************')
+    elif(confirmation['type'] == "result" and confirmation['success'] != True):
+        print(f' \n***Deliver Payload Failed: {confirmation}')
 
 #############################################
 async def hassioConnected():
 #############################################
     try:
-        print(f' \n***hassioConnected')
-        
-        print(f' \n***Wait for hassio control confirmations...')
-        print(f'**********************************************')
+        print(f' \n***hassioConnected: {hassioOptions.hassioNode["endPoint"]}')
     except:
         print('Abort hassioConnected: ', sys.exc_info()[0])
         traceback.print_exc()

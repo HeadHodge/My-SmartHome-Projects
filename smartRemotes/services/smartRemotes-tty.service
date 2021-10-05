@@ -1,6 +1,7 @@
 [Unit]
 Description=smartRemotes-ttyNode
 After=network.target
+After=smartRemotes-posix.service
 
 [Service]
 ExecStart=python3 -u /smartRemotes/nodes/ttyNode/ttyNode.py

@@ -11,7 +11,6 @@ _parent = sys.modules["__main__"]
 async def deliverPayload(connection, payload):
 ##########################
     try:
-        #print(f' \n***deliverPayload: {payload}', connection)
         await connection.send(json.dumps(payload))
     except:
         print('Abort deliverPayload', sys.exc_info()[0])
@@ -25,14 +24,9 @@ async def receivePayloads(options):
     while True:
         try:            
             async with websockets.connect(options['endPoint']) as connection:
-                print(f' \n***ENDPOINT CONNECTED, endpoint: {options["endPoint"]}')
-                #_connection = connection
-    
                 options['connection'] = connection
                 onConnect = getattr(_parent, options['onConnection'], None)
                 onReceived = getattr(_parent, options['onReceived'], None)
-                #onConnect = options.get('onConnection', None)
-                #onReceived = options.get('onReceived', None)
                 
                 if(onConnect != None): await onConnect()
                 
@@ -65,6 +59,7 @@ def start(options={}):
 ##########################
 #         MAIN
 ##########################
+
 # Run this module on main thread to unit test with following code
 if __name__ == '__main__':
     pass

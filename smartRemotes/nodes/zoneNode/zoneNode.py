@@ -52,6 +52,13 @@ def translateWord(controlWord, options):
             #print(f'controlWord translated to: {controlWord}')
             return controlWord
             
+        if(controlWord == 'SoundToggle' and options.isFocusSet == True):
+            controlWord = 'Relax'
+            options.isOn = False
+            options.isFocusSet = False
+            #print(f'controlWord translated to: {controlWord}')
+            return controlWord
+            
         if(controlWord == 'Louder' and options.isFocusSet == True):
             controlWord = 'Wake'
             options.isOn = True
@@ -59,11 +66,52 @@ def translateWord(controlWord, options):
             #print(f'controlWord translated to: {controlWord}')
             return controlWord
             
-        if(controlWord == 'SoundToggle' and options.isFocusSet == True):
-            controlWord = 'Dream'
+        if(controlWord == 'Backward' and options.isFocusSet == True):
+            controlWord = 'Enter'
             options.isOn = False
             options.isFocusSet = False
-            #print(f'controlWord translated to: {controlWord}')
+            return controlWord
+            
+        if(controlWord == 'PlayToggle' and options.isFocusSet == True):
+            controlWord = 'Stay'
+            options.isOn = False
+            options.isFocusSet = False
+            return controlWord
+            
+        if(controlWord == 'Forward' and options.isFocusSet == True):
+            controlWord = 'Exit'
+            options.isOn = False
+            options.isFocusSet = False
+            return controlWord
+            
+        if(controlWord == 'Left' and options.isFocusSet == True):
+            controlWord = 'Preset1'
+            options.isOn = False
+            options.isFocusSet = False
+            return controlWord
+            
+        if(controlWord == 'Up' and options.isFocusSet == True):
+            controlWord = 'Preset2'
+            options.isOn = False
+            options.isFocusSet = False
+            return controlWord
+            
+        if(controlWord == 'Right' and options.isFocusSet == True):
+            controlWord = 'Preset3'
+            options.isOn = False
+            options.isFocusSet = False
+            return controlWord
+            
+        if(controlWord == 'Down' and options.isFocusSet == True):
+            controlWord = 'Preset4'
+            options.isOn = False
+            options.isFocusSet = False
+            return controlWord
+            
+        if(controlWord == 'Ok' and options.isFocusSet == True):
+            controlWord = 'Reset'
+            options.isOn = False
+            options.isFocusSet = False
             return controlWord
  
         if(controlWord == 'SoundToggle' and options.isFocusSet != True):

@@ -7,12 +7,12 @@
 # 3   /dev/input/event3    Anycon AirMouse Remote Consumer Control usb-0000:01:00.0-1.4/input1
 
 usbBridge = {
-    "zone"    : "masterBedroom",
-    "channels": "0,1,2,3",
+    "zone"    : "livingRoom",
+    "channels": "2,3,4,5",
 }
 
 wsClient = {
-    "endPoint": "ws://192.168.0.102:8080/",
+    "endPoint": "ws://192.168.0.163:8080/",
     "onConnection": "hubConnected",
     "onReceived": "receivedNote",
 }
@@ -40,6 +40,6 @@ scanCodeMap = {
     172: {"controlWord": "Home"},
     191: {"controlWord": "PowerToggle"},
     240: {"controlWord": "Focus"},
-    272: {"controlWord": "Ok"},
+    272: {"controlWord": "Home"},
     273: {"controlWord": "Back"},
 }

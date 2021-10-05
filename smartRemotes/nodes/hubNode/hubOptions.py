@@ -7,7 +7,7 @@ localNodes = [
 ]
 
 wsServer = {
-    "address"     : "192.168.0.102",
+    "address"     : "192.168.0.163",
     "port"        : "8080",
     "onReceived"  : "receivedPayload",
 }
