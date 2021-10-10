@@ -10,9 +10,9 @@ smartRemotes is a collection of python coded modules called 'nodes'. Each node p
 
 A node performs only one of these three tasks:
 
-  - Capture input control data from an input device, assign the input a single controlWord that represents the 'intent' of the input control data, then publish the controlWord to the home network via a websockets message.
-  - Subscribe to one or more websocket messages and use the controlWord contained in the message to control a specified device.
-  - Take published messages created by input nodes and route them to output nodes that have subscribed to the message to control a specific device.
+ - Capture input control data from an input device, assign the input a single controlWord that represents the 'intent' of the input control data, then publish the controlWord to the home network via a websockets message.
+ - Subscribe to one or more websocket messages and use the controlWord contained in the message to control a specified device.
+ - Take published messages created by input nodes and route them to output nodes that have subscribed to the message to control a specific device.
 
 The use of any available node is optional and independent of all other nodes **except** at least one router node must be running for the publish and subscribe of controlWord messages to work properly.
 

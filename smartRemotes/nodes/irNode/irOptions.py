@@ -1,10 +1,11 @@
 wsClient = {
-    "endPoint": "ws://192.168.0.102:8080/",
+    "endPoint": "ws://192.168.0.163:8080/",
     "onConnection": "hubConnected",
     "onReceived": "receivedNote",
 }
 
-ttyBridge = {
+irBridge = {
+    'onConnect': None,
     'recordCommand': 'ir-keytable -c -p all -t',
     'sendCommand'  : 'ir-ctl -S [deviceCommand]',
 }
