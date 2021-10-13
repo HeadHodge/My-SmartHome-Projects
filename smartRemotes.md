@@ -1,7 +1,6 @@
-[My Smart Home Projects](https://github.com/HeadHodge/smartHome-Projects-Main/blob/main/README.md)
+[My Smart Home Projects ReadMe](https://github.com/HeadHodge/smartHome-Projects-Main/blob/main/README.md)
 
-
-## **my 'smartRemotes' project:**
+# **My Smart Remotes Project**
 
 My objective is to capture input from a variety of sources and use the input to control a variety of my home devices (mainly, but not totally, entertainment equipment).
 
