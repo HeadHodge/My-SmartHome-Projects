@@ -1,12 +1,5 @@
-# **my smartHome projects**
+[My Smart Home Projects](https://github.com/HeadHodge/smartHome-Projects-Main/blob/main/README.md)
 
-I have ongoing projects with a goal to automate my home with the latest and best technologies. It makes our lives a little more convenient and a little more secure. It's also a fun learning experience for me too.
-
-I've put a lot of work into my projects and get excited when I figure out how to get something working, that up until then was a mystery to me. So I've provided the results of my work here, with the hope it may help others and that people may look at it and offer ways to improve on it.
-
-I currently use a Hassio Hub to control my heat, blinds, lights, locks, and entertainment devices. I also use Abode to secure and protect my home. My code is mostly python, c, and javascript.
-
-My current projects mostly focus on creating bridges to convert data from one format to another and ways to communicate this data over a variety of medium.
 
 ## **my 'smartRemotes' project:**
 
@@ -34,13 +27,3 @@ The main 'bridges' I've written and use are:
   - low power (ble) bluetooth peripheral servers to emulate HID keyboards, mice, and consumer control devices via 'HoG' (HID over Gatt) to control bluetooth based devices, i.e. FireTV stick
 
 more details: https://github.com/HeadHodge/smartHome-Projects-Main/tree/main/smartRemotes
-
-## **my 'hogKeyboard' project:**
-
-My 1st endeavor into programming embedded mcu devices. I bought a Nordic semiconductors nRF52840 usb Dongle for $10 and use it to create a low power (ble) bluetooth peripheral on a stick to emulate HID keyboards, mice, and consumer control devices via 'HoG' (HID over Gatt)
-
-<img src="https://www.rutronik.com/fileadmin//Rutronik/News/Knowledge/Produktmeldungen/09_SEP18-Nordic_Dongle_SOURCE_NORDIC.jpg" width="350">
-
-more details: https://github.com/HeadHodge/smartHome-Projects-Main/tree/main/hogKeyboard
-
-
