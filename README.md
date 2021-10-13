@@ -1,3 +1,5 @@
+[link to Google!](http://google.com)
+
 # **my smartHome projects**
 
 I have ongoing projects with a goal to automate my home with the latest and best technologies. It makes our lives a little more convenient and a little more secure. It's also a fun learning experience for me too.
