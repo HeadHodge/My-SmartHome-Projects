@@ -5,14 +5,12 @@ print('Load routeNote')
 
 from multiprocessing import Process
 from dbus.mainloop.glib import DBusGMainLoop
-import os, sys
+import os, sys, time, json, asyncio, traceback, queue, threading, importlib
 
 path = os.path.join(os.path.dirname(__file__), '../../imports/network')
 sys.path.append(path)
 
-#import usbServer, gattServer, httpServer, wsServer, wsClient, btDevice, btProfile, keyMaps, map2hassio
-import time, json, asyncio, traceback, queue, threading, importlib
-import httpServer, wsServer, noteTool, hubOptions
+import wsServer, noteTool, hubOptions
 
 _titles = {}
     

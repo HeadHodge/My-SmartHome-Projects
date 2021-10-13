@@ -30,7 +30,7 @@ posixBridge = {
 }
 
 noteFilter = {
-    'zone': 'livingRoom'
+    'zone': 'masterBedroom'
 }
 
 hassioEvents = {

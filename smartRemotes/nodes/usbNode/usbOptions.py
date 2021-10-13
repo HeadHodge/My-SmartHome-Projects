@@ -7,8 +7,8 @@
 # 3   /dev/input/event3    Anycon AirMouse Remote Consumer Control usb-0000:01:00.0-1.4/input1
 
 usbBridge = {
-    "zone"    : "livingRoom",
-    "channels": "2,3,4,5",
+    "zone"    : "masterBedroom",
+    "channels": "1,2,3,5",
 }
 
 wsClient = {

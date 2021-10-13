@@ -92,21 +92,25 @@ wordMap = {
         ],
         
         "Louder": [
-            {'device': 'harmonyHub', 'controlWord': 'Louder', 'zone': 'masterBedroom', 'focus': 'Media'}
+            {'device': 'irNode', 'controlWord': 'Louder', 'zone': 'masterBedroom', 'focus': 'Media'}
         ],
         
         "Softer": [
-            {'device': 'harmonyHub', 'controlWord': 'Softer', 'zone': 'masterBedroom', 'focus': 'Media'}
+            {'device': 'irNode', 'controlWord': 'Softer', 'zone': 'masterBedroom', 'focus': 'Media'}
         ],
                
         "Silence": [
-            {'device': 'harmonyHub', 'controlWord': 'Silence', 'zone': 'masterBedroom', 'focus': 'Media'}
+            {'device': 'irNode', 'controlWord': 'Silence', 'zone': 'masterBedroom', 'focus': 'Media'}
         ],
                 
         "Sound": [
-            {'device': 'harmonyHub', 'controlWord': 'Sound', 'zone': 'masterBedroom', 'focus': 'Media'}
+            {'device': 'irNode', 'controlWord': 'Sound', 'zone': 'masterBedroom', 'focus': 'Media'}
         ],
-               
+                
+        "SoundToggle": [
+            {'device': 'irNode', 'controlWord': 'SoundToggle', 'zone': 'masterBedroom', 'focus': 'Media'}
+        ],
+                
         "Relax": [
             {'device': 'hassioNode', 'controlWord': 'Relax', 'zone': 'masterBedroom', 'focus': 'Media'}
         ],
@@ -119,15 +123,9 @@ wordMap = {
         "Wake": [
             {'device': 'hassioNode', 'controlWord': 'Wake', 'zone': 'masterBedroom', 'focus': 'Media'}
         ],
-                
-        "SoundToggle": [
-            {'device': 'irNode', 'controlWord': 'SoundToggle', 'zone': 'masterBedroom', 'focus': 'Media'}
-        ],
-                
+               
         "On": [
             {'device': 'irNode', 'controlWord': 'On', 'zone': 'masterBedroom', 'focus': 'Media'},
-            {'device': 'hassioNode', 'controlWord': 'On', 'zone': 'masterBedroom', 'focus': 'Media'},
-            {'device': 'ttyNode', 'controlWord': 'On', 'zone': 'masterBedroom', 'focus': 'Media'},
         ],
                 
         "Off": [

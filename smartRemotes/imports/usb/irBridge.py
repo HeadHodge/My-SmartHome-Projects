@@ -23,14 +23,21 @@ async def deliverCommand(connection, command):
 ###################
 def start(options={}):
     try:    
-        print(f'Start irBridge: {options}')
+        print(f'Start irBridge')
 
-        devices = broadlink.discover(timeout=5)
-        devices[0].auth()    
-        print(f"devices available: {devices}")
+        deviceDetails = options.get('deviceDetails', None)
+        
+        if(deviceDetails == None):
+            print('Abort irBridge: no deviceDetails provided')
+            return
+            
+        #devices = broadlink.discover(timeout=5)
+        device = broadlink.gendevice(*deviceDetails)
+        device.auth()    
+        print(f"device available: {device}")
         
         onConnect = options.get('onConnect', None)
-        if(onConnect != None): asyncio.run(onConnect(devices[0]))
+        if(onConnect != None): asyncio.run(onConnect(device))
     except:
         print('Abort irBridge', sys.exc_info()[0])
         traceback.print_exc()

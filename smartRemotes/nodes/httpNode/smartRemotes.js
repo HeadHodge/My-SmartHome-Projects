@@ -8,7 +8,7 @@ webRemote = (function(){ //invoke anonymous self executing function
 //################
 //### Global Variables
 //################
-var _server = "ws://192.168.0.102:8080";
+var _server = "ws://192.168.0.106:8080";
 var _authToken = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiI1YmM0ZGYxNGY4ZGE0MTdkYTNhZjdkNjkwYzg0NDQ2ZSIsImlhdCI6MTYxMzAxMDQ4MiwiZXhwIjoxOTI4MzcwNDgyfQ.MffxNYX4VssITLgdZBPilKTq3p4R9RuoQP2yeeoyyPw';
 var _isKeyDown, _wasMapRecalled;
 var	_case, _filter, _map, _shortcuts, _zone, _category, _skin, _commands, _overlay, _menu;
