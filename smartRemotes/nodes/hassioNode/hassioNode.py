@@ -81,16 +81,17 @@ async def hubConnected():
 #############################################
 async def receivedConfirmation(confirmation):
 #############################################
+    if(confirmation['type'] == "result" and confirmation['success'] == True): return
+    print(f' \n***hassioConfirmation: {confirmation}')
+    
     if(confirmation['type'] == "auth_required"):
         payload = {
             "type": "auth",
             "access_token": hassioOptions.accessToken
         }
                       
-        print(f' \n***deliver access token: {payload}')
+        print(f'***deliver access token: {payload}')
         await wsClient.deliverPayload(hassioOptions.hassioNode['connection'], payload)
-    elif(confirmation['type'] == "result" and confirmation['success'] != True):
-        print(f' \n***Deliver Payload Failed: {confirmation}')
 
 #############################################
 async def hassioConnected():

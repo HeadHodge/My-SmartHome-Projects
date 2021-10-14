@@ -38,7 +38,8 @@ async def receivePayloads(options):
                         print('Abort receiveNote', sys.exc_info()[0])
                         traceback.print_exc()
                     
-                print(' \n***ENDPOINT DISCONNECTED')
+                print('***ENDPOINT DISCONNECTED')
+                time.sleep(10)
         except:
             print('Abort receivePayloads, resetting connection...', sys.exc_info()[0])
             time.sleep(10)

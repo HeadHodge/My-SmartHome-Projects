@@ -29,7 +29,11 @@ wordMap = {
 	"SoundToggle": [
 		{"controlWord": "SoundToggle", "irCommand": mute}
 	],
-    
+       
+	"Sleep": [
+		{"controlWord": "Sleep", "irCommand": power}
+	],
+
 	"Off": [
 		{"controlWord": "Off", "irCommand": power}
 	],
