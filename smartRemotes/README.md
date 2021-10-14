@@ -1,4 +1,4 @@
-# **my smartRemotes Project**
+# **My Smart Remotes Project**
 
 ### **Overview:**
 
