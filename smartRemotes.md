@@ -10,7 +10,7 @@ My objective is to capture input from a variety of sources and use the input to 
 
 **Main Features:**
 
-Currently I capture input from:
+Currently captures input from:
   - web pages
   - wired and wireless mice, keyboards, and remote controls
   - any HID compliant input device
