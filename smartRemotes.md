@@ -1,6 +1,6 @@
-[My Smart Home Projects ReadMe](https://github.com/HeadHodge/smartHome-Projects-Main/blob/main/README.md)
+[ReadMe: My Smart Home Projects](https://github.com/HeadHodge/smartHome-Projects-Main/blob/main/README.md)
 
-# **My'Smart Remote'Project:**
+# **My Smart Remotes Project:**
 
 ### **Overview:**
 
