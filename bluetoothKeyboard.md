@@ -8,5 +8,5 @@ My 1st endeavor into programming embedded mcu devices. I bought a Nordic semicon
 
 more details: https://github.com/HeadHodge/smartHome-Projects-Main/tree/main/hogKeyboard
 
-<img src="./images/1.png" width="400px" height="auto">
+<img src="./images/1.png" width="500px" height="auto">
 
