@@ -1,5 +1,5 @@
-#Using My Bluetooth Keyboard
-##Overview:
+# Using My Bluetooth Keyboard
+## Overview:
 
 I've found 3 ways of using Zephyr that all work well...
 
