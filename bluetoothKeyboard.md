@@ -1,6 +1,6 @@
-[My Smart Home Projects ReadMe](https://github.com/HeadHodge/smartHome-Projects-Main/blob/main/README.md)
+[ReadMe: My Smart Home Projects](https://github.com/HeadHodge/smartHome-Projects-Main/blob/main/README.md)
 
-# **My Bluetooth Keyboard Project**
+# **My Virtual Bluetooth Keyboard Project**
 
 My 1st endeavor into programming embedded mcu devices. I bought a Nordic semiconductors nRF52840 usb Dongle for $10 and use it to create a low power (ble) bluetooth peripheral on a stick to emulate HID keyboards, mice, and consumer control devices via 'HoG' (HID over Gatt)
 

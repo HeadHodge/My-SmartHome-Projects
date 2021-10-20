@@ -1,6 +1,6 @@
-[My Smart Home Projects ReadMe](https://github.com/HeadHodge/smartHome-Projects-Main/blob/main/README.md)
+[ReadMe: My Smart Home Projects](https://github.com/HeadHodge/smartHome-Projects-Main/blob/main/README.md)
 
-# **My'Smart Remote'Project:**
+# **My Smart Remotes Project:**
 
 ### **Overview:**
 
@@ -10,7 +10,7 @@ My objective is to capture input from a variety of sources and use the input to 
 
 **Main Features:**
 
-Currently I capture input from:
+Currently captures input from:
   - web pages
   - wired and wireless mice, keyboards, and remote controls
   - any HID compliant input device
