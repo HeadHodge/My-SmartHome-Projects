@@ -67,11 +67,11 @@ In this writeup, I'll focus on how to use the virtual keyboard I created, then a
   
   If it's running properly, you should see output like: 'Bluetooth Enabled, Advertising Started'
   
-  <img src="./images/1.3.jpg" width="400px" height="auto"> 
+  <img src="./images/1.4.png" width="400px" height="auto"> 
   
   If you see that output, then you should be able to pair this keyboard peripheral (advertised as 'smartRemote 1.0') to other peer clients, i.e. Win 10, FireTV other keyboards, etc.
   
-  <img src="./images/1.4.jpg" width="400px" height="auto"> 
+  <img src="./images/1.5.png" width="400px" height="auto"> 
   
 
 
