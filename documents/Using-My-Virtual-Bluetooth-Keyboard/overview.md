@@ -61,7 +61,7 @@ In this writeup, I'll focus on how to use the virtual keyboard I created, then a
 
   https://github.com/HeadHodge/My-SmartHome-Projects/releases/tag/v1.0
   
-  start the Zephyr peripheral in its own terminal:
+* Start the Zephyr peripheral in its own terminal:
   
   #~ /smartRemotes/imports/bt-ble/hogInput.exe --bt-dev=hci0
   
