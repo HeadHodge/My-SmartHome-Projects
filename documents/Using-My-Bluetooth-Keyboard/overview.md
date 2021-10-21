@@ -1,3 +1,5 @@
+** heads-up, document under construction. subject to many updates **
+
 # Using My Virtual Bluetooth Keyboard
 ## Overview:
 
