@@ -112,11 +112,19 @@ One of the things that happens when the Zephyr peripheral starts is to open a se
 My smartRemotes project is a collection of loosely coupled modules designed to do this. Using these modules are not required and may even be overkill for some situations. So at this point you need to decide how you want to interface to the serial port.
 
 ```
-#########################################################################################################################################################################################################################################################################################
-#keyboard report1: byte 1:static 0xff, 2:reportId 0x01, 3: modifier byte: bit 0 is L CTRL, bit 1 is L SHIFT, bit 2 is L ALT, bit 3 is L GUI, bit 4 is R CTRL, bit 5 is R SHIFT, bit 6 is R ALT, and bit 7 is R GUI, 4: low byte of consumer keyCode, 5: reserved 0x00, 6: reserved 0x00
-#consumer report2: byte 1:static 0xff, 2:reportId 0x02, 3: low byte of consumer keyCode, 4: high byte of consumer keyCode, 5: reserved 0x00, 6: reserved 0x00
-#mouse report3   : byte 1:static 0xff, 2:reportId 0x03, 3: modifier byte: bit 0 is left Click, bit 1 middle Click, bit 2 is right Click, , 4: x-axis offset, 5: y-axis offset, 6: reserved 0x00
-#########################################################################################################################################################################################################################################################################################
+3 HID Reports are supported, each 6 bytes long.
+
+keyboard report: byte 1:0xff, 
+		 byte 2:0x01, 
+		 byte 3: modifier byte
+		         bit 0 is L CTRL, bit 1 is L SHIFT, bit 2 is L ALT, bit 3 is L GUI, bit 4 is R CTRL, bit 5 is R SHIFT, bit 6 is R ALT, and bit 7 is R GUI,
+		 byte 4: low byte of consumer keyCode, 
+		 byte 5: reserved 0x00, 
+		 byte 6: reserved 0x00
+		 
+		 
+consumer report: byte 1:static 0xff, 2:reportId 0x02, 3: low byte of consumer keyCode, 4: high byte of consumer keyCode, 5: reserved 0x00, 6: reserved 0x00
+mouse report  : byte 1:static 0xff, 2:reportId 0x03, 3: modifier byte: bit 0 is left Click, bit 1 middle Click, bit 2 is right Click, , 4: x-axis offset, 5: y-axis offset, 6: reserved 0x00
 wordMap = {
 	"Home": [
 		{"deviceCommand": [0xff, 0x02, 0x23, 0x02, 0x00, 0x00], "controlWord": "Home", "hidCode": 0x223, "options": "reload"}
