@@ -5,7 +5,7 @@ I've found 3 ways of using Zephyr that all work well...
 
 1. Use the Zephyr support for a native_posix_x86 board to create a linux executable that runs on any linux x86 box and uses the linux kernel distributed hci bluetooth controller to use the onboard bluetooth soc.
 
-2. Same as option 2 except provide your own usb hci controller and soc for any linux x86 box that doesnt have a supported onboard soc.  https://www.amazon.com/dp/B08M1VJHVD?psc=1&ref=ppx_yo2_dt_b_product_details
+2. Same as option 1 except provide your own usb hci controller and soc for any linux x86 box that doesnt have a supported onboard soc.  https://www.amazon.com/dp/B08M1VJHVD?psc=1&ref=ppx_yo2_dt_b_product_details
 
 3. Program the compiled image onto any Zephyr supported soc board, like the nRF52840 dongle.. https://docs.zephyrproject.org/latest/boards/index.html#boards
 
