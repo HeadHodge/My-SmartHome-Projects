@@ -25,7 +25,13 @@ In this writeup, I'll focus on how to use the virtual keyboard I created, then a
 
 * Install Ubuntu 20.04 lts server on your x86 box and make sure everything is up to date
 
-* Install Bluez 
+* Install Bluez, then disable it. Bluez is not needed, but it's useful to use the tools that come with it, like hcitools, btmon, and bluetoothctl, but we don't want bluez interfering.
+
+  >systemctl stop bluetooth
+  >systemctl disable bluetooth
+  >systemctl mask bluetooth
+
+
 
 
 
