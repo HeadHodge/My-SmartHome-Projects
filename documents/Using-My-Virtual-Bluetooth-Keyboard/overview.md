@@ -75,3 +75,24 @@ In this writeup, I'll focus on how to use the virtual keyboard I created, then a
   
 One thing I really love about Zephyr is that it implements persistent state storage. So once a peer is paired, they will always try to reconnect again whenever or however they may become disconnected. Bluez does not have this feature which makes it unusable or at least unstable.
 
+
+### Using Option 2: Zephyr with an external usb bluetooth soc
+
+Using this option is practically identical to using option 1. Here is only the difference:
+
+* Plug usb hci connector and verify the controller is available.
+
+  #~ hciconfig
+  
+  If the controller is available hciconfig should list it as hci0 with state of 'down' (not powered). If you also have an onboard controller, you will see hciconfig list hci0 and hci1. In my experience the usb controller was always hci0.
+  
+ When you run:
+ 
+ #~ /smartRemotes/imports/bt-ble/hogInput.exe --bt-dev=hci0 
+ 
+ make sure you specify the correct controller.
+ 
+ I think that's it!
+ 
+
+
