@@ -23,8 +23,11 @@ In this writeup, I'll focus on how to use the virtual keyboard I created, then a
 
 * I found out the hard way it's essential to have properly working hardware. Most of the cheap mini x86 boxes I tried didn't work, because the hardware is either crap or there is simply no properly working linux drivers available.
 
-* Install Ubuntu 20.04 lts server on your x86 box and make sure everything is up to date
-
+* Install Ubuntu 20.04 lts server on your x86 box and make sure everything is up to date. Use the root user:
+  #~ sudo passwd root
+  
+  #~ su
+  
 * Install Bluez, then disable it. Bluez is not needed, but it's useful to use the tools that come with it, like hcitools, btmon, and bluetoothctl, but we don't want bluez interfering.
 
   #~ systemctl stop bluetooth
