@@ -1,4 +1,4 @@
-# Using My Bluetooth Keyboard
+# Using My Virtual Bluetooth Keyboard
 ## Overview:
 
 I've found 3 ways of using the Zephyr rtos for my virtual bluetooth keyboard peripheral that all work well...
@@ -13,3 +13,5 @@ I've found 3 ways of using the Zephyr rtos for my virtual bluetooth keyboard per
 I have a working nRF52840 dongle, but I'm personally using option 1 in my home using an Ubuntu server 20.04 on a BRIX mini <img src="./images/1.3.jpg" width="400px" height="auto"> https://www.amazon.com/dp/B07DMM7Z7N?psc=1&ref=ppx_yo2_dt_b_product_detail 
 
 The BRIX comes with an Intel bluetooth/wifi soc that works really well with Ubuntu, as opposed to the junk broadcom/realtec socs that come with many cheapo chinese mini boxes.
+
+In this writeup, I'll focus on how to use the virtual keyboard I created, then afterwards I'll describe how I created it to help understand how it works and help others roll their own.
