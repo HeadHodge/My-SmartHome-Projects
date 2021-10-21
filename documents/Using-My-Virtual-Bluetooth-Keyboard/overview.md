@@ -114,17 +114,29 @@ My smartRemotes project is a collection of loosely coupled modules designed to d
 ```
 3 HID Reports are supported, each 6 bytes long.
 
-keyboard report: byte 1:0xff, 
-		 byte 2:0x01, 
+keyboard report: byte 1: 0xff (sync byte)
+		 byte 2: 0x01 (report id)
 		 byte 3: modifier byte
-		         bit 0 is L CTRL, bit 1 is L SHIFT, bit 2 is L ALT, bit 3 is L GUI, bit 4 is R CTRL, bit 5 is R SHIFT, bit 6 is R ALT, and bit 7 is R GUI,
-		 byte 4: low byte of consumer keyCode, 
+		   bits: 0-L CTRL, 1-L SHIFT, 2-L ALT, 3-L GUI, 4-R CTRL, 5-R SHIFT, 6-R ALT, 7-R GUI
+		 byte 4: hid keyboard keyCode, 
 		 byte 5: reserved 0x00, 
 		 byte 6: reserved 0x00
 		 
 		 
-consumer report: byte 1:static 0xff, 2:reportId 0x02, 3: low byte of consumer keyCode, 4: high byte of consumer keyCode, 5: reserved 0x00, 6: reserved 0x00
-mouse report  : byte 1:static 0xff, 2:reportId 0x03, 3: modifier byte: bit 0 is left Click, bit 1 middle Click, bit 2 is right Click, , 4: x-axis offset, 5: y-axis offset, 6: reserved 0x00
+consumer report: byte 1: 0xff (sync byte)
+		 byte 2: 0x02 (report id)
+		 byte 3: low byte of hid consumer keyCode
+		 byte 4: high byte of hid consumer keyCode
+		 byte 5: reserved 0x00
+		 byte 6: reserved 0x00
+		 
+mouse report   : byte 1: 0xff (sync byte)
+		 byte 2: 0x03 (report id)
+		 byte 3: modifier byte
+		   bits: 0-left Click, 1-middle Click, 2-right Click
+		 byte 4: x-axis offset
+		 byte 5: y-axis offset
+		 byte 6: reserved 0x00
 wordMap = {
 	"Home": [
 		{"deviceCommand": [0xff, 0x02, 0x23, 0x02, 0x00, 0x00], "controlWord": "Home", "hidCode": 0x223, "options": "reload"}
