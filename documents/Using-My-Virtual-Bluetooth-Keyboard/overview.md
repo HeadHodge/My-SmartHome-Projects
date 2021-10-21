@@ -65,13 +65,13 @@ In this writeup, I'll focus on how to use the virtual keyboard I created, then a
   
   #~ /smartRemotes/imports/bt-ble/hogInput.exe --bt-dev=hci0
   
-  If it's running properly, you should see output like: 'Bluetooth Enabled, Advertising Started'
+  If it's running properly, you should see output like: 'Bluetooth Enabled, Advertising Started'. If Zephyr starts ok, it opens a tty port for you to send hid reports to the paired client. Take note of the port name to be used later.
   
   <img src="./images/1.4.png" width="400px" height="auto"> 
   
-  If you see that output, then you should be able to pair this keyboard peripheral (advertised as 'smartRemote 1.0') to other peer clients, i.e. Win 10, FireTV other keyboards, etc.
+  If you see that output, then you should be able to pair this keyboard peripheral (advertised as 'smartRemote 1.0') to other peer clients, i.e. Win 10, FireTV other keyboards, etc. Sample output when peer client pairs properly.
   
   <img src="./images/1.5.png" width="400px" height="auto"> 
   
-
+One thing I really love about Zephyr is that it implements persistent state storage. So once a peer is paired, they will always try to reconnect again whenever or however they may become disconnected. Bluez does not have this feature which makes it unusable or at least unstable.
 
