@@ -69,7 +69,7 @@ In this writeup, I'll focus on how to use the virtual keyboard I created, then a
   
   <img src="./images/1.4.png" width="400px" height="auto"> 
   
-  If you see that output, then you should be able to pair this keyboard peripheral (advertised as 'smartRemote 1.0') to other peer clients, i.e. Win 10, FireTV other keyboards, etc. Sample output when peer client pairs properly.
+  If you see that output, then you should be able to pair this keyboard peripheral (advertised as 'smartRemotes 5.1') to other peer clients, i.e. Win 10, FireTV other keyboards, etc. Sample output when peer client pairs properly.
   
   <img src="./images/1.5.png" width="400px" height="auto"> 
   
