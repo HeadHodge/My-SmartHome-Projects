@@ -52,6 +52,22 @@ In this writeup, I'll focus on how to use the virtual keyboard I created, then a
   #~ python3 --version (3.6)
   
   #~ dtc --version (1.4.6)
+  
+* Check for a valid hci controller is available
 
+  #~ hciconfig (hci0 should be available and 'down')
+
+* Download a copy of my smartRemotes directory to your box
+
+  https://github.com/HeadHodge/My-SmartHome-Projects/releases/tag/v1.0
+  
+  start the Zephyr peripheral in its own shell:
+  
+  #~ /smartRemotes/imports/bt-ble/hogInput.exe --bt-dev=hci0
+  
+  If it's running properly, you should see output like: 'Bluetooth Enabled, Advertising Started'
+  
+  If you see that output, then you should be able to pair this keyboard peripheral (advertised as 'smartRemote 1.0') to other peer clients, i.e. Win 10, FireTV other keyboards, etc.
+  
 
 
