@@ -80,11 +80,11 @@ One thing I really love about Zephyr is that it implements persistent state stor
 
 Using this option is practically identical to using option 1. Here is only the difference:
 
-* Plug usb hci connector and verify the controller is available.
+* Plug in the usb bluetooth device and verify an HCI controller is available.
 
   #~ hciconfig
   
-  If the controller is available hciconfig should list it as hci0 with state of 'down' (not powered). If you also have an onboard controller, you will see hciconfig list hci0 and hci1. In my experience the usb controller was always hci0.
+  If a controller is available hciconfig should list it as hci0 with state of 'down' (not powered). If you also have an onboard controller, you will see hciconfig list hci0 and hci1. In my experience the usb controller was always hci0.
   
  When you run:
  
@@ -94,5 +94,17 @@ Using this option is practically identical to using option 1. Here is only the d
  
  I think that's it!
  
+
+### Using Option 3: Zephyr with external usb soc board
+
+  With this option, the Zephyr peripheral resides and runs solely on a soc micro board which contains its own on-board bluetooth/wifi radio. It will run on any box that supports tty serial i/o. 
+  
+  More to come......
+
+### Sending HID Reports (keyboard characters)
+
+
+  
+  
 
 
