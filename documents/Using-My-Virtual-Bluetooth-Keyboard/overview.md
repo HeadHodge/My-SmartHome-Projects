@@ -97,11 +97,23 @@ Using this option is practically identical to using option 1. Here is only the d
 
 ### Using Option 3: Zephyr with external usb soc board
 
-  With this option, the Zephyr peripheral resides and runs solely on a soc micro board which contains its own on-board bluetooth/wifi radio. It will run on any box that supports tty serial i/o. 
+With this option, the Zephyr peripheral resides and runs solely on a soc micro board which contains its own on-board bluetooth/wifi radio. It will run on any box that supports tty serial i/o. 
   
   More to come......
 
-### Sending HID Reports (keyboard characters)
+### Sending HID Reports (keyboard characters) to peer clients
+
+Congratulations if you made it this far and was able to pair with a peer client. It literally took me months to get this far, the first time around.
+
+Being connected to a peer client as an HID peripheral is fun, but not much use if you can't send keyboard codes to the peer.
+
+One of the things that happens when the Zephyr peripheral starts is to open a serial port for you to send your HID keycode reports. The port uses standard serial port communication protocols and you need to be able to stuff 6 bytes of data down the serial port for each HID report you want sent to the peer.
+
+My smartRemotes project is a collection of loosely coupled modules designed to do this. Using these modules are not required and may even be overkill for some situations. So at this point you need to decide how you want to interface to the serial port.
+
+
+
+
 
 
   
