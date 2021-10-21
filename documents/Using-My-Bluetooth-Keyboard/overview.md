@@ -19,6 +19,6 @@ The BRIX comes with an Intel bluetooth/wifi soc that works really well with Ubun
 In this writeup, I'll focus on how to use the virtual keyboard I created, then afterwards I'll describe how I created it to help understand how it works and help others roll their own.
 
 
-## Using Option 1: Zephyr with linux on-board bluetooth soc
+### Using Option 1: Zephyr with linux on-board bluetooth soc
 
 
