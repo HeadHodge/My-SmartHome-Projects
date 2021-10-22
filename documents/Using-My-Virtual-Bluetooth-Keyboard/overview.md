@@ -224,9 +224,20 @@ def start(options={}):
 	
 ```
 
+### Starting Option 1 & 2 at system reboot
 
+If your happy with your HID peripheral and don't want to always manually open the service in a foreground terminal window, just auto start the peripheral as a systemd service:
 
+* Copy service file \smartRemotes\services\smartRemotes-posix.service to /etc/systemd/system
 
+	#~ systemctl enable smartRemotes-posix.service
+
+	#~ systemctl restart smartRemotes-posix.service
+	
+* To view the systemd log the service creates:
+
+	#~ /smartRemotes/scripts/posixLog.sh
+	
 
   
   
