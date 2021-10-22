@@ -118,16 +118,16 @@ keyboard report: byte 1: 0xff (sync byte)
 		 byte 2: 0x01 (report id)
 		 byte 3: modifier byte
 		   bits: 0-L CTRL, 1-L SHIFT, 2-L ALT, 3-L GUI, 4-R CTRL, 5-R SHIFT, 6-R ALT, 7-R GUI
-		 byte 4: hid keyboard keyCode, 
-		 byte 5: reserved 0x00, 
-		 byte 6: reserved 0x00
+		 byte 4: hid keyboard keyCode
+		 byte 5: 0x00 (reserved)
+		 byte 6: 0x00 (reserved)
 		 		 
 consumer report: byte 1: 0xff (sync byte)
 		 byte 2: 0x02 (report id)
 		 byte 3: low byte of hid consumer keyCode
 		 byte 4: high byte of hid consumer keyCode
-		 byte 5: reserved 0x00
-		 byte 6: reserved 0x00
+		 byte 5: 0x00 (reserved)
+		 byte 6: 0x00 (reserved)
 		 
 mouse report   : byte 1: 0xff (sync byte)
 		 byte 2: 0x03 (report id)
@@ -135,7 +135,7 @@ mouse report   : byte 1: 0xff (sync byte)
 		   bits: 0-left Click, 1-middle Click, 2-right Click
 		 byte 4: x-axis offset
 		 byte 5: y-axis offset
-		 byte 6: reserved 0x00
+		 byte 6: 0x00 (reserved)
 
 List of 6 byte HID Reports I use to control an Amazon Firestick
 
