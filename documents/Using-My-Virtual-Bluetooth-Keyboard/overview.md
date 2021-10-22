@@ -102,8 +102,10 @@ With this option, the Zephyr peripheral resides and runs solely on a soc micro b
 You can set up a Zephyr build chain on linux to program your micro soc board, but I found it easier to install Nordic's nrfConnect v.3.7.0 for Win10 and use it's programmer to burn your image to the soc board.
   
   <img src="./images/1.6.png" width="400px" height="auto"> 
-   
-  More to come......
+  
+  Here you can setup your own Zephyr build chain to create your own custome image or use my image to test with. To setup a build chain, follow Zephyr's instructions in their documentaion: https://docs.zephyrproject.org/latest/getting_started/index.html
+  
+To use my image, use the Nordic programmer to burn this file: \bluetoothKeyboard\hogKeyboard-dongle\hogKeyboard.hex to your soc board.
 
 ### Sending HID Reports (keyboard characters) to peer clients
 
