@@ -97,8 +97,12 @@ Using this option is practically identical to using option 1. Here is only the d
 
 ### Using Option 3: Zephyr with external usb soc board
 
-With this option, the Zephyr peripheral resides and runs solely on a soc micro board which contains its own on-board bluetooth/wifi radio. It will run on any box that supports tty serial i/o. 
+With this option, the Zephyr peripheral resides and runs solely on a soc micro board which contains its own on-board bluetooth/wifi radio. It will run on any box that supports tty serial i/o.
+
+You can set up a Zephyr build chain on linux to program your micro soc board, but I found it easier to install Nordic's nrfConnect v.3.7.0 for Win10 and use it's programmer to burn your image to the soc board.
   
+  <img src="./images/1.6.png" width="400px" height="auto"> 
+   
   More to come......
 
 ### Sending HID Reports (keyboard characters) to peer clients
