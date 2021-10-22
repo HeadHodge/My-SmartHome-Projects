@@ -154,7 +154,8 @@ List of 6 byte HID Reports I use to control an Amazon Firestick
 ```
 Here is a python code snippet than will work to drive a tty port:
 
-```print('Load ttyBridge')
+```
+print('Load ttyBridge')
 
 import sys, time, json, threading, traceback, asyncio
 import serial, noteTool
@@ -162,7 +163,7 @@ import serial, noteTool
 _parent = sys.modules["__main__"]
         
 ##########################
-async def deliverReports(connection, report):
+async def deliverReport(connection, report):
 ##########################
     try:
         #print(f'***deliverCommand: {report}')
