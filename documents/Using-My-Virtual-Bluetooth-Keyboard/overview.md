@@ -80,11 +80,11 @@ One thing I really love about Zephyr is that it implements persistent state stor
 
 Using this option is practically identical to using option 1. Here is only the difference:
 
-* Plug usb hci connector and verify the controller is available.
+* Plug in the usb bluetooth device and verify an HCI controller is available.
 
   #~ hciconfig
   
-  If the controller is available hciconfig should list it as hci0 with state of 'down' (not powered). If you also have an onboard controller, you will see hciconfig list hci0 and hci1. In my experience the usb controller was always hci0.
+  If a controller is available hciconfig should list it as hci0 with state of 'down' (not powered). If you also have an onboard controller, you will see hciconfig list hci0 and hci1. In my experience the usb controller was always hci0.
   
  When you run:
  
@@ -94,5 +94,131 @@ Using this option is practically identical to using option 1. Here is only the d
  
  I think that's it!
  
+
+### Using Option 3: Zephyr with external usb soc board
+
+With this option, the Zephyr peripheral resides and runs solely on a soc micro board which contains its own on-board bluetooth/wifi radio. It will run on any box that supports tty serial i/o. 
+  
+  More to come......
+
+### Sending HID Reports (keyboard characters) to peer clients
+
+Congratulations if you made it this far and was able to pair with a peer client. It literally took me months to get this far, the first time around.
+
+Being connected to a peer client as an HID peripheral is fun, but not much use if you can't send keyboard codes to the peer.
+
+One of the things that happens when the Zephyr peripheral starts is to open a serial port for you to send your HID keycode reports. The port uses standard serial port communication protocols and you need to be able to stuff 6 bytes of data down the serial port for each HID report you want sent to the peer.
+
+My smartRemotes project is a collection of loosely coupled modules designed to do this. Using these modules are not required and may even be overkill for some situations. So at this point you need to decide how you want to interface to the serial port.
+
+```
+Three HID Reports are supported, each 6 bytes long.
+
+keyboard report: byte 1: 0xff (sync byte)
+		 byte 2: 0x01 (report id)
+		 byte 3: modifier byte
+		   bits: 0-L CTRL, 1-L SHIFT, 2-L ALT, 3-L GUI, 4-R CTRL, 5-R SHIFT, 6-R ALT, 7-R GUI
+		 byte 4: hid keyboard keyCode
+		 byte 5: 0x00 (reserved)
+		 byte 6: 0x00 (reserved)
+		 		 
+consumer report: byte 1: 0xff (sync byte)
+		 byte 2: 0x02 (report id)
+		 byte 3: low byte of hid consumer keyCode
+		 byte 4: high byte of hid consumer keyCode
+		 byte 5: 0x00 (reserved)
+		 byte 6: 0x00 (reserved)
+		 
+mouse report   : byte 1: 0xff (sync byte)
+		 byte 2: 0x03 (report id)
+		 byte 3: modifier byte
+		   bits: 0-left Click, 1-middle Click, 2-right Click
+		 byte 4: x-axis offset
+		 byte 5: y-axis offset
+		 byte 6: 0x00 (reserved)
+
+List of 6 byte HID Reports I use to control an Amazon Firestick
+
+	{"Home"      : [0xff, 0x02, 0x23, 0x02, 0x00, 0x00]}
+	{"Menu"      : [0xff, 0x02, 0x40, 0x00, 0x00, 0x00]}
+	{"Back"      : [0xff, 0x02, 0x46, 0x00, 0x00, 0x00]}
+	{"Up"        : [0xff, 0x02, 0x42, 0x00, 0x00, 0x00]}
+	{"Down"      : [0xff, 0x02, 0x43, 0x00, 0x00, 0x00]}
+	{"Left"      : [0xff, 0x02, 0x44, 0x00, 0x00, 0x00]}
+	{"Right"     : [0xff, 0x02, 0x45, 0x00, 0x00, 0x00]}
+	{"Ok"        : [0xff, 0x02, 0x41, 0x00, 0x00, 0x00]}
+	{"Forward"   : [0xff, 0x02, 0xB3, 0x00, 0x00, 0x00]}
+	{"Backward"  : [0xff, 0x02, 0xB4, 0x00, 0x00, 0x00]}
+	{"PlayToggle": [0xff, 0x02, 0xCD, 0x00, 0x00, 0x00]}
+
+```
+Here is a python code snippet than will work to drive a tty port:
+
+```
+print('Load ttyBridge')
+
+import sys, time, json, threading, traceback, asyncio
+import serial, noteTool
+
+_parent = sys.modules["__main__"]
+        
+##########################
+async def deliverReport(connection, report):
+##########################
+    try:
+        #print(f'***deliverCommand: {report}')
+        connection.write(report)
+        #await receiveReports(connection)
+    except:
+        print('Abort deliverCommand', sys.exc_info()[0])
+        traceback.print_exc()
+        
+##########################
+def receiveReports(connection):
+##########################
+    try:
+        print(f' \n***receiveReports')
+        
+        while True:
+            report = connection.readline()
+            if(len(report) == 0): break
+            print(f'{report[0:-2]}')        
+    except:
+        print('Abort receiveReports', sys.exc_info()[0])
+        traceback.print_exc()
+
+###################
+#     start
+###################
+def start(options={}):
+    print(f'Start ttyBridge: {options["connection"]["port"]}')
+
+    try:    
+        options['connection'] = serial.Serial(
+            options['connection']['port'],
+            options['connection']['speed'], 
+            timeout=options['connection']['timeout'],
+            parity=options['connection']['parity'], 
+            xonxoff=options['connection']['xonxoff'], 
+            rtscts=options['connection']['rtscts']
+        )
+
+        if(options['connection'].is_open == False): print('Abort: open serial port failed'); return;
+        
+        onConnect = options.get('onConnection', None)
+        if(onConnect != None): asyncio.run(onConnect())
+        receiveReports(options['connection'])
+    except:
+        print('Abort ttyBridge', sys.exc_info()[0])
+        traceback.print_exc()
+	
+```
+
+
+
+
+
+  
+  
 
 
