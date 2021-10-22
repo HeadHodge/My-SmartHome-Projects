@@ -1,5 +1,3 @@
-** heads-up, document under construction. subject to many updates **
-
 # Using My Virtual Bluetooth Keyboard
 ## Overview:
 
@@ -99,13 +97,19 @@ Using this option is practically identical to using option 1. Here is only the d
 
 With this option, the Zephyr peripheral resides and runs solely on a soc micro board which contains its own on-board bluetooth/wifi radio. It will run on any box that supports tty serial i/o.
 
-You can set up a Zephyr build chain on linux to program your micro soc board, but I found it easier to install Nordic's nrfConnect v.3.7.0 for Win10 and use it's programmer to burn your image to the soc board.
+You can set up a Zephyr build chain on linux to program your micro soc board, but I found it easier to install Nordic's nrfConnect v.3.7.0 for Win10 and use it's programmer to burn your image to the soc board. https://www.nordicsemi.com/Products/Development-tools/nrf-connect-for-desktop
   
   <img src="./images/1.6.png" width="400px" height="auto"> 
   
-  Here you can setup your own Zephyr build chain to create your own custome image or use my image to test with. To setup a build chain, follow Zephyr's instructions in their documentaion: https://docs.zephyrproject.org/latest/getting_started/index.html
+  Here you can setup your own Zephyr build chain to create your own custom image or use my image to test with. To setup a build chain, follow Zephyr's instructions in their documentaion: https://docs.zephyrproject.org/latest/getting_started/index.html
   
 To use my image, use the Nordic programmer to burn this file: \bluetoothKeyboard\hogKeyboard-dongle\hogKeyboard.hex to your soc board.
+
+Once the image is programed, the image will reboot each time you unplug/plug the soc dongle. If my image starts properly, the dongle will open a vCom serial port on the box the dongle is plugged into, and both onboard led's will start flashing. The flashing blue led means the dongle is in GAP mode and advertising for peer clients to discover. The flashing yellow means the dongle is not connected to a peer client.
+
+You should now be able to use any peer client i.e. Windows 10, Amazon Firestick other keyboards to connect and pair to your HID peripheral.
+
+Once connected, use the serial port i.e. /dev/ttyacm0 to send HID reports to the connected peer.
 
 ### Sending HID Reports (keyboard characters) to peer clients
 
