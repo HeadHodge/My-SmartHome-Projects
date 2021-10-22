@@ -1,4 +1,4 @@
-[ReadMe: My Smart Home Projects](https://github.com/HeadHodge/smartHome-Projects-Main/blob/main/README.md)
+[Home](https://github.com/HeadHodge/smartHome-Projects-Main/blob/main/README.md)
 
 # **My Virtual Bluetooth Keyboard Project**
 
