@@ -162,11 +162,11 @@ import serial, noteTool
 _parent = sys.modules["__main__"]
         
 ##########################
-async def deliverCommand(connection, command):
+async def deliverReports(connection, report):
 ##########################
     try:
-        #print(f'***deliverCommand: {command}')
-        connection.write(command)
+        #print(f'***deliverCommand: {report}')
+        connection.write(report)
         #await receiveReports(connection)
     except:
         print('Abort deliverCommand', sys.exc_info()[0])
