@@ -31,4 +31,4 @@ The main 'bridges' I've written and use are:
   - ip based interaces to control various ip based devices, i.e. Sonos, Huntington shades, Wimo outlets, Hassio Hub
   - low power (ble) bluetooth peripheral servers to emulate HID keyboards, mice, and consumer control devices via 'HoG' (HID over Gatt) to control bluetooth based devices, i.e. FireTV stick
 
-usage details: https://github.com/HeadHodge/My-SmartHome-Projects/tree/main/documents/Using-smartRemotesMain/tree/main/smartRemotes
+[Using smartRemotes]https://github.com/HeadHodge/My-SmartHome-Projects/tree/main/documents/Using-smartRemotesMain/tree/main/smartRemotes
