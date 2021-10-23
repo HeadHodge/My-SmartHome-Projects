@@ -13,10 +13,9 @@ My objective is to capture input from a variety of sources and use the input to 
 **Main Features:**
 
 Currently captures input from:
-  - web pages
-  - wired and wireless mice, keyboards, and remote controls
-  - any HID compliant input device
-  - wireless and other ip based data input.
+  - html web pages
+  - any HID compliant wired/wireless mice, keyboards, and remote controls
+  -  linux/windows keybboard input
 
 I use web sockets to transport this input around the home to the devices the input is intended to control.
 
