@@ -15,13 +15,13 @@ My objective is to capture input from a variety of sources and use the input to 
 Currently captures input from:
   - html web pages
   - any HID compliant wired/wireless mice, keyboards, and remote controls
-  -  linux/windows keybboard input
+  -  linux/windows keyboard input
 
 I use web sockets to transport this input around the home to the devices the input is intended to control.
 
 I use 'bridges' to convert captured input from a variety of input devices to ip packets which are routed to other 'bridges' that convert the packets to formats required to control the intended device. 
 
-The main 'bridges' I've written and use are:
+The main 'bridges' available are:
 
   - web sockets servers and clients to transfer data around my lan to their intended destinations with durable long lasting connections.
   - usb HID input data capture from any HID compliant device, i.e. wired/wireless keyboards, mice, and remote controls
@@ -32,15 +32,15 @@ The main 'bridges' I've written and use are:
 
 ### **How it Works:**
 
-smartRemotes is a collection of python coded modules called 'nodes'. Each node performs a single task and is designed to be easily loaded and run independently of all other nodes.
+smartRemotes is a collection of python modules called 'nodes'. Each node performs a single task and is designed to be easily loaded and run independently of all other nodes.
 
 A node performs only one of these three tasks:
 
  - Capture input control data from an input device, assign the input a single controlWord that represents the 'intent' of the input control data, then publish the controlWord to the home network via a websockets message.
  - Subscribe to one or more websocket messages and use the controlWord contained in the message to control a specified device.
- - Take published messages created by input nodes and route them to output nodes that have subscribed to the message to control a specific device.
+ - Subscribe to published messages created by input nodes and route them to output nodes that have subscribed to the message to control a specific device.
 
-The use of any available node is optional and independent of all other nodes **except** at least one router node must be running for the publish and subscribe of controlWord messages to work properly.
+The use of any node is optional and independent of all other nodes **except** at least one hub node must be running to publish and subscribe controlWord messages properly.
 
 Nodes are loosely coupled to each other via your home network using websockets. This is a stateful communications protocol that is efficient for continuous data flow and is available on practically any platform you can think of. The ubiquitous nature of websockets along with the JSON standard for object serialization, makes for an easy convenient way to communicate between diverse systems.
 
