@@ -1,7 +1,5 @@
 [Home](https://github.com/HeadHodge/smartHome-Projects-Main/blob/main/README.md)
 
-# **My Smart Remotes Project:**
-
 ## Using smartRemotes:
 
 Using smartRemotes should hopefully be relatively painless... :)
