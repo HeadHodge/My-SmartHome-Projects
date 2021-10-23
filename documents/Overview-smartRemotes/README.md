@@ -15,6 +15,8 @@ Currently captures input from:
   - wired and wireless mice, keyboards, and remote controls
   - any HID compliant input device
   - wireless and other ip based data input.
+  
+  <img src="./images/1.1.png" width="400px" height="auto"> 
 
 I use web sockets to transport this input around the home to the devices the input is intended to control.
 
