@@ -30,4 +30,18 @@ The main 'bridges' I've written and use are:
   - ip based interaces to control various ip based devices, i.e. Sonos, Huntington shades, Wimo outlets, Hassio Hub
   - low power (ble) bluetooth peripheral servers to emulate HID keyboards, mice, and consumer control devices via 'HoG' (HID over Gatt) to control bluetooth based devices, i.e. FireTV stick
 
+### **How it Works:**
+
+smartRemotes is a collection of python coded modules called 'nodes'. Each node performs a single task and is designed to be easily loaded and run independently of all other nodes.
+
+A node performs only one of these three tasks:
+
+ - Capture input control data from an input device, assign the input a single controlWord that represents the 'intent' of the input control data, then publish the controlWord to the home network via a websockets message.
+ - Subscribe to one or more websocket messages and use the controlWord contained in the message to control a specified device.
+ - Take published messages created by input nodes and route them to output nodes that have subscribed to the message to control a specific device.
+
+The use of any available node is optional and independent of all other nodes **except** at least one router node must be running for the publish and subscribe of controlWord messages to work properly.
+
+Nodes are loosely coupled to each other via your home network using websockets. This is a stateful communications protocol that is efficient for continuous data flow and is available on practically any platform you can think of. The ubiquitous nature of websockets along with the JSON standard for object serialization, makes for an easy convenient way to communicate between diverse systems.
+
 More info: [Using smartRemotes](https://github.com/HeadHodge/My-SmartHome-Projects/tree/main/documents/Using-smartRemotes)
