@@ -7,6 +7,8 @@
 smartRemotes is a simple framework to control all the devices around my home with a variety of input control devices. It's to control many devices i.e. tv, stereo, shades, fireplace, lights, etc. with a single input control device, like a wireless usb remote control. Conversely it's to control a single device, like a fireplace, with a variety of input control devices, i.e. remote control, keyboard, wall mounted control panel, web page, etc.
 
 My objective is to capture input from a variety of sources and use the input to control a variety of my home devices (mainly, but not totally, entertainment equipment).
+  
+<img src="./images/1.1.png" width="400px" height="auto"> 
 
 **Main Features:**
 
@@ -16,7 +18,7 @@ Currently captures input from:
   - any HID compliant input device
   - wireless and other ip based data input.
   
-  <img src="./images/1.1.png" width="400px" height="auto"> 
+<img src="https://github.com/HeadHodge/My-SmartHome-Projects/blob/main/documents/Overview-smartRemotes/images/1.1..png" width="400px" height="auto"> 
 
 I use web sockets to transport this input around the home to the devices the input is intended to control.
 
@@ -32,7 +34,6 @@ The main 'bridges' I've written and use are:
   - low power (ble) bluetooth peripheral servers to emulate HID keyboards, mice, and consumer control devices via 'HoG' (HID over Gatt) to control bluetooth based devices, i.e. FireTV stick
 
 more details: https://github.com/HeadHodge/smartHome-Projects-Main/tree/main/smartRemotes
-
 
 ### **How it Works:**
 
