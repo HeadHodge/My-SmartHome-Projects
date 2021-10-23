@@ -8,7 +8,7 @@ smartRemotes is a simple framework to control all the devices around my home wit
 
 My objective is to capture input from a variety of sources and use the input to control a variety of my home devices (mainly, but not totally, entertainment equipment).
   
-<img src=",/images/1.1..png" width="400px" height="auto"> 
+<img src="./images/1.1.png" width="400px" height="auto"> 
 
 **Main Features:**
 
