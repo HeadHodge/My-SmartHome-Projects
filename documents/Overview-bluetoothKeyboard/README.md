@@ -1,6 +1,6 @@
 [Home](https://github.com/HeadHodge/smartHome-Projects-Main/blob/main/README.md)
 
-<u>[Virtual bluetoothKeyboard Usage]</u>(https://github.com/HeadHodge/My-SmartHome-Projects/tree/main/documents/Using-bluetoothKeyboard)
+[Virtual bluetoothKeyboard Usage](https://github.com/HeadHodge/My-SmartHome-Projects/tree/main/documents/Using-bluetoothKeyboard)
 
 ##  Virtual bluetoothKeyboard Overview
 
