@@ -1,7 +1,7 @@
 # **My Smart Home Projects**
 I have ongoing projects with a goal to automate my home with the latest and best technologies. It makes our lives a little more convenient and a little more secure. It's also a fun learning experience for me too.
 
-[Overview of my Virtual bluetoothKeyboard Project](https://github.com/HeadHodge/smartHome-Projects-Main/blob/main/documents/Overview-bluetoothKeyboard/README.md)
+[Overview of my bluetoothKeyboard Project](https://github.com/HeadHodge/smartHome-Projects-Main/blob/main/documents/Overview-bluetoothKeyboard/README.md)
 
 I found a slick way of using a mini-x86 box installed with the Ubuntu server distro to create a virtual combo keyboard/mouse/consumerControl bluetooth hid over gatt (HoG) ble 5.0 peripheral. It uses the linux's new baby brother Zephyr rtos (real time operating system) and an Ubuntu Posix shell to do this. 
 
