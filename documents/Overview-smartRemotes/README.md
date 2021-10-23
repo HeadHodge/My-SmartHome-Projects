@@ -1,8 +1,8 @@
 [Home](https://github.com/HeadHodge/smartHome-Projects-Main/blob/main/README.md)
 
-# **My Smart Remotes Project:**
+[Using smartRemotes](https://github.com/HeadHodge/My-SmartHome-Projects/tree/main/documents/Using-smartRemotes)
 
-### **Overview:**
+## **smartRemotes Overview:**
 
 smartRemotes is a simple framework to control all the devices around my home with a variety of input control devices. It's to control many devices i.e. tv, stereo, shades, fireplace, lights, etc. with a single input control device, like a wireless usb remote control. Conversely it's to control a single device, like a fireplace, with a variety of input control devices, i.e. remote control, keyboard, wall mounted control panel, web page, etc.
 
