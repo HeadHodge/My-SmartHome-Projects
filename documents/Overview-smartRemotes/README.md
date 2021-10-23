@@ -16,9 +16,7 @@ Currently captures input from:
   - any HID compliant input device
   - wireless and other ip based data input.
   
-
 <img src="./images/1.1.png" width="400px" height="auto"> 
-
 
 I use web sockets to transport this input around the home to the devices the input is intended to control.
 
@@ -34,7 +32,6 @@ The main 'bridges' I've written and use are:
   - low power (ble) bluetooth peripheral servers to emulate HID keyboards, mice, and consumer control devices via 'HoG' (HID over Gatt) to control bluetooth based devices, i.e. FireTV stick
 
 more details: https://github.com/HeadHodge/smartHome-Projects-Main/tree/main/smartRemotes
-
 
 ### **How it Works:**
 
