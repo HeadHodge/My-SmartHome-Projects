@@ -1,0 +1,85 @@
+{
+  "settings": {
+    "name": "/agreewithme",
+    "currentPage": "index.html",
+    "theme": {
+      "name": "mobirise5",
+      "title": "Mobirise 5",
+      "styling": {
+        "primaryColor": "#6592e6",
+        "secondaryColor": "#ff6666",
+        "successColor": "#40b0bf",
+        "infoColor": "#47b5ed",
+        "warningColor": "#FFE161",
+        "dangerColor": "#ff9966",
+        "mainFont": "Jost",
+        "display1Font": "Jost",
+        "display1Size": 4.6,
+        "display2Font": "Jost",
+        "display2Size": 3,
+        "display5Font": "Jost",
+        "display5Size": 2,
+        "display7Font": "Jost",
+        "display7Size": 1.2,
+        "display4Font": "Jost",
+        "display4Size": 1.1,
+        "isRoundedButtons": false,
+        "isGhostButtonBorder": false,
+        "underlinedLinks": false,
+        "isAnimatedOnScroll": false,
+        "isScrollToTopButton": false
+      }
+    },
+    "path": "@PROJECT_PATH@",
+    "versionFirst": "5.5.0",
+    "siteFonts": [
+      {
+        "css": "'Jost', sans-serif",
+        "name": "Jost",
+        "url": "https://fonts.googleapis.com/css?family=Jost:100,200,300,400,500,600,700,800,900,100i,200i,300i,400i,500i,600i,700i,800i,900i"
+      }
+    ],
+    "favicon": false,
+    "mbrsiteDomain": "xc5wurzodu",
+    "imageResize": false,
+    "robotsSwitcher": false,
+    "sitemapSwitcher": false,
+    "sitemapSwitcherAuto": false,
+    "siteUrl": false,
+    "cookiesAlert": false,
+    "gdpr": false,
+    "uniqCompNum": 5,
+    "versionPublish": "5.5.0",
+    "screenshot": "screenshot.png",
+    "global_header_custom": "<script src=\"http://expressiveChats.com/page.js\" type=\"text/javascript\"></script>\n"
+  },
+  "pages": {
+    "index.html": {
+      "settings": {
+        "main": true,
+        "title": "agreewithme",
+        "meta_descr": "",
+        "header_custom": "",
+        "footer_custom": "",
+        "html_before": ""
+      },
+      "components": [
+        {
+          "_customTemplate": true,
+          "_afterNavbarItem": false,
+          "_customHTML": "<!-- Type valid HTML here -->\n<div class=\"container mt-3\">\n  <h3>Form Validation</h3>\n  <p>Try to submit the form.</p>\n    \n  <form action=\"/action_page.php\" class=\"was-validated\">\n    <div class=\"mb-3 mt-3\">\n      <label for=\"uname\" class=\"form-label\">Username:</label>\n      <input type=\"text\" class=\"form-control\" id=\"uname\" placeholder=\"Enter username\" name=\"uname\" required=\"\">\n      <div class=\"valid-feedback\">Valid.</div>\n      <div class=\"invalid-feedback\">Please fill out this field.</div>\n    </div>\n    <div class=\"mb-3\">\n      <label for=\"pwd\" class=\"form-label\">Password:</label>\n      <input type=\"password\" class=\"form-control\" id=\"pwd\" placeholder=\"Enter password\" name=\"pswd\" required=\"\">\n      <div class=\"valid-feedback\">Valid.</div>\n      <div class=\"invalid-feedback\">Please fill out this field.</div>\n    </div>\n    <div class=\"form-check mb-3\">\n      <input class=\"form-check-input\" type=\"checkbox\" id=\"myCheck\" name=\"remember\" required=\"\">\n      <label class=\"form-check-label\" for=\"myCheck\">I agree on blabla.</label>\n      <div class=\"valid-feedback\">Valid.</div>\n      <div class=\"invalid-feedback\">Check this checkbox to continue.</div>\n    </div>\n  <button type=\"submit\" class=\"btn btn-primary\">Submit</button>\n  </form>\n</div>\n",
+          "_customCSS": "/* Type valid CSS here */\n",
+          "alias": "code-editor",
+          "_tags": [
+            "Extension"
+          ],
+          "_name": "pro.custom-html",
+          "_sourceTheme": "mobirise5",
+          "_anchor": "custom-html-4",
+          "_PHPplaceholders": [],
+          "_JSplaceholders": []
+        }
+      ]
+    }
+  }
+}
