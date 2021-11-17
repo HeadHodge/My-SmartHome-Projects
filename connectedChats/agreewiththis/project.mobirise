@@ -1,6 +1,6 @@
 {
   "settings": {
-    "name": "/agreewithme",
+    "name": "agreewiththis.connectedchats.com",
     "currentPage": "index.html",
     "theme": {
       "name": "mobirise5",
@@ -40,7 +40,7 @@
       }
     ],
     "favicon": false,
-    "mbrsiteDomain": "xc5wurzodu",
+    "mbrsiteDomain": "med5kqnxbq",
     "imageResize": false,
     "robotsSwitcher": false,
     "sitemapSwitcher": false,
@@ -51,13 +51,13 @@
     "uniqCompNum": 5,
     "versionPublish": "5.5.0",
     "screenshot": "screenshot.png",
-    "global_header_custom": "<script src=\"http://expressiveChats.com/page.js\" type=\"text/javascript\"></script>\n"
+    "global_header_custom": "<script src=\"http://includes.connectedchats.com/js/connectedchats.js\" type=\"text/javascript\"></script>\n"
   },
   "pages": {
     "index.html": {
       "settings": {
         "main": true,
-        "title": "agreewithme",
+        "title": "agreewiththis",
         "meta_descr": "",
         "header_custom": "",
         "footer_custom": "",
