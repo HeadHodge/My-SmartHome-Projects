@@ -1,11 +1,13 @@
 //##################################################
 // 					Connected Chats
 //##################################################
-connectedChats = {}; //js namespace
-connectedChats.options = {}; //coniguration file
+console.log(`**** Load connectedChat.core.js ****`);
+if(typeof connectedChats == 'undefined') connectedChats = {}; //js namespace
+connectedChats.core = {};
 
 //////////////// BEGIN PRIVATE NAMESPACE //////////////////////
-connectedChats.wsObj = (function(){ //invoke anonymous self executing function
+
+(function(){ //invoke anonymous self executing function
 
 //####################
 //### Globals
@@ -13,6 +15,7 @@ connectedChats.wsObj = (function(){ //invoke anonymous self executing function
 var _options = undefined;
 var _socket = undefined;
 var _isConnected = undefined;
+var _core = connectedChats.core;
 
 //####################
 //### openConnection
@@ -223,11 +226,11 @@ var keyCode = button.attributes['key'].nodeValue;
 
 	publishNote('htmlNode', 'control device request', {'controlWord': keyCode, 'zone': _zone.getAttribute('value')});
 };
-
+  
 //################
-//### startClient
+//### startCore
 //################
-function startClient() {
+function startCore() {
 console.log(`startClient`);
 
 	_options = connectedChats.options;
@@ -236,12 +239,10 @@ console.log(`startClient`);
 }
 
 //################
-//###   MAIN   ###
+//     MAIN
 //################
 
-	console.log(`**** Start connectedChat.js ****`);
-	
-	window.addEventListener("load", startClient);
-
+	_core.startCore = startCore;
+		
 /////////////////////////// END PRIVATE NAMESPACE //////////////////////	
 })();

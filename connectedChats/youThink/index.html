@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en" style="height: 100%;">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>youThink</title>
+    <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+
+<body style="height: 100%;">
+    <div class="container-fluid" id="select-container" style="height: 100%;">
+        <div class="row g-0 row-cols-3" style="margin-bottom: 50px;">
+            <div class="col-3 order-first"></div>
+            <div class="col-3 text-center align-self-center order-last me-auto"><button class="btn btn-primary" type="button">Start New Topic</button></div>
+            <div class="col-6 text-center align-self-center">
+                <h1>Do You Agree?</h1>
+            </div>
+        </div>
+        <div class="row" style="margin-top: 10px;">
+            <div class="col text-center">
+                <h5 class="text-start">Select a Topic to View and Discuss</h5>
+            </div>
+        </div>
+        <div class="row g-0 d-sm-flex align-self-end me-auto justify-content-sm-start align-items-sm-end" style="text-align: center;margin: 6px;">
+            <div class="col" style="text-align: center;">
+                <div class="accordion accordion-flush" role="tablist" id="accordion-2">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" role="tab"><button class="accordion-button" data-bs-toggle="collapse" data-bs-target="#accordion-2 .item-1" aria-expanded="true" aria-controls="accordion-2 .item-1">Accordion Item</button></h2>
+                        <div class="accordion-collapse collapse show item-1" role="tabpanel" data-bs-parent="#accordion-2">
+                            <div class="accordion-body">
+                                <p class="mb-0">Nullam id dolor id nibh ultricies vehicula ut id elit. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec id elit non mi porta gravida at eget metus.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" role="tab"><button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#accordion-2 .item-2" aria-expanded="false" aria-controls="accordion-2 .item-2">Accordion Item</button></h2>
+                        <div class="accordion-collapse collapse item-2" role="tabpanel" data-bs-parent="#accordion-2">
+                            <div class="accordion-body">
+                                <p class="mb-0">Nullam id dolor id nibh ultricies vehicula ut id elit. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec id elit non mi porta gravida at eget metus.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" role="tab"><button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#accordion-2 .item-3" aria-expanded="false" aria-controls="accordion-2 .item-3">Accordion Item</button></h2>
+                        <div class="accordion-collapse collapse item-3" role="tabpanel" data-bs-parent="#accordion-2">
+                            <div class="accordion-body">
+                                <p class="mb-0">Nullam id dolor id nibh ultricies vehicula ut id elit. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec id elit non mi porta gravida at eget metus.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container-fluid" id="add-container" style="height: 100%;">
+        <div class="row g-0 row-cols-3 justify-content-center">
+            <div class="col-7 text-center align-self-center">
+                <h1>Ask a New Question</h1>
+            </div>
+        </div>
+        <div class="row justify-content-center" style="margin: -1px;margin-bottom: 10px;">
+            <div class="col-8">
+                <div class="card">
+                    <div class="card-body">
+                        <p class="card-text">Nullam id dolor id nibh ultricies vehicula ut id elit. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec id elit non mi porta gravida at eget metus.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row g-0" style="margin-top: 10px;height: 5%;">
+            <div class="col-8 offset-3 text-center align-self-center" style="height: 100%;">
+                <h5 class="text-start" style="height: 100%;">Enter Your Question Here:</h5>
+            </div>
+        </div>
+        <div class="row g-0 text-start d-sm-flex justify-content-center align-self-end me-auto justify-content-sm-start align-items-sm-end" style="text-align: center;margin: 6px;height: 40%;margin-bottom: 2%;">
+            <div class="col-6 offset-3 align-self-center" style="height: 100%;"><textarea style="width: 100%;height: 100%;"></textarea></div>
+        </div>
+        <div class="row">
+            <div class="col-8 offset-3 align-self-center">
+                <h6>Select Best Category for Your Question:</h6>
+            </div>
+        </div>
+        <div class="row" style="margin-bottom: 2%;">
+            <div class="col-6 offset-3"><select style="width: 100%;">
+                    <optgroup label="CATEGORIES">
+                        <option value="cat0001">Random Topics</option>
+                    </optgroup>
+                </select></div>
+        </div>
+        <div class="row">
+            <div class="col-8 offset-3 align-self-center">
+                <h6>Enter a Chat Name&nbsp;</h6>
+            </div>
+        </div>
+        <div class="row" style="margin-bottom: 2%;">
+            <div class="col-6 offset-3"><input type="text" placeholder="TopCat"></div>
+        </div>
+        <div class="row">
+            <div class="col-8 offset-3 align-self-center">
+                <h6>Enter a 5 Digit Pin Number</h6>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-6 offset-3"><input type="number" placeholder="#####"></div>
+        </div>
+        <div class="row">
+            <div class="col-4 offset-7 text-start"><button class="btn btn-primary" id="addChat-button" type="button">Add Question</button></div>
+        </div>
+    </div>
+    <script src="assets/bootstrap/js/bootstrap.min.js"></script>
+    <script src="assets/js/connectedchats.core.js"></script>
+    <script src="assets/js/connectedchats.options.js"></script>
+    <script src="assets/js/connectedChats.youThink.js"></script>
+</body>
+
+</html>
