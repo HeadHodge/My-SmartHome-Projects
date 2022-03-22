@@ -1,0 +1,16 @@
+////////////////////////////////////////////
+//          activateMinion
+////////////////////////////////////////////
+console.log(`***Load activateMinion...`);
+
+///////////////////////////////////////////////////////////////////
+/////////////////////// MAIN //////////////////////////////////////
+///////////////////////////////////////////////////////////////////
+module.exports = async function(receivedOrder, requireModule) {
+console.log(`***Start activateMinion, receivedOrder: `, receivedOrder);
+var activateMinion = await requireModule(`minions/` + receivedOrder.MINION.name + `/`, `minion.js`);
+var resultOrder = activateMinion(receivedOrder);
+
+  console.log(resultOrder);
+  return resultOrder;
+};
