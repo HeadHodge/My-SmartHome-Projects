@@ -30,27 +30,27 @@ console.log("Enter openConnection");
 	
 	//### onopen ###
 	_socket.onopen = function(event) {
-		console.log(`**** Endpoint Connected to: ${_options.endpoint} ****`);
+		console.log(`\n**** Endpoint: ${_options.endpoint}, connected. ****`, event);
 		_isConnected = true;
 		if(callBack) callBack();
 	};
 	
 	//### onmessage ###
 	_socket.onmessage = function(event) {
-		console.log(`Message from Endpoint: ${event.data}`);
-	};
-	
-	//### onclose ###
-	_socket.onclose = function(event) {
-		console.log("****Endpoint Closed****");
-		_socket = null;
-		_isConnected = null;
-		//openConnection();
+		console.log(`\n****Endpoint Received: `, event.data);
 	};
 
 	//### onerror ###
 	_socket.onerror = function(error) {
-		console.log(`****Endpoint Error: ${error.message}****`);
+		console.log(`\n****Endpoint Error: `, error);
+	};
+	
+	//### onclose ###
+	_socket.onclose = function(event) {
+		console.log(`\n****Endpoint Closed****`);
+		_socket = null;
+		_isConnected = null;
+		//openConnection();
 	};
 }
 
@@ -62,13 +62,22 @@ console.log(`Enter listObjects`);
 
 	if(!_isConnected) return console.log(`Abort: Not Connected`);
 
-	post = JSON.stringify({
-		'action': 'registerMinion',
-		'minionName': 'learning.minionLogic.hello.webjs',
+	orderWork = JSON.stringify({
+		ORDER: {
+			action	  : 'activateMinion',
+			minionName: 'minionLogic.helloWorld.example',
+			minionTask: 'fillOrder',
+			startOn   : 'now',
+			clientRef : 'job210.step27',
+		},
+		
+		DATA: {
+			message: 'Hello from minionLogic',
+		},
 	});
 
-	console.log(`Post: ${post}`);
-	_socket.send(post);
+	console.log(`orderWork: ${orderWork}`);
+	_socket.send(orderWork);
 }
 
 //################

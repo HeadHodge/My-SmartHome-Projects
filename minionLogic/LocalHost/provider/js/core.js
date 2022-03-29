@@ -37,7 +37,7 @@ console.log("Enter openConnection");
 	
 	//### onmessage ###
 	_socket.onmessage = function(event) {
-		console.log(`**** Endpoint Message ${event.data}`);
+		console.log(`Message from Endpoint: ${event.data}`);
 	};
 	
 	//### onclose ###
@@ -62,28 +62,13 @@ console.log(`Enter listObjects`);
 
 	if(!_isConnected) return console.log(`Abort: Not Connected`);
 
-	workOrder = JSON.stringify({
-		TICKET: {
-			client   : 'HeadHodge',
-			office   : 'minionServices',
-			action	 : 'activateMinion',
-			dueDate  : 'now',
-			deliverTo: 'job210.step27',
-			signature: 'HeadHodge',
-		},
-			
-		MINION: {
-			name: 'example.minionLogic.helloWorld.bjs',
-			task: 'fillOrder', //querySpecs querySample
-		},
-		
-		DATA: {
-			message   : 'Hello from minionLogic',
-		},
+	post = JSON.stringify({
+		'action': 'registerMinion',
+		'minionName': 'learning.minionLogic.hello.webjs',
 	});
 
-	console.log(`workOrder: ${workOrder}`);
-	_socket.send(workOrder);
+	console.log(`Post: ${post}`);
+	_socket.send(post);
 }
 
 //################
