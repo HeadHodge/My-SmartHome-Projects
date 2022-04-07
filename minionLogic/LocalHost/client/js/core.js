@@ -62,7 +62,9 @@ console.log(`Enter listObjects`);
 
 	if(!_isConnected) return console.log(`Abort: Not Connected`);
 
-	orderWork = JSON.stringify({
+	workOrder = JSON.stringify({
+		SUBJECT: 'WORKORDER',
+		
 		ORDER: {
 			action	  : 'activateMinion',
 			minionName: 'minionLogic.helloWorld.example',
@@ -71,13 +73,18 @@ console.log(`Enter listObjects`);
 			clientRef : 'job210.step27',
 		},
 		
-		DATA: {
-			message: 'Hello from minionLogic',
+		OPTIONS: {
+			REQUIRED: {
+				message: 'Hello from minionLogic',
+			},
+			
+			ADVANCED: {
+			},
 		},
 	});
 
-	console.log(`orderWork: ${orderWork}`);
-	_socket.send(orderWork);
+	console.log(`workOrder: ${workOrder}`);
+	_socket.send(workOrder);
 }
 
 //################

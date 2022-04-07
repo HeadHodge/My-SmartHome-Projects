@@ -1,36 +1,21 @@
-console.log(`***Loading 'example.minionLogic.helloWorld.bjs/minion.js'`);
+console.log(`***Load minionLogic.helloWorld.example/minion.js`);
 
-module.exports = function(receivedOrder) {
-	console.log(`***Start 'example.minionLogic.helloWorld.bjs/minion.js', receivedOrder: ${receivedOrder}`);
+///////////////////////////////////////////////////////////////////
+/////////////////////// MAIN //////////////////////////////////////
+///////////////////////////////////////////////////////////////////
+module.exports = async function(receivedOrder) {
+	console.log(`***Start minionLogic.helloWorld.example/minion.js, receivedOrder: ${receivedOrder}`);
    
-	var returnOrder = {
-		TICKET: {
-			action     : 'completeOrder',
-			submittedby: 'minionLogic',
-			deliverTo  : receivedOrder.TICKET.deliverTo,
-		},
+	var orderResult = {
 		
-	    STATUS: {
-	        state  : 'FILLED FAILED ANSWERED',
-	        notes  : 'Minion: "example.minionLogic.helloWorld.bjs", Task: "displayMessage", completed successfully',
-	    },
- 
         RESULT: {
-		    SCRIPT: `alert('Hello Fellow Minion Lovers!');`,
+			VIEW   : null,
+			DATA   : null,
+			CONSOLE: null,
+		    SCRIPT : `alert('Hello Fellow Minion Lovers!');`,
 	    },
-		
-		SETTLEMENT: {
-			billTo   : 'HeadHodge',
-			royaltyTo: 'minionMakers',
-			startTime: '123456',
-			stopTime : '123478',
-			unitTotal: '22',
-			unitRate : '.02',
-			units    : 'milliseconds',
-			ratePlan : '30 Day Trial',
-		},
 	};
    
-   console.log('returnOrder', returnOrder);
-   return returnOrder;
+   console.log('orderResult', orderResult);
+   return orderResult;
 };

@@ -1,1 +1,1 @@
-{"name": "provider", "activateWith": "activateLocalMinion"}
+{"name": "provider", "workFlow": "localMinion", "activateWith": "activateLocalMinion"}

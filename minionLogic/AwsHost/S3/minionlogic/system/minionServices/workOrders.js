@@ -1,7 +1,7 @@
 ////////////////////////////////////////////
-//          activateMinion
+//            workOrders.js
 ////////////////////////////////////////////
-console.log(`***Load activateMinion...`);
+console.log(`***Load workOrders...`);
 
 ///////////////////////////////////////////////////////////////////
 activateLocalMinion = async function(receivedOrder) {
@@ -46,12 +46,20 @@ console.log(`activateLocalMinion: ${receivedOrder.ORDER.minionName}`);
 ///////////////////////////////////////////////////////////////////
 /////////////////////// MAIN //////////////////////////////////////
 ///////////////////////////////////////////////////////////////////
-module.exports = async function(connection, receivedOrder) {
+module.exports = function(event, loadModule) {
 
 try {
-console.log(`***Start activateMinion, receivedOrder: `, receivedOrder);
-
-	var contract = await global.createContract(receivedOrder);
+console.log(`***Start workOrders, event: `, event);
+	
+	var contractServices = await loadModule('system/minionServices/', 'contractServices.js');
+	return;
+	
+} catch(err) {
+	console.log(`***ABORT workOrders: `, err);
+	
+}};
+/*
+	var contract = await global.createContract(workOrder);
 
 	
 //call activateMinion method
@@ -83,5 +91,4 @@ console.log(`***Start activateMinion, receivedOrder: `, receivedOrder);
 
 	console.log(`***Send orderFailed`);	
 	await global.sendMemo('client', orderFailed);
-	
-}};
+*/	
