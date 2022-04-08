@@ -37,7 +37,7 @@ console.log("Enter openConnection");
 	
 	//### onmessage ###
 	_socket.onmessage = function(event) {
-		console.log(`\n****Endpoint Received: `, event.data);
+		console.log(`\n****Received Notice: `, event.data);
 	};
 
 	//### onerror ###
