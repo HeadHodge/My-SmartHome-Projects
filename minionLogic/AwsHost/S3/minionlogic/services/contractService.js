@@ -1,14 +1,13 @@
 ////////////////////////////////////////////
 //            contractServices.js
 ////////////////////////////////////////////
-console.log(`***Load contractServices...`);
-var gwo;
+console.log(`***Load contractServices`);
 
 ///////////////////////////////////////////////////////////////////
 var createContract = async function(workOrder) {
 ///////////////////////////////////////////////////////////////////
-console.log(`createContract: `, workOrder, gwo);
-return;
+console.log(`createContract: `, workOrder);
+return workOrder;
 //var key = `123456789createdOn + ':' + orderContract.TICKET.client + ':' + orderContract.TICKET.provider; 
 //get contract client and provider
   var contract = {};
@@ -65,15 +64,8 @@ return;
   return contract;
 };
 
-///////////////////////////////////////////////////////////////////
-/////////////////////// MAIN //////////////////////////////////////
-///////////////////////////////////////////////////////////////////
-
-module.exports = async function(workOrder) {
-console.log(`***Start contractServices, workOrder: `, workOrder);
-	gwo = workOrder;
-	
-	return {
-		createContract: createContract,
-	};
+//////////////////////////////////////////////////////////////////
+module.exports = {
+//////////////////////////////////////////////////////////
+	createContract: createContract,
 };
