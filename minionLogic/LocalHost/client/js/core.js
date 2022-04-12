@@ -63,8 +63,10 @@ console.log(`Enter listObjects`);
 	if(!_isConnected) return console.log(`Abort: Not Connected`);
 
 	workOrder = JSON.stringify({
+		SUBJECT: 'OPEN-WORKORDER',
+		
 		TASK: {
-			name	 : 'activateMinion',
+			name	 : 'orderMinion',
 			startTime: 'now',
 			reference: 'job210.step27',
 		},
@@ -79,7 +81,7 @@ console.log(`Enter listObjects`);
 		},
 	});
 
-	console.log(`workOrder: ${workOrder}`);
+	console.log(`****workOrder: ${workOrder}`);
 	_socket.send(workOrder);
 }
 

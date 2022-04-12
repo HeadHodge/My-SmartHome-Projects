@@ -3,7 +3,7 @@
 ////////////////////////////////////////////
 console.log(`***Load orderService Methods...`);
 
-//global.services.bootService.loadModule('services/', 'systemService.js').then(result => global.services.systemService = result);
+var order = {};
 
 ///////////////////////////////////////////////////////////////////
 activateLocalMinion = async function(receivedOrder) {
@@ -46,83 +46,60 @@ console.log(`activateLocalMinion: ${receivedOrder.ORDER.minionName}`);
 };
 
 ///////////////////////////////////////////////////////////////////
-var createTicket = async function(workOrder) {
+var shipOrder = async function(workOrder) {
 ///////////////////////////////////////////////////////////////////
-console.log(`createTicket: `, workOrder);
+console.log(`shipOrder: `, workOrder);
 var ticket = {};
+};
 
-var clientConnection = global.services.bootService.event.requestContext.connectionId;
+///////////////////////////////////////////////////////////////////
+var createOrder = async function(workOrder) {
+///////////////////////////////////////////////////////////////////
+console.log(`createOrder: `, workOrder);
+
+// Get ticket info
+	var clientConnection = global.services.bootService.event.requestContext.connectionId;
 	console.log(`***clientConnection: `, clientConnection);
-
-var client = await services.systemService.loadObject(`connections/connectedList/${clientConnection}`);
-	console.log(`***Client: `, client);
-
-var provider = await services.systemService.loadObject(`minions/${workOrder.OPTIONS.required.minion}/provider`);
-	console.log(`***Provider: `, provider);
-
-	ticket.reference = `${Date.now()}:${client.name}:${provider.name}`
-
-	await global.services.bootService.postNotice(ticket);
-
-
-
-
-return ticket;
-
-//var key = `123456789createdOn + ':' + orderContract.TICKET.client + ':' + orderContract.TICKET.provider; 
-//get contract client and provider
-  var contract = {};
-  
-  var client = await global.loadObject(`connections/connectedList/${global.memo.requestContext.connectionId}`);
-	console.log(`***Client: `, client.name);
 	
-	var provider = await global.loadObject(`minions/${workOrder.ORDER.minionName}/provider`);
-	console.log(`***Provider: `, provider.name);
+	var connectInfo = await services.systemService.loadObject(`connections/${clientConnection}.json`);
+	console.log(`***connectInfo: `, connectInfo);
 	
-  contract.CLIENT = client;
+	var minionInfo = await services.systemService.loadObject(`minions/${workOrder.OPTIONS.required.minion}/minion.json`);
+	console.log(`***minionInfo: `, minionInfo);
 	
-  contract.PROVIDER = provider;
-  
-	contract.TICKET = {
-			client     : client.name,
-			provider   : provider.name,
-			clientRef  : workOrder.ORDER.clientRef,
-			contractRef: `${Date.now()}:${client.name}:${provider.name}`,
-			createdOn  : `${Date.now()}`,
+	var providerInfo = await services.systemService.loadObject(`clients/${minionInfo.client}/${minionInfo.client}.json`);
+	console.log(`***providerInfo: `, providerInfo);
+
+//create order	
+	order = workOrder;
+
+//create ticket
+	order.TICKET = {
+		taskName	      : workOrder.TASK.name,
+		minionName	      : workOrder.OPTIONS.required.minion,
+		clientReference   : workOrder.TASK.reference,
+		orderReference    : `${Date.now()}:${connectInfo.client}:${minionInfo.client}`,
 	};
 
-  contract.ORDER = workOrder.ORDER;
-  
-  contract.UPDATES = [{
-			timestamp: `${Date.now()}`,
-			progress : 'RECEIVED',
-			note     : 'Order was received and ticket opened for processing',
-  }];
-  
-  contract.BILLING = {};
-  
-//createContract
-  var params = {
-      Bucket: 'minionlogic',
-      Key   : 'contracts/openedList/' + contract.TICKET.contractRef,
-      Body  : JSON.stringify(contract),
-      ContentType: 'text/plain',
-  };
-        
-	console.log(`createContract, params: `, params);
-  await S3.putObject(params).promise();
-  
-//sendUpdate
-  var receivedOrder = {
-		  SUBJECT: 'ORDERUPDATE',
-      TICKET: contract.TICKET,
-      UPDATE: contract.UPDATES[0],
-  };
-  
-	console.log(`***Send receivedOrder update`);	
-	await global.sendMemo('client', receivedOrder);
-  
-  return contract;
+//create contract
+	order.CONTRACT = {
+		clientName        : connectInfo.client,
+		clientConnection  : clientConnection,
+		providerName      : minionInfo.client,
+		providerConnection: providerInfo.connection,
+		billingMode	      : minionInfo.mode,
+		startTime		  : `${Date.now()}`,
+	};
+	
+//create updates
+	order.UPDATES = [{
+		progress	   : 'OPENED',
+		note  		   : 'workOrder received by minionLogic and shipping to provider for fulfillment',
+		timestamp      : `${Date.now()}`,
+	}];
+			
+	console.log(`***Order Created: `, order);
+	return order;
 };
 
 /*
@@ -136,32 +113,22 @@ ORDER
 */
 
 ///////////////////////////////////////////////
-//            activateMinion 
+//            orderMinion 
 ///////////////////////////////////////////////
-var activateMinion = async function(workOrder) {
+var orderMinion = async function(workOrder) {
+console.log(`***orderMinion: `, workOrder);
 
-console.log(`***activateMinion: `, workOrder);
-
-//await global.services.bootService.postNotice({status: 'received workOrder'}, global.services.bootService.event.requestContext.connectionId);
-
-//var contractServices = await loadModule('system/', 'contractServices.js');
+//create order
+	var order = await createOrder(workOrder);
+	await services.systemService.saveObject(`orders/active/${order.TICKET.orderReference}.json`, order);
 	
-	var ticket = await createTicket(workOrder);
-	//console.log(`event: `, global.services.bootService);
-    
-	return;
-
-	
-//call activateMinion method
-	console.log(`activate method: `, contract.PROVIDER.activateWith, contract);
-	receivedOrder.TICKET = contract.TICKET 
-	await eval(contract.PROVIDER.activateWith + '(receivedOrder)');
-	//await activateLocalMinion(receivedOrder);
+//update client 
+	await global.services.bootService.postNotice(order);
 };
 	
 //////////////////////////////////////////////////////////
 module.exports = {
 //////////////////////////////////////////////////////////
-    name          : 'orderService',
-	activateMinion: activateMinion,
+    name       : 'orderService',
+	orderMinion: orderMinion,
 };
