@@ -6,12 +6,14 @@ console.log(`***Load orderService Methods...`);
 var order = {};
 
 ///////////////////////////////////////////////////////////////////
-var deliverProduct = async function(orderUpdate) {
-console.log(`deliverProduct, progress: ${orderUpdate.UPDATE.progress}`);
-var timeStamp = `${Date.now()}`
+var completeOrder = async function(orderUpdate) {
+console.log(`completeOrder, progress: ${orderUpdate.UPDATE.progress}`);
 
 //get order
 	var order = await services.systemService.loadObject(`orders/active/${orderUpdate.TICKET.orderReference}.json`);
+	order.CONTRACT.stopStamp = `${Date.now()}`;
+
+//get billing info
 	var clientName = order.CONTRACT.clientName;
 	var providerName = order.CONTRACT.providerName;
 	var clientInfo = await services.systemService.loadObject(`clients/${clientName}/${clientName}.json`);
@@ -19,9 +21,9 @@ var timeStamp = `${Date.now()}`
 
 //calculate bill
 	var currentBalance = parseFloat(clientInfo.runtimeBalance);
-	var start = parseFloat(order.CONTRACT.startTime);
-	var stop = parseFloat(timeStamp);
-	var runtimeTotal = (stop - start); //minutes
+	var startTime = parseFloat(order.CONTRACT.startStamp);
+	var stopTime = parseFloat(order.CONTRACT.stopStamp);
+	var runtimeTotal = (stopTime - startTime); //minutes
 	var usageFee = 0; //minutes
 	var billingMode = order.CONTRACT.billingMode;
 	if(billingMode == 'billable') usageFee = runtimeTotal/60000;
@@ -32,8 +34,8 @@ var timeStamp = `${Date.now()}`
 		'billType'               : 'minion usage fee',
 		'billingMode'            : billingMode,
 		'currentBalance(minutes)': currentBalance,
-		'startStamp(millisecs)'  : start,
-		'stopStamp(millisecs)'   : stop,
+		'startTime(millisecs)'  : startTime,
+		'stopTime(millisecs)'   : stopTime,
 		'runtimeTotal(millisecs)': runtimeTotal,
 		'usageFee(minutes)'      : usageFee,
 		'newBalance(minutes)'    : newBalance,
@@ -41,9 +43,9 @@ var timeStamp = `${Date.now()}`
 		
 	orderUpdate.BILL = bill;
 	await global.services.bootService.postNotice(orderUpdate, clientConnection);
-	
+
 //update order
-	order.CONTRACT.stopTime = timeStamp;
+	order.UPDATES.push(orderUpdate.UPDATE);
 	order.BILL = bill;
 	await services.systemService.saveObject(`orders/complete/${order.TICKET.orderReference}.json`, order);
 	await services.systemService.deleteObject(`orders/active/${order.TICKET.orderReference}.json`, order);
@@ -57,15 +59,12 @@ var timeStamp = `${Date.now()}`
 	var chargeType;
 	
 	if(usageFee == 0)
-		chargeType = 'free';
+		chargeType = 'noFee';
 	else
-		chargeType = 'fees';
+		chargeType = 'usageFee';
 	
-	await services.systemService.saveObject(`clients/${clientName}/bills/${chargeType}/${orderUpdate.TICKET.orderReference}.json`, clientReceipt);
-	await services.systemService.saveObject(`clients/${providerName}/receipts/${chargeType}/${orderUpdate.TICKET.orderReference}.json`, clientReceipt);
-
-//save bill copy to provider
-
+	await services.systemService.saveObject(`clients/${clientName}/bills/${chargeType}/${orderUpdate.TICKET.orderReference}/`);
+	await services.systemService.saveObject(`clients/${providerName}/receipts/${chargeType}/${orderUpdate.TICKET.orderReference}/`);
 };
 
 ///////////////////////////////////////////////////////////////////
@@ -109,29 +108,43 @@ console.log(`createOrder: `, workOrder);
 		minionLocation    : minionInfo.location,
 		runtimeBalance	  : clientInfo.runtimeBalance,
 		billingMode	      : minionInfo.mode,
-		startTime		  : `${Date.now()}`,
 	};
 	
 //create updates
-	order.UPDATES = [{
-		progress	   : 'OPENED',
-		note  		   : 'workOrder received by minionLogic and shipping to provider for fulfillment',
-		timestamp      : `${Date.now()}`,
-	}];
+	order.UPDATES = [];
 			
 	console.log(`***Order Created: `, order);
 	return order;
 };
 
-/*
-ORDER
--TASK
--OPTIONS
--CONTENT
--TICKET
--UPDATE
--CONTRACT
-*/
+///////////////////////////////////////////////////////////////////
+var fillOrder = async function(order) {
+///////////////////////////////////////////////////////////////////
+console.log(`fillOrder: `, order);
+
+//load minion
+	order.TICKET = order.TICKET;
+	var minionService = await global.services.bootService.loadModule(`minions/${order.TICKET.minionName}/`, 'minion.js');
+
+//update client
+	var orderUpdate = {
+		SUBJECT: 'ORDER-UPDATE',
+		TICKET: order.TICKET,
+		OUTPUT: await minionService(order),
+		UPDATE: {
+			progress:"FULFILLED",
+			note: "Order fulfilled by minionLogic. Thank You for using our minions!",
+		}
+	};
+
+//save order
+	order.UPDATES.push(orderUpdate.UPDATE);
+	order.CONTRACT.startStamp = `${Date.now()}`;
+	await services.systemService.saveObject(`orders/active/${order.TICKET.orderReference}.json`, order);
+
+//complete order
+	await completeOrder(orderUpdate);
+};
 
 ///////////////////////////////////////////////
 //            orderMinion 
@@ -149,34 +162,15 @@ console.log(`***orderMinion: `, workOrder);
 		throw new Error('*** ABORT ORDER, Client has insufficient runtimeBalance. Increase runtimeBalance and try again.');
 	}
 
-//save order
-	await services.systemService.saveObject(`orders/active/${order.TICKET.orderReference}.json`, order);
+//update order
+	order.UPDATES.push({
+		progress	   : 'OPEN',
+		note  		   : 'workOrder received by minionLogic and opened new order for fulfillment',
+		timestamp      : `${Date.now()}`,
+	});
 
-//update client
-	var update = {
-		SUBJECT: 'ORDER-UPDATE',
-		TICKET: order.TICKET,
-		UPDATE: order.UPDATES[0],
-	};
-	
-	await global.services.bootService.postNotice(update);
-
-//load minion
-	workOrder.TICKET = order.TICKET;
-	var minionService = await global.services.bootService.loadModule(`minions/${order.TICKET.minionName}/`, 'minion.js');
-
-//update client
-	var update = {
-		SUBJECT: 'ORDER-UPDATE',
-		TICKET: workOrder.TICKET,
-		OUTPUT: await minionService(workOrder),
-		UPDATE: {
-			progress:"FULFILLED",
-			note: "workOrder fulfilled by minionLogic. Thank You for using our minions.",
-		}
-	};
-
-	await deliverProduct(update);
+//fill local order
+	await fillOrder(order);
 };
 	
 //////////////////////////////////////////////////////////
