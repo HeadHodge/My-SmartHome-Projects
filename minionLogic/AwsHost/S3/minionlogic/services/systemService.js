@@ -20,10 +20,24 @@ console.log(`***renameObject, currentKey: ${cureentKey}, newKey: ${newKey}`);
 };
 
 /////////////////////////////////////////////////////////
+var deleteObject = async function(objectKey) {
+//////////////////////////////////////////////////////////
+console.log(`***deleteObject: ${objectKey}`);
+
+//deleteObject
+	params = {
+        Bucket     : 'minionlogic',
+        Key        : objectKey,
+    };
+
+    console.log(`deleteObject, params: `, params);
+    object = await s3Client.deleteObject(params).promise();
+};
+
+/////////////////////////////////////////////////////////
 var saveObject = async function(objectKey, object) {
 //////////////////////////////////////////////////////////
 console.log(`***loadObject: ${objectKey}`);
-var objectBuffer;
 
 //saveObject
 	params = {
@@ -65,4 +79,5 @@ module.exports = {
     apiGateway: apiGateway,
     loadObject: loadObject,
 	saveObject: saveObject,
+	deleteObject: deleteObject,
 };

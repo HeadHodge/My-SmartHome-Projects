@@ -3,19 +3,17 @@ console.log(`***Load minionLogic.helloWorld.example/minion.js`);
 ///////////////////////////////////////////////////////////////////
 /////////////////////// MAIN //////////////////////////////////////
 ///////////////////////////////////////////////////////////////////
-module.exports = async function(receivedOrder) {
-	console.log(`***Start minionLogic.helloWorld.example/minion.js, receivedOrder: ${receivedOrder}`);
+module.exports = async function(workOrder) {
+	console.log(`***Start minionLogic.helloWorld.example/minion.js, workOrder: ${workOrder}`);
    
-	var orderResult = {
-		
-        RESULT: {
-			VIEW   : null,
+	var minionOutput = {
+			RESULT : 'SUCCESS',
+ 			VIEW   : null,
 			DATA   : null,
-			CONSOLE: null,
+			CONSOLE: 'minion completed task succesfully',
 		    SCRIPT : `alert('Hello Fellow Minion Lovers!');`,
-	    },
 	};
    
-   console.log('orderResult', orderResult);
-   return orderResult;
+   console.log('minionOutput', minionOutput);
+   return minionOutput;
 };

@@ -6,50 +6,66 @@ console.log(`***Load orderService Methods...`);
 var order = {};
 
 ///////////////////////////////////////////////////////////////////
-activateLocalMinion = async function(receivedOrder) {
-console.log(`activateLocalMinion: ${receivedOrder.ORDER.minionName}`);
+var deliverProduct = async function(orderUpdate) {
+console.log(`deliverProduct, progress: ${orderUpdate.UPDATE.progress}`);
+var timeStamp = `${Date.now()}`
 
-//create transferredOrder
-	var transferredOrder = {
-		SUBJECT: 'ORDERUPDATE',
-		
-		TICKET  : receivedOrder.TICKET,
-		
-		UPDATE : {
-			timestamp: `${Date.now()}`,
-			progress : 'TRANSFERRED',
-			note     : 'order was transferred to provider for processing',
-		},	
+//get order
+	var order = await services.systemService.loadObject(`orders/active/${orderUpdate.TICKET.orderReference}.json`);
+	var clientName = order.CONTRACT.clientName;
+	var providerName = order.CONTRACT.providerName;
+	var clientInfo = await services.systemService.loadObject(`clients/${clientName}/${clientName}.json`);
+	var clientConnection = clientInfo.connection;
+
+//calculate bill
+	var currentBalance = parseFloat(clientInfo.runtimeBalance);
+	var start = parseFloat(order.CONTRACT.startTime);
+	var stop = parseFloat(timeStamp);
+	var runtimeTotal = (stop - start); //minutes
+	var usageFee = 0; //minutes
+	var billingMode = order.CONTRACT.billingMode;
+	if(billingMode == 'billable') usageFee = runtimeTotal/60000;
+	var newBalance = currentBalance - usageFee;
+
+// create bill
+	var bill = {
+		'billType'               : 'minion usage fee',
+		'billingMode'            : billingMode,
+		'currentBalance(minutes)': currentBalance,
+		'startStamp(millisecs)'  : start,
+		'stopStamp(millisecs)'   : stop,
+		'runtimeTotal(millisecs)': runtimeTotal,
+		'usageFee(minutes)'      : usageFee,
+		'newBalance(minutes)'    : newBalance,
 	};
-
-	console.log(`***Send orderTransferred update`);	
-	await global.updateContract(transferredOrder);
+		
+	orderUpdate.BILL = bill;
+	await global.services.bootService.postNotice(orderUpdate, clientConnection);
 	
-//Load minion
-	var minion = await global.loadModule(`minions/${receivedOrder.ORDER.minionName}/`, `minion.js`);
-	console.log(`minion: `, minion);
+//update order
+	order.CONTRACT.stopTime = timeStamp;
+	order.BILL = bill;
+	await services.systemService.saveObject(`orders/complete/${order.TICKET.orderReference}.json`, order);
+	await services.systemService.deleteObject(`orders/active/${order.TICKET.orderReference}.json`, order);
 
-//invokeMinion
-	var orderResult = await minion(receivedOrder);
+//save receipts
+	var clientReceipt = {
+		TICKET: orderUpdate.TICKET,
+		BILL: bill,
+	}
 	
-	orderResult.SUBJECT = 'COMPLETED',
-	orderResult.TICKET  = receivedOrder.TICKET,
-	orderResult.UPDATE  = {
-		timestamp: `${Date.now()}`,
-		progress : 'CLOSED',
-		note     : 'Order was filled and transferred to client.',
-	},	
+	var chargeType;
 	
-	console.log(`orderResult: `, orderResult);
-	await global.updateContract(orderResult);
+	if(usageFee == 0)
+		chargeType = 'free';
+	else
+		chargeType = 'fees';
+	
+	await services.systemService.saveObject(`clients/${clientName}/bills/${chargeType}/${orderUpdate.TICKET.orderReference}.json`, clientReceipt);
+	await services.systemService.saveObject(`clients/${providerName}/receipts/${chargeType}/${orderUpdate.TICKET.orderReference}.json`, clientReceipt);
 
-};
+//save bill copy to provider
 
-///////////////////////////////////////////////////////////////////
-var shipOrder = async function(workOrder) {
-///////////////////////////////////////////////////////////////////
-console.log(`shipOrder: `, workOrder);
-var ticket = {};
 };
 
 ///////////////////////////////////////////////////////////////////
@@ -63,6 +79,9 @@ console.log(`createOrder: `, workOrder);
 	
 	var connectInfo = await services.systemService.loadObject(`connections/${clientConnection}.json`);
 	console.log(`***connectInfo: `, connectInfo);
+	
+	var clientInfo = await services.systemService.loadObject(`clients/${connectInfo.client}/${connectInfo.client}.json`);
+	console.log(`***clientInfo: `, clientInfo);
 	
 	var minionInfo = await services.systemService.loadObject(`minions/${workOrder.OPTIONS.required.minion}/minion.json`);
 	console.log(`***minionInfo: `, minionInfo);
@@ -87,6 +106,8 @@ console.log(`createOrder: `, workOrder);
 		clientConnection  : clientConnection,
 		providerName      : minionInfo.client,
 		providerConnection: providerInfo.connection,
+		minionLocation    : minionInfo.location,
+		runtimeBalance	  : clientInfo.runtimeBalance,
 		billingMode	      : minionInfo.mode,
 		startTime		  : `${Date.now()}`,
 	};
@@ -120,10 +141,42 @@ console.log(`***orderMinion: `, workOrder);
 
 //create order
 	var order = await createOrder(workOrder);
-	await services.systemService.saveObject(`orders/active/${order.TICKET.orderReference}.json`, order);
 	
-//update client 
-	await global.services.bootService.postNotice(order);
+//check balance
+	console.log(`billingMode: ${order.CONTRACT.billingMode}, runTimeBalance: ${order.CONTRACT.runtimeBalance}`);
+	
+	if(order.CONTRACT.billingMode == 'billable' && parseFloat(order.CONTRACT.runtimeBalance) >= 0) {
+		throw new Error('*** ABORT ORDER, Client has insufficient runtimeBalance. Increase runtimeBalance and try again.');
+	}
+
+//save order
+	await services.systemService.saveObject(`orders/active/${order.TICKET.orderReference}.json`, order);
+
+//update client
+	var update = {
+		SUBJECT: 'ORDER-UPDATE',
+		TICKET: order.TICKET,
+		UPDATE: order.UPDATES[0],
+	};
+	
+	await global.services.bootService.postNotice(update);
+
+//load minion
+	workOrder.TICKET = order.TICKET;
+	var minionService = await global.services.bootService.loadModule(`minions/${order.TICKET.minionName}/`, 'minion.js');
+
+//update client
+	var update = {
+		SUBJECT: 'ORDER-UPDATE',
+		TICKET: workOrder.TICKET,
+		OUTPUT: await minionService(workOrder),
+		UPDATE: {
+			progress:"FULFILLED",
+			note: "workOrder fulfilled by minionLogic. Thank You for using our minions.",
+		}
+	};
+
+	await deliverProduct(update);
 };
 	
 //////////////////////////////////////////////////////////

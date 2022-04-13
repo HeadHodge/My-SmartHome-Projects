@@ -68,6 +68,7 @@ console.log(`Enter listObjects`);
 		TASK: {
 			name	 : 'orderMinion',
 			startTime: 'now',
+			ifDelayed: 'cancel',
 			reference: 'job210.step27',
 		},
 		
