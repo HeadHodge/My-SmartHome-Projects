@@ -1,0 +1,5 @@
+var minion_namespace = {};
+
+(function($public) { 
+ML.script
+})(minion_namespace);  

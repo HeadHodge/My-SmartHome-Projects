@@ -38,6 +38,17 @@ console.log("Enter openConnection");
 	//### onmessage ###
 	_socket.onmessage = function(event) {
 		console.log(`\n****Received Notice: `, event.data);
+		
+		//install product
+		var PRODUCT = JSON.parse(event.data).PRODUCT;
+		
+		if(PRODUCT){
+			console.log(`\n****PRODUCT: `, PRODUCT);
+			var s = document.createElement('script');
+			s.type = 'text/javascript';
+			s.appendChild(document.createTextNode(PRODUCT));
+			document.body.appendChild(s);
+		}
 	};
 
 	//### onerror ###

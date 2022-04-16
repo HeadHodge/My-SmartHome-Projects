@@ -6,9 +6,69 @@ console.log(`***Load orderService Methods...`);
 var order = {};
 
 ///////////////////////////////////////////////////////////////////
-var completeOrder = async function(orderUpdate) {
-console.log(`completeOrder, progress: ${orderUpdate.UPDATE.progress}`);
+var wrapProduct = async function(product, namespace) {
+console.log(`wrapProduct: `, namespace);
 
+var template = await services.systemService.loadFile(`services/productWrapper.txt`);
+template = template.replace(/ML.namespace/g, namespace);
+template = template.replace(/ML.script/g, product.SCRIPT);
+template = template.replace(/ML.view/g, product.VIEW);
+template = template.replace(/ML.data/g, product.DATA);
+template = template.replace(/ML.console/g, product.CONSOLE);
+
+	await global.services.bootService.postNotice(template);
+	return template;
+
+
+/*
+window.onload = function() {
+    var s = document.createElement('script');
+    s.type = 'text/javascript';
+    var code = 'alert("hello world!");';
+    try {
+      s.appendChild(document.createTextNode(code));
+      document.body.appendChild(s);
+    } catch (e) {
+      s.text = code;
+      document.body.appendChild(s);
+    }
+  }
+  
+//wrap namespace around product
+window.onload = function() {
+    var s = document.createElement('script');
+    s.type = 'text/javascript';
+    var code = 'alert("hello world!");';
+    try {
+      s.appendChild(document.createTextNode(code));
+      document.body.appendChild(s);
+    } catch (e) {
+      s.text = code;
+      document.body.appendChild(s);
+    }
+  }
+var myApp = {};
+(function(context) { 
+    var id = 0;
+ 
+    context.next = function() {
+        return id++;    
+    };
+ 
+    context.reset = function() {
+        id = 0;     
+    }
+})(myApp);  
+*/
+  
+};
+
+///////////////////////////////////////////////////////////////////
+var completeOrder = async function(orderUpdate) {
+console.log(`completeOrder, progress: ${orderUpdate.REPORT.progress}`);
+//wrapProduct
+	orderUpdate.PRODUCT = await wrapProduct(orderUpdate.OUTPUT, orderUpdate.TICKET.minionName);
+	
 //get order
 	var order = await services.systemService.loadObject(`orders/active/${orderUpdate.TICKET.orderReference}.json`);
 	order.CONTRACT.stopStamp = `${Date.now()}`;
@@ -34,8 +94,8 @@ console.log(`completeOrder, progress: ${orderUpdate.UPDATE.progress}`);
 		'billType'               : 'minion usage fee',
 		'billingMode'            : billingMode,
 		'currentBalance(minutes)': currentBalance,
-		'startTime(millisecs)'  : startTime,
-		'stopTime(millisecs)'   : stopTime,
+		'startTime(millisecs)'   : startTime,
+		'stopT(millisecs)'       : stopTime,
 		'runtimeTotal(millisecs)': runtimeTotal,
 		'usageFee(minutes)'      : usageFee,
 		'newBalance(minutes)'    : newBalance,
@@ -45,10 +105,13 @@ console.log(`completeOrder, progress: ${orderUpdate.UPDATE.progress}`);
 	await global.services.bootService.postNotice(orderUpdate, clientConnection);
 
 //update order
-	order.UPDATES.push(orderUpdate.UPDATE);
+	order.REPORTS.push(orderUpdate.REPORT);
 	order.BILL = bill;
-	await services.systemService.saveObject(`orders/complete/${order.TICKET.orderReference}.json`, order);
-	await services.systemService.deleteObject(`orders/active/${order.TICKET.orderReference}.json`, order);
+	await services.systemService.renameObject(`orders/active/${order.TICKET.orderReference}.json`, `orders/complete/${order.TICKET.orderReference}.json`);
+
+//update client's balance
+	clientInfo.runtimeBalance = `${Math.round((newBalance - runtimeTotal/1000) * 10000)/10000}`;
+	await services.systemService.saveObject(`clients/${clientName}/${clientName}.json`, clientInfo);
 
 //save receipts
 	var clientReceipt = {
@@ -111,36 +174,30 @@ console.log(`createOrder: `, workOrder);
 	};
 	
 //create updates
-	order.UPDATES = [];
+	order.REPORTS = [];
 			
 	console.log(`***Order Created: `, order);
 	return order;
 };
 
 ///////////////////////////////////////////////////////////////////
-var fillOrder = async function(order) {
+var fillOrder = async function(workOrder) {
 ///////////////////////////////////////////////////////////////////
-console.log(`fillOrder: `, order);
+console.log(`fillOrder: `, workOrder);
 
 //load minion
-	order.TICKET = order.TICKET;
-	var minionService = await global.services.bootService.loadModule(`minions/${order.TICKET.minionName}/`, 'minion.js');
+	var minionService = await global.services.bootService.loadModule(`minions/${workOrder.TICKET.minionName}/`, 'minion.js');
 
 //update client
 	var orderUpdate = {
 		SUBJECT: 'ORDER-UPDATE',
-		TICKET: order.TICKET,
-		OUTPUT: await minionService(order),
-		UPDATE: {
-			progress:"FULFILLED",
-			note: "Order fulfilled by minionLogic. Thank You for using our minions!",
+		TICKET: workOrder.TICKET,
+		OUTPUT: await minionService(workOrder),
+		REPORT: {
+			progress:"FILLED",
+			note: "Order filled by minionLogic. Thank You for using our minions!",
 		}
 	};
-
-//save order
-	order.UPDATES.push(orderUpdate.UPDATE);
-	order.CONTRACT.startStamp = `${Date.now()}`;
-	await services.systemService.saveObject(`orders/active/${order.TICKET.orderReference}.json`, order);
 
 //complete order
 	await completeOrder(orderUpdate);
@@ -162,15 +219,22 @@ console.log(`***orderMinion: `, workOrder);
 		throw new Error('*** ABORT ORDER, Client has insufficient runtimeBalance. Increase runtimeBalance and try again.');
 	}
 
-//update order
-	order.UPDATES.push({
+//create order report
+	orderReport = {
 		progress	   : 'OPEN',
-		note  		   : 'workOrder received by minionLogic and opened new order for fulfillment',
+		note  		   : 'workOrder received by minionLogic and waiting for provider fulfillment',
 		timestamp      : `${Date.now()}`,
-	});
+	};
+
+//save order
+	order.REPORTS.push(orderReport);
+	order.CONTRACT.startStamp = `${Date.now()}`;
+	await services.systemService.saveObject(`orders/active/${order.TICKET.orderReference}.json`, order);
 
 //fill local order
-	await fillOrder(order);
+	workOrder.TICKET = order.TICKET;
+	workOrder.REPORT = order.REPORT;
+	await fillOrder(workOrder);
 };
 	
 //////////////////////////////////////////////////////////

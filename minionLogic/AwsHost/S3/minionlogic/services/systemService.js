@@ -13,10 +13,30 @@ var apiGateway = new aws.ApiGatewayManagementApi({
 /////////////////////////////////////////////////////////
 var renameObject = async function(currentKey, newKey) {
 //////////////////////////////////////////////////////////
-console.log(`***renameObject, currentKey: ${cureentKey}, newKey: ${newKey}`);
+console.log(`***renameObject, currentKey: ${currentKey}, newKey: ${newKey}`);
+var params;
 
 //renameObject
-	await s3Client.copyObject('minionlogic', currentKey, 'minionlogic', newKey).promise();
+
+//copy new
+	console.log(`copy current object: ${currentKey}`);
+	
+	params = {
+		Bucket    : `minionlogic`, 
+		CopySource: `/minionlogic/${currentKey}`, 
+		Key       : `${newKey}`,
+ };
+	
+	await s3Client.copyObject(params).promise();
+
+//delete old
+	console.log(`delete current object: ${currentKey}`);
+	params = {
+        Bucket     : 'minionlogic',
+        Key        : currentKey,		
+	};
+	
+    await s3Client.deleteObject(params).promise();
 };
 
 /////////////////////////////////////////////////////////
@@ -37,7 +57,7 @@ console.log(`***deleteObject: ${objectKey}`);
 /////////////////////////////////////////////////////////
 var saveObject = async function(objectKey, object) {
 //////////////////////////////////////////////////////////
-console.log(`***loadObject: ${objectKey}`);
+console.log(`***saveObject: ${objectKey}`);
 
 //saveObject
 	params = {
@@ -47,15 +67,14 @@ console.log(`***loadObject: ${objectKey}`);
         ContentType: 'text/plain',
     };
 
-    console.log(`saveObject, params: `, params);
+    console.log(`saveObject, params: `, params.bucket, params.key);
     object = await s3Client.putObject(params).promise();
 };
 
 /////////////////////////////////////////////////////////
-var loadObject = async function(objectKey) {
+var loadFile = async function(objectKey) {
 //////////////////////////////////////////////////////////
-console.log(`***loadObject: ${objectKey}`);
-var objectBuffer;
+console.log(`***loadFile: ${objectKey}`);
 
 //getObject
     var params = {
@@ -63,7 +82,24 @@ var objectBuffer;
         Key   : objectKey,
     };
   
-  console.log(`getObject, params: : `, params);
+  console.log(`loadFile, params: : `, params);
+  var object = await s3Client.getObject(params).promise();
+  
+  return object.Body.toString('utf-8'); 
+};
+
+/////////////////////////////////////////////////////////
+var loadObject = async function(objectKey) {
+//////////////////////////////////////////////////////////
+console.log(`***loadObject: ${objectKey}`);
+
+//getObject
+    var params = {
+        Bucket: 'minionlogic',
+        Key   : objectKey,
+    };
+  
+  console.log(`loadObject, params: : `, params);
   var object = await s3Client.getObject(params).promise();
   
   return JSON.parse(object.Body.toString('utf-8')); 
@@ -72,12 +108,14 @@ var objectBuffer;
 //////////////////////////////////////////////////////////
 module.exports = {
 //////////////////////////////////////////////////////////
-    name      : 'systemServices',
-    aws       : aws,
-    fs        : fs,
-    s3Client  : s3Client,
-    apiGateway: apiGateway,
-    loadObject: loadObject,
-	saveObject: saveObject,
+    name        : 'systemServices',
+    aws         : aws,
+    fs          : fs,
+    s3Client    : s3Client,
+    apiGateway  : apiGateway,
+	loadFile    : loadFile,
+    loadObject  : loadObject,
+	saveObject  : saveObject,
 	deleteObject: deleteObject,
+	renameObject: renameObject,
 };
