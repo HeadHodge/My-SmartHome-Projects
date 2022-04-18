@@ -107,7 +107,7 @@ console.log(`createOrder: `, workOrder);
 	var clientInfo = await services.systemService.loadObject(`clients/${connectInfo.client}/${connectInfo.client}.json`);
 	console.log(`***clientInfo: `, clientInfo);
 	
-	var minionInfo = await services.systemService.loadObject(`minions/${workOrder.OPTIONS.required.minion}/minion.json`);
+	var minionInfo = await services.systemService.loadObject(`minions/${workOrder.OPTIONS.minionName}/minion.json`);
 	console.log(`***minionInfo: `, minionInfo);
 	
 	var providerInfo = await services.systemService.loadObject(`clients/${minionInfo.client}/${minionInfo.client}.json`);
@@ -119,7 +119,7 @@ console.log(`createOrder: `, workOrder);
 //create ticket
 	order.TICKET = {
 		taskName	      : workOrder.TASK.name,
-		minionName	      : workOrder.OPTIONS.required.minion,
+		minionName	      : workOrder.OPTIONS.minionName,
 		clientReference   : workOrder.TASK.reference,
 		orderReference    : `${Date.now()}:${connectInfo.client}:${minionInfo.client}`,
 	};
@@ -175,7 +175,7 @@ console.log(`***orderMinion: `, workOrder);
 	workOrder.REPORT = order.REPORT;
 	await fillOrder(workOrder);
 };
-	
+
 //////////////////////////////////////////////////////////
 module.exports = {
 //////////////////////////////////////////////////////////

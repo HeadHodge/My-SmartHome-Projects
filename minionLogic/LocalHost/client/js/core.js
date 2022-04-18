@@ -43,7 +43,7 @@ var content = ``;
 	var content = ``;
 	content += `console.log('${orderUpdate.PRODUCT.Console}');\r\n`;
 	content += `var ${nameSpace} = {};\r\n`;
-	content += `(function($publicObject) {;\r\n`;
+	content += `(function($publicObject) {\r\n`;
 	content += `${orderUpdate.PRODUCT.Script}\r\n`;
 	content += `})(${nameSpace});\r\n`;
 	script.textContent = content;
@@ -96,6 +96,35 @@ console.log("Enter openConnection");
 }
 
 //################
+//### orderMinion
+//################
+function orderMinion() {
+console.log(`Enter orderMinion`);
+
+	if(!_isConnected) return console.log(`Abort: Not Connected`);
+
+	workOrder = JSON.stringify({
+		SUBJECT: 'OPEN-WORKORDER',
+		
+		TASK: {
+			activity : 'orderMinion',
+			startTime: 'now',
+			ifDelayed: 'cancel',
+			reference: 'job210.step27',
+		},
+		
+		OPTIONS: {			
+			minionName   : 'minionLogic_helloWorld_example',
+			minionCommand: 'fill',
+			message      : 'Hello World from minionLogic !',			
+			otherOptions : {},
+		},
+	});
+
+	console.log(`****workOrder: ${workOrder}`);
+	_socket.send(workOrder);
+}
+//################
 //### listObjects
 //################
 function listObjects() {
@@ -107,19 +136,17 @@ console.log(`Enter listObjects`);
 		SUBJECT: 'OPEN-WORKORDER',
 		
 		TASK: {
-			name	 : 'orderMinion',
+			activity : 'orderMinion',
 			startTime: 'now',
 			ifDelayed: 'cancel',
 			reference: 'job210.step27',
 		},
 		
 		OPTIONS: {			
-			required: {
-				minion  : 'minionLogic_helloWorld_example',
-				message : 'Hello World from minionLogic !',
-			},
-			
-			advanced: {},
+			minionName   : 'minionLogic_helloWorld_example',
+			minionCommand: 'query',
+			queryTopics  : ['Description', 'Usage', 'Example', 'Availability', 'About', 'Support'],
+			otherOptions : {},
 		},
 	});
 
