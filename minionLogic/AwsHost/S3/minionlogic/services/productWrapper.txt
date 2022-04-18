@@ -1,5 +1,6 @@
-var minion_namespace = {};
+console.log(`ML.console`);
+var ML.namespace = {};
 
-(function($public) { 
+(function($publicObject) { 
 ML.script
-})(minion_namespace);  
+})(ML.namespace);  

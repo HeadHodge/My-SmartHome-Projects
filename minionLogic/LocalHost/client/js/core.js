@@ -17,6 +17,40 @@ var _socket = undefined;
 var _isConnected = undefined;
 var _core = microServiceMinions.core;
 
+///////////////////////////////////////////////////////////////////
+var installProduct = async function(orderUpdate) {
+///////////////////////////////////////////////////////////////////
+console.log(`installProduct`);
+
+var nameSpace = orderUpdate.TICKET.minionName;
+var content = ``;
+	
+//create shadow host	
+	var div = document.createElement('div');
+	var root = div.attachShadow({mode: 'open'});
+    div.id = nameSpace;
+	document.body.appendChild(div);
+	
+//create style
+	var style = document.createElement('style');
+	style.textContent = orderUpdate.PRODUCT.Style;
+	root.innerHTML = style.outerHTML + orderUpdate.PRODUCT.View;
+
+//create private/public script
+	var script = document.createElement('script');
+	script.type = 'text/javascript';
+	
+	var content = ``;
+	content += `console.log('${orderUpdate.PRODUCT.Console}');\r\n`;
+	content += `var ${nameSpace} = {};\r\n`;
+	content += `(function($publicObject) {;\r\n`;
+	content += `${orderUpdate.PRODUCT.Script}\r\n`;
+	content += `})(${nameSpace});\r\n`;
+	script.textContent = content;
+	
+	root.appendChild(script);
+};
+
 //####################
 //### openConnection
 //####################
@@ -39,15 +73,11 @@ console.log("Enter openConnection");
 	_socket.onmessage = function(event) {
 		console.log(`\n****Received Notice: `, event.data);
 		
-		//install product
-		var PRODUCT = JSON.parse(event.data).PRODUCT;
+		//filter received data
+		var notice = JSON.parse(event.data);
 		
-		if(PRODUCT){
-			console.log(`\n****PRODUCT: `, PRODUCT);
-			var s = document.createElement('script');
-			s.type = 'text/javascript';
-			s.appendChild(document.createTextNode(PRODUCT));
-			document.body.appendChild(s);
+		if(notice.PRODUCT){
+			installProduct(notice);
 		}
 	};
 
@@ -85,8 +115,8 @@ console.log(`Enter listObjects`);
 		
 		OPTIONS: {			
 			required: {
-				minion  : 'minionLogic.helloWorld.example',
-				message : 'Hello from minionLogic',
+				minion  : 'minionLogic_helloWorld_example',
+				message : 'Hello World from minionLogic !',
 			},
 			
 			advanced: {},

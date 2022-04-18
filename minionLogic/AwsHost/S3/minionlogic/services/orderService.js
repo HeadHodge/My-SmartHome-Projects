@@ -6,69 +6,8 @@ console.log(`***Load orderService Methods...`);
 var order = {};
 
 ///////////////////////////////////////////////////////////////////
-var wrapProduct = async function(product, namespace) {
-console.log(`wrapProduct: `, namespace);
-
-var template = await services.systemService.loadFile(`services/productWrapper.txt`);
-template = template.replace(/ML.namespace/g, namespace);
-template = template.replace(/ML.script/g, product.SCRIPT);
-template = template.replace(/ML.view/g, product.VIEW);
-template = template.replace(/ML.data/g, product.DATA);
-template = template.replace(/ML.console/g, product.CONSOLE);
-
-	await global.services.bootService.postNotice(template);
-	return template;
-
-
-/*
-window.onload = function() {
-    var s = document.createElement('script');
-    s.type = 'text/javascript';
-    var code = 'alert("hello world!");';
-    try {
-      s.appendChild(document.createTextNode(code));
-      document.body.appendChild(s);
-    } catch (e) {
-      s.text = code;
-      document.body.appendChild(s);
-    }
-  }
-  
-//wrap namespace around product
-window.onload = function() {
-    var s = document.createElement('script');
-    s.type = 'text/javascript';
-    var code = 'alert("hello world!");';
-    try {
-      s.appendChild(document.createTextNode(code));
-      document.body.appendChild(s);
-    } catch (e) {
-      s.text = code;
-      document.body.appendChild(s);
-    }
-  }
-var myApp = {};
-(function(context) { 
-    var id = 0;
- 
-    context.next = function() {
-        return id++;    
-    };
- 
-    context.reset = function() {
-        id = 0;     
-    }
-})(myApp);  
-*/
-  
-};
-
-///////////////////////////////////////////////////////////////////
 var completeOrder = async function(orderUpdate) {
 console.log(`completeOrder, progress: ${orderUpdate.REPORT.progress}`);
-//wrapProduct
-	orderUpdate.PRODUCT = await wrapProduct(orderUpdate.OUTPUT, orderUpdate.TICKET.minionName);
-	
 //get order
 	var order = await services.systemService.loadObject(`orders/active/${orderUpdate.TICKET.orderReference}.json`);
 	order.CONTRACT.stopStamp = `${Date.now()}`;
@@ -131,6 +70,29 @@ console.log(`completeOrder, progress: ${orderUpdate.REPORT.progress}`);
 };
 
 ///////////////////////////////////////////////////////////////////
+var fillOrder = async function(workOrder) {
+///////////////////////////////////////////////////////////////////
+console.log(`fillOrder: `, workOrder);
+
+//load minion
+	var minionService = await global.services.bootService.loadModule(`minions/${workOrder.TICKET.minionName}/`, 'minion.js');
+
+//update client
+	var orderUpdate = {
+		SUBJECT: 'ORDER-UPDATE',
+		TICKET : workOrder.TICKET,
+		PRODUCT: await minionService(workOrder),
+		REPORT : {
+			progress:"FILLED",
+			note    : "Order filled by minionLogic. Thank You for using our minions!",
+		}
+	};
+
+//complete order
+	await completeOrder(orderUpdate);
+};
+
+///////////////////////////////////////////////////////////////////
 var createOrder = async function(workOrder) {
 ///////////////////////////////////////////////////////////////////
 console.log(`createOrder: `, workOrder);
@@ -178,29 +140,6 @@ console.log(`createOrder: `, workOrder);
 			
 	console.log(`***Order Created: `, order);
 	return order;
-};
-
-///////////////////////////////////////////////////////////////////
-var fillOrder = async function(workOrder) {
-///////////////////////////////////////////////////////////////////
-console.log(`fillOrder: `, workOrder);
-
-//load minion
-	var minionService = await global.services.bootService.loadModule(`minions/${workOrder.TICKET.minionName}/`, 'minion.js');
-
-//update client
-	var orderUpdate = {
-		SUBJECT: 'ORDER-UPDATE',
-		TICKET: workOrder.TICKET,
-		OUTPUT: await minionService(workOrder),
-		REPORT: {
-			progress:"FILLED",
-			note: "Order filled by minionLogic. Thank You for using our minions!",
-		}
-	};
-
-//complete order
-	await completeOrder(orderUpdate);
 };
 
 ///////////////////////////////////////////////
