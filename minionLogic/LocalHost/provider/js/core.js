@@ -17,6 +17,42 @@ var _socket = undefined;
 var _isConnected = undefined;
 var _core = microServiceMinions.core;
 
+///////////////////////////////////////////////////////////////////
+function fillOrder(workOrder) {
+///////////////////////////////////////////////////////////////////
+console.log(`***Start minionLogic.helloWorld.example/minion.js, workOrder: `, workOrder);
+
+	var product = {
+			Result : 'ANSWER',
+			
+			Console: 'minion query completed succesfully',
+			
+ 			View   : `<div id='Topics'>\r\n
+					     <div id='Description'>Query result: Description</div>\r\n
+					     <div id='Usage'>Query result: Usage</div>\r\n
+					     <div id='Example'>Query result: Example</div>\r\n
+					     <div id='Availability'>Query result: Availability</div>\r\n
+					     <div id='About'>Query result: About</div>\r\n
+					     <div id='Support'>Query result: Support</div>\r\n
+					  </div>\r\n`,
+					  
+			Data   : ``,
+			
+		    Script : `
+				var event = new CustomEvent("name-of-event", { "detail": "Example of an event" });
+				document.dispatchEvent(event);
+				alert('?Query Minion?');
+			`,
+					  
+ 			Style  : `div {
+						display : none;
+					 }`,				 
+	};
+ 
+	console.log(`****filled: `, product);
+	return product;
+};
+
 //####################
 //### openConnection
 //####################
@@ -30,27 +66,42 @@ console.log("Enter openConnection");
 	
 	//### onopen ###
 	_socket.onopen = function(event) {
-		console.log(`**** Endpoint Connected to: ${_options.endpoint} ****`);
+		console.log(`\n**** Endpoint: ${_options.endpoint}, connected. ****`, event);
 		_isConnected = true;
 		if(callBack) callBack();
 	};
 	
 	//### onmessage ###
 	_socket.onmessage = function(event) {
-		console.log(`Message from Endpoint: ${event.data}`);
-	};
-	
-	//### onclose ###
-	_socket.onclose = function(event) {
-		console.log("****Endpoint Closed****");
-		_socket = null;
-		_isConnected = null;
-		//openConnection();
+		console.log(`\n****Received Notice: `, event.data);
+		
+		//filter received data
+		var notice = JSON.parse(event.data);
+		if(notice.SUBJECT == 'MINION-WORKORDER' && notice.TASK.activity == 'orderMinion') {
+			var product = fillOrder(notice);
+			var update = {};
+			update.SUBJECT = 'ORDER-UPDATE';
+			update.TICKET = notice.TICKET;
+			update.REPORT = {
+					progress:"FILLED",
+					note    : "Order filled by minionLogic. Thank You for using our minions!",
+				};
+			update.PRODUCT = product;
+			_socket.send(JSON.stringify(update));
+		};
 	};
 
 	//### onerror ###
 	_socket.onerror = function(error) {
-		console.log(`****Endpoint Error: ${error.message}****`);
+		console.log(`\n****Endpoint Error: `, error);
+	};
+	
+	//### onclose ###
+	_socket.onclose = function(event) {
+		console.log(`\n****Endpoint Closed****`);
+		_socket = null;
+		_isConnected = null;
+		openConnection();
 	};
 }
 
@@ -59,16 +110,26 @@ console.log("Enter openConnection");
 //################
 function listObjects() {
 console.log(`Enter listObjects`);
+return;
 
 	if(!_isConnected) return console.log(`Abort: Not Connected`);
 
-	post = JSON.stringify({
-		'action': 'registerMinion',
-		'minionName': 'learning.minionLogic.hello.webjs',
+	serviceOrder = JSON.stringify({
+		SUBJECT: 'TEST-CONNECTION',
+		
+		TASK: {
+			activity : 'pingServer',
+			startTime: 'now',
+			reference: `ping-${Date.now()}`,
+		},
+		
+		OPTIONS: {			
+			otherOptions : {},
+		},
 	});
 
-	console.log(`Post: ${post}`);
-	_socket.send(post);
+	console.log(`****serviceOrder: ${serviceOrder}`);
+	_socket.send(serviceOrder);
 }
 
 //################

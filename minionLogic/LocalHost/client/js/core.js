@@ -104,7 +104,7 @@ console.log(`Enter orderMinion`);
 	if(!_isConnected) return console.log(`Abort: Not Connected`);
 
 	workOrder = JSON.stringify({
-		SUBJECT: 'OPEN-WORKORDER',
+		SUBJECT: 'MINION-WORKORDER',
 		
 		TASK: {
 			activity : 'orderMinion',
@@ -133,7 +133,7 @@ console.log(`Enter listObjects`);
 	if(!_isConnected) return console.log(`Abort: Not Connected`);
 
 	workOrder = JSON.stringify({
-		SUBJECT: 'OPEN-WORKORDER',
+		SUBJECT: 'MINION-WORKORDER',
 		
 		TASK: {
 			activity : 'orderMinion',
