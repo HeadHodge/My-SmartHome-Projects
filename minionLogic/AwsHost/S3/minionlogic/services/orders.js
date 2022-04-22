@@ -6,6 +6,50 @@ console.log(`***Load orders service...`);
 ///////////////////////////////////////////////////////////////////
 var completeOrder = async function(orderUpdate) {
 console.log(`completeOrder, progress: ${orderUpdate.REPORT.progress}`);
+
+//get order
+	var order = await services.systemService.loadObject(`orders/active/${orderUpdate.TICKET.orderReference}.json`);
+
+//get client connection
+	var clientInfo = await services.systemService.loadObject(`members/${order.CONTRACT.clientName}/${order.CONTRACT.clientName}.json`);
+	var clientConnection = clientInfo.connection;
+	
+//create bill
+	order.CONTRACT.stopStamp = `${Date.now()}`;
+	
+	var startTime = parseFloat(order.CONTRACT.startStamp);
+	var stopTime = parseFloat(order.CONTRACT.stopStamp);
+	var computeTime = stopTime - startTime;
+	var minutesCharged = parseInt((computeTime/60000)*1000000)/1000000, minutesBilled = 0;
+	
+	if(order.CONTRACT.billingMode == 'billable') minutesBilled = minutesCharged;
+	
+	order.BILL = {
+		minionName    : order.CONTRACT.minionName,
+		orderReference: order.CONTRACT.orderReference,
+		startTime     : startTime,
+		stopTime      : stopTime,
+		computeTime   : computeTime,
+		billingMode	  : order.CONTRACT.billingMode,
+		minutesCharged: minutesCharged,
+		minutesBilled : minutesBilled,
+	};
+	
+	orderUpdate.BILL = order.BILL;
+	
+//deliver order	to client
+	await global.services.bootService.postNotice(orderUpdate, clientConnection);
+	
+//delete order	
+	await services.systemService.deleteObject(`orders/active/${order.TICKET.orderReference}.json`);
+
+//save order
+	await services.systemService.saveObject(`orders/closed/${order.TICKET.orderReference}.json`, order);
+	await services.systemService.saveObject(`members/${order.CONTRACT.clientName}/bills/${order.CONTRACT.billingMode}/${orderUpdate.TICKET.orderReference}/`);
+	await services.systemService.saveObject(`members/${order.CONTRACT.providerName}/receipts/${order.CONTRACT.billingMode}/${orderUpdate.TICKET.orderReference}/`);
+
+return;
+
 //get order
 	var order = await services.systemService.loadObject(`orders/active/${orderUpdate.TICKET.orderReference}.json`);
 	order.CONTRACT.stopStamp = `${Date.now()}`;
@@ -32,7 +76,7 @@ console.log(`completeOrder, progress: ${orderUpdate.REPORT.progress}`);
 		'billingMode'            : billingMode,
 		'currentBalance(minutes)': currentBalance,
 		'startTime(millisecs)'   : startTime,
-		'stopT(millisecs)'       : stopTime,
+		'stopTime(millisecs)'       : stopTime,
 		'runtimeTotal(millisecs)': runtimeTotal,
 		'usageFee(minutes)'      : usageFee,
 		'newBalance(minutes)'    : newBalance,
@@ -96,51 +140,54 @@ var createOrder = async function(workOrder) {
 console.log(`createOrder: `, workOrder);
 var order = {};
 
-// Get ticket info
+//BUILD ORDER
+
+//get member names	
 	var clientConnection = global.services.bootService.event.requestContext.connectionId;
-	console.log(`***clientConnection: `, clientConnection);
+	var connectionInfo = await services.systemService.loadObject(`connections/${clientConnection}.json`);
+	var clientInfo = await services.systemService.loadObject(`members/${connectionInfo.member}/${connectionInfo.member}.json`);
+	var clientName = clientInfo.member;
 	
-	var connectInfo = await services.systemService.loadObject(`connections/${clientConnection}.json`);
-	console.log(`***connectInfo: `, connectInfo);
-	
-	var clientInfo = await services.systemService.loadObject(`members/${connectInfo.member}/${connectInfo.member}.json`);
-	console.log(`***clientInfo: `, clientInfo);
-	
+	var minionName = workOrder.OPTIONS.minionName;
 	var minionInfo = await services.systemService.loadObject(`minions/${workOrder.OPTIONS.minionName}/minion.json`);
-	console.log(`***minionInfo: `, minionInfo);
-	
 	var providerInfo = await services.systemService.loadObject(`members/${minionInfo.member}/${minionInfo.member}.json`);
-	console.log(`***providerInfo: `, providerInfo);
-//add workOrder
+	var providerName = providerInfo.member;
+	var providerConnection = providerInfo.connection;
+	
+//check balance
+	if(minionInfo.mode == 'billable' && parseFloat(clientInfo.timeBalance) <= 0) {
+		throw new Error('*** ABORT createOrder, Insufficient timeBalance to open order. Increase your timeBalance and try again.');
+	}
+
+//add taskName
 	order.TASK = workOrder.TASK;
-	order.OPTIONS = workOrder.OPTIONS;
 	
 //create ticket
 	order.TICKET = {
-		taskName	      : workOrder.TASK.name,
-		minionName	      : workOrder.OPTIONS.minionName,
-		clientReference   : workOrder.TASK.reference,
-		orderReference    : `${Date.now()}:${connectInfo.member}:${minionInfo.member}`,
+		minionName    : minionName,
+		taskReference : workOrder.TASK.reference,
+		orderReference: `${Date.now()}`,
 	};
 
-//create contract
+//create contract	
 	order.CONTRACT = {
-		clientName        : connectInfo.member,
-		clientConnection  : clientConnection,
-		providerName      : minionInfo.member,
-		providerConnection: providerInfo.connection,
-		minionLocation    : minionInfo.location,
-		timeBalance	  	  : clientInfo.timeBalance,
-		billingMode	      : minionInfo.mode,
+		orderReference: order.TICKET.orderReference,
+		clientName    : clientName,
+		providerName  : providerName,
+		minionName    : minionName,
+		minionLocation: minionInfo.location,
+		billingMode   : minionInfo.mode,
+		startStamp    : `${Date.now()}`,
 	};
 	
-//create updates
-	order.REPORTS = [];
-			
-	console.log(`***Order Created: `, order);
-	return order;
-};
+//send workOrder to provider
+	workOrder.TICKET = order.TICKET;
+	await global.services.bootService.postNotice(workOrder, providerConnection);
 
+//save order
+	await services.systemService.saveObject(`orders/active/${order.TICKET.orderReference}.json`, order);
+};	
+		
 //////////////////////////////////////////////////////////
 module.exports = {
 //////////////////////////////////////////////////////////

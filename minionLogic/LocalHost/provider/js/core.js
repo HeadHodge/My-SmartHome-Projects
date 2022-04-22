@@ -77,13 +77,13 @@ console.log("Enter openConnection");
 		
 		//filter received data
 		var notice = JSON.parse(event.data);
-		if(notice.SUBJECT == 'MINION-WORKORDER' && notice.TASK.activity == 'orderMinion') {
+		if(notice.SUBJECT == 'OPEN-ORDER' && notice.TASK.activity == 'orderMinion') {
 			var product = fillOrder(notice);
 			var update = {};
-			update.SUBJECT = 'ORDER-UPDATE';
+			update.SUBJECT = 'CLOSE-ORDER';
 			update.TICKET = notice.TICKET;
 			update.REPORT = {
-					progress:"FILLED",
+					progress: "FILLED",
 					note    : "Order filled by minionLogic. Thank You for using our minions!",
 				};
 			update.PRODUCT = product;
