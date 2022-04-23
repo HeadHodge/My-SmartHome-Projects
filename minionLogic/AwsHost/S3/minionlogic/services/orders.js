@@ -45,70 +45,8 @@ console.log(`completeOrder, progress: ${orderUpdate.REPORT.progress}`);
 
 //save order
 	await services.systemService.saveObject(`orders/closed/${order.TICKET.orderReference}.json`, order);
-	await services.systemService.saveObject(`members/${order.CONTRACT.clientName}/bills/${order.CONTRACT.billingMode}/${orderUpdate.TICKET.orderReference}/`);
-	await services.systemService.saveObject(`members/${order.CONTRACT.providerName}/receipts/${order.CONTRACT.billingMode}/${orderUpdate.TICKET.orderReference}/`);
-
-return;
-
-//get order
-	var order = await services.systemService.loadObject(`orders/active/${orderUpdate.TICKET.orderReference}.json`);
-	order.CONTRACT.stopStamp = `${Date.now()}`;
-
-//get billing info
-	var clientName = order.CONTRACT.clientName;
-	var providerName = order.CONTRACT.providerName;
-	var clientInfo = await services.systemService.loadObject(`members/${clientName}/${clientName}.json`);
-	var clientConnection = clientInfo.connection;
-
-//calculate bill
-	var currentBalance = parseFloat(clientInfo.runtimeBalance);
-	var startTime = parseFloat(order.CONTRACT.startStamp);
-	var stopTime = parseFloat(order.CONTRACT.stopStamp);
-	var runtimeTotal = (stopTime - startTime); //minutes
-	var usageFee = 0; //minutes
-	var billingMode = order.CONTRACT.billingMode;
-	if(billingMode == 'billable') usageFee = runtimeTotal/60000;
-	var newBalance = currentBalance - usageFee;
-
-// create bill
-	var bill = {
-		'billType'               : 'minion usage fee',
-		'billingMode'            : billingMode,
-		'currentBalance(minutes)': currentBalance,
-		'startTime(millisecs)'   : startTime,
-		'stopTime(millisecs)'       : stopTime,
-		'runtimeTotal(millisecs)': runtimeTotal,
-		'usageFee(minutes)'      : usageFee,
-		'newBalance(minutes)'    : newBalance,
-	};
-		
-	orderUpdate.BILL = bill;
-	await global.services.bootService.postNotice(orderUpdate, clientConnection);
-
-//update order
-	order.REPORTS.push(orderUpdate.REPORT);
-	order.BILL = bill;
-	await services.systemService.renameObject(`orders/active/${order.TICKET.orderReference}.json`, `orders/complete/${order.TICKET.orderReference}.json`);
-
-//update client's balance
-	clientInfo.runtimeBalance = `${Math.round((newBalance - runtimeTotal/1000) * 10000)/10000}`;
-	await services.systemService.saveObject(`members/${clientName}/${clientName}.json`, clientInfo);
-
-//save receipts
-	var clientReceipt = {
-		TICKET: orderUpdate.TICKET,
-		BILL: bill,
-	}
-	
-	var chargeType;
-	
-	if(usageFee == 0)
-		chargeType = 'noFee';
-	else
-		chargeType = 'usageFee';
-	
-	await services.systemService.saveObject(`members/${clientName}/bills/${chargeType}/${orderUpdate.TICKET.orderReference}/`);
-	await services.systemService.saveObject(`members/${providerName}/receipts/${chargeType}/${orderUpdate.TICKET.orderReference}/`);
+	await services.systemService.saveObject(`members/${order.CONTRACT.clientName}/orders/${order.CONTRACT.billingMode}/${orderUpdate.TICKET.orderReference}/`);
+	await services.systemService.saveObject(`members/${order.CONTRACT.providerName}/orders/${order.CONTRACT.billingMode}/${orderUpdate.TICKET.orderReference}/`);
 };
 
 ///////////////////////////////////////////////////////////////////
@@ -153,7 +91,30 @@ var order = {};
 	var providerInfo = await services.systemService.loadObject(`members/${minionInfo.member}/${minionInfo.member}.json`);
 	var providerName = providerInfo.member;
 	var providerConnection = providerInfo.connection;
+
+//debit billed orders
+
+billList = await services.systemService.listObjects(`members/${clientName}/orders/billable/`);
+
+console.log(`***BILL LIST*** `, billList);
+
+var totalDebit = 0, order = {};
+
+	for (var bill in billList.CommonPrefixes) {
+		var orderPrefix = billList.CommonPrefixes[bill].Prefix
+		var orderRef = billList.CommonPrefixes[bill].Prefix.split('/')[4];
+
+		order = await services.systemService.loadObject(`orders/closed/${orderRef}.json`);
+		await services.systemService.saveObject(`members/${clientName}/orders/debited/${orderRef}/`);
+		await services.systemService.deleteObject(`members/${clientName}/orders/billable/${orderRef}/`);
+
+		totalDebit += order.BILL.minutesBilled;
+	};
 	
+	clientInfo.timeBalance -= totalDebit;
+	console.log(`timeBalance`, clientInfo.timeBalance);
+	await services.systemService.saveObject(`members/${clientName}/${clientName}.json`, clientInfo);
+
 //check balance
 	if(minionInfo.mode == 'billable' && parseFloat(clientInfo.timeBalance) <= 0) {
 		throw new Error('*** ABORT createOrder, Insufficient timeBalance to open order. Increase your timeBalance and try again.');

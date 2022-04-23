@@ -1,6 +1,0 @@
-console.log(`ML.console`);
-var ML.namespace = {};
-
-(function($publicObject) { 
-ML.script
-})(ML.namespace);  

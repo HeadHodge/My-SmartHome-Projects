@@ -49,6 +49,8 @@ var content = ``;
 	script.textContent = content;
 	
 	root.appendChild(script);
+	
+	location.reload();
 };
 
 //####################
@@ -91,7 +93,7 @@ console.log("Enter openConnection");
 		console.log(`\n****Endpoint Closed****`);
 		_socket = null;
 		_isConnected = null;
-		//openConnection();
+		location.reload();
 	};
 }
 
@@ -115,7 +117,6 @@ console.log(`Enter orderMinion`);
 		
 		OPTIONS: {			
 			minionName   : 'minionLogic_helloWorld_example',
-			minionCommand: 'fill',
 			message      : 'Hello World from minionLogic !',			
 			otherOptions : {},
 		},

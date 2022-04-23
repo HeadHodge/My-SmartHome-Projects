@@ -1,1 +1,1 @@
-{"member": "provider", "location": "local", "mode": "test", "royalty": "exclusive", "description": "A small sample minion that displays a hello message."}
+{"member": "provider", "location": "local", "mode": "billable", "royalty": "exclusive", "description": "A small sample minion that displays a hello message."}

@@ -45,7 +45,7 @@ console.log(`***Start minionLogic.helloWorld.example/minion.js, workOrder: `, wo
 			`,
 					  
  			Style  : `div {
-						display : none;
+						display : block;
 					 }`,				 
 	};
  

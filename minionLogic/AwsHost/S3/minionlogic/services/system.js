@@ -55,6 +55,22 @@ console.log(`***deleteObject: ${objectKey}`);
 };
 
 /////////////////////////////////////////////////////////
+var listObjects = async function(objectPrefix) {
+//////////////////////////////////////////////////////////
+console.log(`***listObjects: ${objectPrefix}`);
+
+//listObjects
+	params = {
+        Bucket   : 'minionlogic',
+		Delimiter: '/',
+		Prefix   : objectPrefix,
+	};
+
+    console.log(`listObjects, params: `, params);
+    return await s3Client.listObjectsV2(params).promise();
+};
+
+/////////////////////////////////////////////////////////
 var saveObject = async function(objectKey, object) {
 //////////////////////////////////////////////////////////
 console.log(`***saveObject: ${objectKey}`);
@@ -118,4 +134,5 @@ module.exports = {
 	saveObject  : saveObject,
 	deleteObject: deleteObject,
 	renameObject: renameObject,
+	listObjects : listObjects,
 };
