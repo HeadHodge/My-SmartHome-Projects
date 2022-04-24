@@ -11,11 +11,11 @@ console.log(`***pingServer: `, serviceOrder);
 };
 
 ///////////////////////////////////////////////
-var receivedNotice = async function(notice) {
+var receivedNotice = async function(filledOrder) {
 ///////////////////////////////////////////////
-console.log(`***receivedNotice: `, notice.SUBJECT);
+console.log(`***receivedNotice: `, filledOrder.SUBJECT);
 
-	await global.services.orderService.completeOrder(notice);
+	await global.services.orderService.closeOrder(filledOrder);
 };
 
 //////////////////////////////////////////////////////////

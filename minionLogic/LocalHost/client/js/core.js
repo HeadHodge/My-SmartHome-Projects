@@ -49,8 +49,6 @@ var content = ``;
 	script.textContent = content;
 	
 	root.appendChild(script);
-	
-	location.reload();
 };
 
 //####################
@@ -98,34 +96,6 @@ console.log("Enter openConnection");
 }
 
 //################
-//### orderMinion
-//################
-function orderMinion() {
-console.log(`Enter orderMinion`);
-
-	if(!_isConnected) return console.log(`Abort: Not Connected`);
-
-	workOrder = JSON.stringify({
-		SUBJECT: 'OPEN-ORDER',
-		
-		TASK: {
-			activity : 'orderMinion',
-			startTime: 'now',
-			ifDelayed: 'cancel',
-			reference: 'job210.step27',
-		},
-		
-		OPTIONS: {			
-			minionName   : 'minionLogic_helloWorld_example',
-			message      : 'Hello World from minionLogic !',			
-			otherOptions : {},
-		},
-	});
-
-	console.log(`****workOrder: ${workOrder}`);
-	_socket.send(workOrder);
-}
-//################
 //### listObjects
 //################
 function listObjects() {
@@ -144,7 +114,7 @@ console.log(`Enter listObjects`);
 		},
 		
 		OPTIONS: {			
-			minionName   : 'minionLogic_helloWorld_example',
+			minionName   : 'minionLogic_helloWorld1_example',
 			minionCommand: 'query',
 			queryTopics  : ['Description', 'Usage', 'Example', 'Availability', 'About', 'Support'],
 			otherOptions : {},

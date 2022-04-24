@@ -4,12 +4,12 @@
 console.log(`***Load orders service...`);
 
 ///////////////////////////////////////////////////////////////////
-var completeOrder = async function(orderUpdate) {
-console.log(`completeOrder, progress: ${orderUpdate.CONSOLE.progress}`);
+var closeOrder = async function(filledOrder) {
+console.log(`closeOrder, progress: ${filledOrder.CONSOLE.progress}`);
 
 //get order
-	global.activeOrder = orderUpdate.TICKET.orderReference;
-	var order = await services.systemService.loadObject(`orders/active/${orderUpdate.TICKET.orderReference}.json`);
+	global.activeOrder = filledOrder.TICKET.orderReference;
+	var order = await services.systemService.loadObject(`orders/active/${filledOrder.TICKET.orderReference}.json`);
 
 //get client connection
 	var clientInfo = await services.systemService.loadObject(`members/${order.CONTRACT.clientName}/${order.CONTRACT.clientName}.json`);
@@ -37,19 +37,18 @@ console.log(`completeOrder, progress: ${orderUpdate.CONSOLE.progress}`);
 		minutesBilled : minutesBilled,
 	};
 	
-	orderUpdate.BILL = order.BILL;
+	filledOrder.BILL = order.BILL;
 	
 //deliver order	to client
-	await global.services.bootService.postNotice(orderUpdate, clientConnection);
+	await global.services.bootService.postNotice(filledOrder, clientConnection);
 	
 //delete order	
 	await services.systemService.deleteObject(`orders/active/${order.TICKET.orderReference}.json`);
 
 //save order
 	await services.systemService.saveObject(`orders/closed/${order.TICKET.orderReference}.json`, order);
-	await services.systemService.saveObject(`members/${order.CONTRACT.clientName}/orders/${order.CONTRACT.billingMode}/${orderUpdate.TICKET.orderReference}/`);
-	await services.systemService.saveObject(`members/${order.CONTRACT.providerName}/orders/${order.CONTRACT.billingMode}/${orderUpdate.TICKET.orderReference}/`);
-
+	await services.systemService.saveObject(`members/${order.CONTRACT.clientName}/orders/${order.CONTRACT.billingMode}/${filledOrder.TICKET.orderReference}/`);
+	await services.systemService.saveObject(`members/${order.CONTRACT.providerName}/orders/${order.CONTRACT.billingMode}/${filledOrder.TICKET.orderReference}/`);
 
 //debit billed orders
 billList = await services.systemService.listObjects(`members/${clientName}/orders/billable/`);
@@ -75,32 +74,37 @@ var totalDebit = 0, order = {};
 };
 
 ///////////////////////////////////////////////////////////////////
-var localOrder = async function(workOrder) {
+var fillOrder = async function(openedOrder) {
 ///////////////////////////////////////////////////////////////////
-console.log(`fillOrder: `, workOrder);
+console.log(`postProxyNotice: `, openedOrder);
+
+//debit billed orders
+billList = await services.systemService.listObjects(`minions/${openedOrder.TICKET.minionName}/minion.js`);
+
+console.log(`MINIONLIST`, billList);
+
 
 //load minion
-	var minionService = await global.services.bootService.loadModule(`minions/${workOrder.TICKET.minionName}/`, 'minion.js');
-
-//update client
-	var orderUpdate = {
-		SUBJECT: 'ORDER-UPDATE',
-		TICKET : workOrder.TICKET,
-		PRODUCT: await minionService(workOrder),
-		REPORT : {
-			progress:"FILLED",
-			note    : "Order filled by minionLogic. Thank You for using our minions!",
-		}
+	var minion = await global.services.bootService.loadModule(`minions/${openedOrder.TICKET.minionName}/`, 'minion.js');
+	var product = await minion(openedOrder);
+	var filledOrder = {};
+	
+	filledOrder.SUBJECT = 'CLOSE-ORDER';
+	filledOrder.TICKET = openedOrder.TICKET;
+	filledOrder.PRODUCT = product;
+	filledOrder.CONSOLE = {
+		progress: "FILLED",
+			note: "Minion Order Complete. Thank You for using minionLogic!",
 	};
 
 //complete order
-	await completeOrder(orderUpdate);
+	await closeOrder(filledOrder);
 };
-
+  
 ///////////////////////////////////////////////////////////////////
-var createOrder = async function(workOrder) {
+var openOrder = async function(createdOrder) {
 ///////////////////////////////////////////////////////////////////
-console.log(`createOrder: `, workOrder);
+console.log(`openOrder: `, createdOrder);
 var order = {};
 
 //BUILD ORDER
@@ -111,24 +115,24 @@ var order = {};
 	var clientInfo = await services.systemService.loadObject(`members/${connectionInfo.member}/${connectionInfo.member}.json`);
 	var clientName = clientInfo.member;
 	
-	var minionName = workOrder.OPTIONS.minionName;
-	var minionInfo = await services.systemService.loadObject(`minions/${workOrder.OPTIONS.minionName}/minion.json`);
+	var minionName = createdOrder.OPTIONS.minionName;
+	var minionInfo = await services.systemService.loadObject(`minions/${createdOrder.OPTIONS.minionName}/minion.json`);
 	var providerInfo = await services.systemService.loadObject(`members/${minionInfo.member}/${minionInfo.member}.json`);
 	var providerName = providerInfo.member;
 	var providerConnection = providerInfo.connection;
 
 //check balance
 	if(minionInfo.mode == 'billable' && parseFloat(clientInfo.timeBalance) <= 0) {
-		throw new Error('*** ABORT createOrder, Insufficient timeBalance to open order. Increase your timeBalance and try again.');
+		throw new Error('*** ABORT openOrder, Insufficient timeBalance to open order. Increase your timeBalance and try again.');
 	}
 
 //add taskName
-	order.TASK = workOrder.TASK;
+	order.TASK = createdOrder.TASK;
 	
 //create ticket
 	order.TICKET = {
 		minionName    : minionName,
-		taskReference : workOrder.TASK.reference,
+		taskReference : createdOrder.TASK.reference,
 		orderReference: `${Date.now()}`,
 	};
 
@@ -142,20 +146,21 @@ var order = {};
 		billingMode   : minionInfo.mode,
 		startStamp    : `${Date.now()}`,
 	};
-	
-//send workOrder to provider
-	workOrder.TICKET = order.TICKET;
-	await global.services.bootService.postNotice(workOrder, providerConnection);
 
 //save order
 	await services.systemService.saveObject(`orders/active/${order.TICKET.orderReference}.json`, order);
-	global.activeOrder = order.TICKET.orderReference;
+	 global.services.activeOrder = order.TICKET.orderReference;
+	
+//send createdOrder to provider
+	createdOrder.TICKET = order.TICKET;
+	//await global.services.bootService.postNotice(createdOrder, providerConnection);
+	await fillOrder(createdOrder);
 };	
 		
 //////////////////////////////////////////////////////////
 module.exports = {
 //////////////////////////////////////////////////////////
     name         : 'orderServices',
-	createOrder  : createOrder,
-	completeOrder: completeOrder,
+	openOrder : openOrder,
+	closeOrder: closeOrder,
 };
