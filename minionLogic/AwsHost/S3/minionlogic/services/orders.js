@@ -5,14 +5,16 @@ console.log(`***Load orders service...`);
 
 ///////////////////////////////////////////////////////////////////
 var completeOrder = async function(orderUpdate) {
-console.log(`completeOrder, progress: ${orderUpdate.REPORT.progress}`);
+console.log(`completeOrder, progress: ${orderUpdate.CONSOLE.progress}`);
 
 //get order
+	global.activeOrder = orderUpdate.TICKET.orderReference;
 	var order = await services.systemService.loadObject(`orders/active/${orderUpdate.TICKET.orderReference}.json`);
 
 //get client connection
 	var clientInfo = await services.systemService.loadObject(`members/${order.CONTRACT.clientName}/${order.CONTRACT.clientName}.json`);
 	var clientConnection = clientInfo.connection;
+	var clientName = clientInfo.member;
 	
 //create bill
 	order.CONTRACT.stopStamp = `${Date.now()}`;
@@ -47,6 +49,29 @@ console.log(`completeOrder, progress: ${orderUpdate.REPORT.progress}`);
 	await services.systemService.saveObject(`orders/closed/${order.TICKET.orderReference}.json`, order);
 	await services.systemService.saveObject(`members/${order.CONTRACT.clientName}/orders/${order.CONTRACT.billingMode}/${orderUpdate.TICKET.orderReference}/`);
 	await services.systemService.saveObject(`members/${order.CONTRACT.providerName}/orders/${order.CONTRACT.billingMode}/${orderUpdate.TICKET.orderReference}/`);
+
+
+//debit billed orders
+billList = await services.systemService.listObjects(`members/${clientName}/orders/billable/`);
+
+console.log(`***BILL LIST*** `, billList);
+
+var totalDebit = 0, order = {};
+
+	for (var bill in billList.CommonPrefixes) {
+		var orderPrefix = billList.CommonPrefixes[bill].Prefix
+		var orderRef = billList.CommonPrefixes[bill].Prefix.split('/')[4];
+
+		order = await services.systemService.loadObject(`orders/closed/${orderRef}.json`);
+		await services.systemService.saveObject(`members/${clientName}/orders/debited/${orderRef}/`);
+		await services.systemService.deleteObject(`members/${clientName}/orders/billable/${orderRef}/`);
+
+		totalDebit += order.BILL.minutesBilled;
+	};
+	
+	clientInfo.timeBalance -= totalDebit;
+	console.log(`timeBalance`, clientInfo.timeBalance);
+	await services.systemService.saveObject(`members/${clientName}/${clientName}.json`, clientInfo);
 };
 
 ///////////////////////////////////////////////////////////////////
@@ -92,29 +117,6 @@ var order = {};
 	var providerName = providerInfo.member;
 	var providerConnection = providerInfo.connection;
 
-//debit billed orders
-
-billList = await services.systemService.listObjects(`members/${clientName}/orders/billable/`);
-
-console.log(`***BILL LIST*** `, billList);
-
-var totalDebit = 0, order = {};
-
-	for (var bill in billList.CommonPrefixes) {
-		var orderPrefix = billList.CommonPrefixes[bill].Prefix
-		var orderRef = billList.CommonPrefixes[bill].Prefix.split('/')[4];
-
-		order = await services.systemService.loadObject(`orders/closed/${orderRef}.json`);
-		await services.systemService.saveObject(`members/${clientName}/orders/debited/${orderRef}/`);
-		await services.systemService.deleteObject(`members/${clientName}/orders/billable/${orderRef}/`);
-
-		totalDebit += order.BILL.minutesBilled;
-	};
-	
-	clientInfo.timeBalance -= totalDebit;
-	console.log(`timeBalance`, clientInfo.timeBalance);
-	await services.systemService.saveObject(`members/${clientName}/${clientName}.json`, clientInfo);
-
 //check balance
 	if(minionInfo.mode == 'billable' && parseFloat(clientInfo.timeBalance) <= 0) {
 		throw new Error('*** ABORT createOrder, Insufficient timeBalance to open order. Increase your timeBalance and try again.');
@@ -147,6 +149,7 @@ var totalDebit = 0, order = {};
 
 //save order
 	await services.systemService.saveObject(`orders/active/${order.TICKET.orderReference}.json`, order);
+	global.activeOrder = order.TICKET.orderReference;
 };	
 		
 //////////////////////////////////////////////////////////

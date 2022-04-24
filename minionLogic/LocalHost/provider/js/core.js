@@ -23,7 +23,7 @@ function fillOrder(workOrder) {
 console.log(`***Start minionLogic.helloWorld.example/minion.js, workOrder: `, workOrder);
 
 	var product = {
-			Result : 'ANSWER',
+			Result : 'FILLED',
 			
 			Console: 'minion query completed succesfully',
 			
@@ -49,7 +49,7 @@ console.log(`***Start minionLogic.helloWorld.example/minion.js, workOrder: `, wo
 					 }`,				 
 	};
  
-	console.log(`****filled: `, product);
+	console.log(`****Filled: `, product);
 	return product;
 };
 
@@ -82,9 +82,9 @@ console.log("Enter openConnection");
 			var update = {};
 			update.SUBJECT = 'CLOSE-ORDER';
 			update.TICKET = notice.TICKET;
-			update.REPORT = {
+			update.CONSOLE = {
 					progress: "FILLED",
-					note    : "Order filled by minionLogic. Thank You for using our minions!",
+					note    : "Minion Order Complete. Thank You for using minionLogic!",
 				};
 			update.PRODUCT = product;
 			_socket.send(JSON.stringify(update));
