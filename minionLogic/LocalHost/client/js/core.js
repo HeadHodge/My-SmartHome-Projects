@@ -18,44 +18,9 @@ var _isConnected = undefined;
 var _core = microServiceMinions.core;
 
 ///////////////////////////////////////////////////////////////////
-var installProduct = async function(orderUpdate) {
+function openConnection() {
 ///////////////////////////////////////////////////////////////////
-console.log(`installProduct`);
-
-var nameSpace = orderUpdate.TICKET.minionName;
-var content = ``;
-	
-//create shadow host	
-	var div = document.createElement('div');
-	var root = div.attachShadow({mode: 'open'});
-    div.id = nameSpace;
-	document.body.appendChild(div);
-	
-//create style
-	var style = document.createElement('style');
-	style.textContent = orderUpdate.PRODUCT.Style;
-	root.innerHTML = style.outerHTML + orderUpdate.PRODUCT.View;
-
-//create private/public script
-	var script = document.createElement('script');
-	script.type = 'text/javascript';
-	
-	var content = ``;
-	content += `console.log('${orderUpdate.PRODUCT.Console}');\r\n`;
-	content += `var ${nameSpace} = {};\r\n`;
-	content += `(function($publicObject) {\r\n`;
-	content += `${orderUpdate.PRODUCT.Script}\r\n`;
-	content += `})(${nameSpace});\r\n`;
-	script.textContent = content;
-	
-	root.appendChild(script);
-};
-
-//####################
-//### openConnection
-//####################
-function openConnection(callBack) {
-console.log("Enter openConnection");
+console.log("openConnection");
 
 	if(_isConnected) return;
 	
@@ -94,6 +59,40 @@ console.log("Enter openConnection");
 		location.reload();
 	};
 }
+///////////////////////////////////////////////////////////////////
+var installProduct = async function(orderUpdate) {
+///////////////////////////////////////////////////////////////////
+console.log(`installProduct`);
+
+var nameSpace = orderUpdate.TICKET.minionName;
+var content = ``;
+	
+//create shadow host	
+	var div = document.createElement('div');
+	var root = div.attachShadow({mode: 'open'});
+    div.id = nameSpace;
+	document.body.appendChild(div);
+	
+//create style
+	var style = document.createElement('style');
+	style.textContent = orderUpdate.PRODUCT.Style;
+	root.innerHTML = style.outerHTML + orderUpdate.PRODUCT.View;
+
+//create private/public script
+	var script = document.createElement('script');
+	script.type = 'text/javascript';
+	
+	var content = ``;
+	content += `console.log('${orderUpdate.PRODUCT.Console}');\r\n`;
+	content += `var ${nameSpace} = {};\r\n`;
+	content += `(function($publicObject) {\r\n`;
+	content += `${orderUpdate.PRODUCT.Script}\r\n`;
+	content += `})(${nameSpace});\r\n`;
+	script.textContent = content;
+	
+	root.appendChild(script);
+};
+
 
 //################
 //### listObjects
@@ -114,7 +113,7 @@ console.log(`Enter listObjects`);
 		},
 		
 		OPTIONS: {			
-			minionName   : 'minionLogic_helloWorld1_example',
+			minionName   : 'minionLogic_helloWorld_example',
 			minionCommand: 'query',
 			queryTopics  : ['Description', 'Usage', 'Example', 'Availability', 'About', 'Support'],
 			otherOptions : {},

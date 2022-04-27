@@ -74,17 +74,17 @@ var totalDebit = 0, order = {};
 };
 
 ///////////////////////////////////////////////////////////////////
-var fillOrder = async function(openedOrder) {
+var fillOrder = async function(openedOrder, providerConnection) {
 ///////////////////////////////////////////////////////////////////
 console.log(`postProxyNotice: `, openedOrder);
 
 //debit billed orders
-billList = await services.systemService.listObjects(`minions/${openedOrder.TICKET.minionName}/minion.js`);
-
-console.log(`MINIONLIST`, billList);
+//billList = await services.systemService.listObjects(`minions/${openedOrder.TICKET.minionName}/minion.js`);
+//console.log(`MINIONLIST`, billList);
 
 
 //load minion
+try {
 	var minion = await global.services.bootService.loadModule(`minions/${openedOrder.TICKET.minionName}/`, 'minion.js');
 	var product = await minion(openedOrder);
 	var filledOrder = {};
@@ -99,7 +99,12 @@ console.log(`MINIONLIST`, billList);
 
 //complete order
 	await closeOrder(filledOrder);
-};
+	
+} catch {
+	
+	await global.services.bootService.postNotice(openedOrder, providerConnection);
+		
+}};
   
 ///////////////////////////////////////////////////////////////////
 var openOrder = async function(createdOrder) {
@@ -133,7 +138,8 @@ var order = {};
 	order.TICKET = {
 		minionName    : minionName,
 		taskReference : createdOrder.TASK.reference,
-		orderReference: `${Date.now()}`,
+		orderReference:`${Date.now()}`,
+		session       : connectionInfo.session,
 	};
 
 //create contract	
@@ -154,7 +160,7 @@ var order = {};
 //send createdOrder to provider
 	createdOrder.TICKET = order.TICKET;
 	//await global.services.bootService.postNotice(createdOrder, providerConnection);
-	await fillOrder(createdOrder);
+	await fillOrder(createdOrder, providerConnection);
 };	
 		
 //////////////////////////////////////////////////////////
