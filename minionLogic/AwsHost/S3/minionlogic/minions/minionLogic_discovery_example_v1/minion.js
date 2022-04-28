@@ -10,21 +10,14 @@ console.log(`***Start minionLogic.helloWorld.example/minion.js, workOrder: ${wor
 			
 			Console: 'minion query completed succesfully',
 			
- 			View   : `<div id='Topics'>\r\n
-					     <div id='Description'>Query result: Description</div>\r\n
-					     <div id='Usage'>Query result: Usage</div>\r\n
-					     <div id='Example'>Query result: Example</div>\r\n
-					     <div id='Availability'>Query result: Availability</div>\r\n
-					     <div id='About'>Query result: About</div>\r\n
-					     <div id='Support'>Query result: Support</div>\r\n
-					  </div>\r\n`,
+ 			View   : ``,
 					  
 			Data   : ``,
 			
 		    Script : `
 				var event = new CustomEvent("name-of-event", { "detail": "Example of an event" });
 				document.dispatchEvent(event);
-				alert('?Query Minion?');
+				alert('**HELLO WORLD**');
 			`,
 					  
  			Style  : `div {
@@ -65,7 +58,7 @@ console.log(`***Start minionLogic.helloWorld.example/minion.js, workOrder: ${wor
 var product;
 
 	if(workOrder.OPTIONS.minionCommand == 'query') {
-		product = query(workOrder);
+		product = fill(workOrder);
 	} else {
 		product = fill(workOrder);
 	}

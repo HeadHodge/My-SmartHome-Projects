@@ -26,7 +26,7 @@ var endpoint;
 	
 	////// new WebSocket //////member
 	_session = `${Date.now()}`;
-	_endpoint = `wss://clients.minionLogic.com?name=${_minionLogic.identity.name}&member=${_minionLogic.identity.member}&pin=${_minionLogic.identity.pin}&session=${_session}`;
+	_endpoint = `wss://clients.minionLogic.com?nickname=${_minionLogic.identity.nickname}&member=${_minionLogic.identity.member}&pin=${_minionLogic.identity.pin}&session=${_session}`;
 	_socket = new WebSocket(_endpoint);
 	
 	////// onopen //////

@@ -84,8 +84,12 @@ console.log(`postProxyNotice: `, openedOrder);
 
 
 //load minion
-try {
-	var minion = await global.services.bootService.loadModule(`minions/${openedOrder.TICKET.minionName}/`, 'minion.js');
+	try {
+		var minion = await global.services.bootService.loadModule(`minions/${openedOrder.TICKET.minionName}/`, 'minion.js');
+	} catch {
+		return await global.services.bootService.postNotice(openedOrder, providerConnection);
+	}
+
 	var product = await minion(openedOrder);
 	var filledOrder = {};
 	
@@ -98,13 +102,8 @@ try {
 	};
 
 //complete order
-	await closeOrder(filledOrder);
-	
-} catch {
-	
-	await global.services.bootService.postNotice(openedOrder, providerConnection);
-		
-}};
+	await closeOrder(filledOrder);	
+};
   
 ///////////////////////////////////////////////////////////////////
 var openOrder = async function(createdOrder) {

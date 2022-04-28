@@ -113,7 +113,7 @@ console.log(`Enter listObjects`);
 		},
 		
 		OPTIONS: {			
-			minionName   : 'minionLogic_helloWorld_example',
+			minionName   : 'minionLogic_helloWorld_example_v1',
 			minionCommand: 'query',
 			queryTopics  : ['Description', 'Usage', 'Example', 'Availability', 'About', 'Support'],
 			otherOptions : {},
