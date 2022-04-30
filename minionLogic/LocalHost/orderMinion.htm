@@ -7,33 +7,37 @@
 <script id='identity'>
 console.log(`**** Load identity.js ****`);
 
-	_minionLogic.identity = {
-		nickname:'jojo',
-		member   : 'bob@hodgemail.us',
-		pin       : '7377',
-	};
+    _minionLogic.identity = {
+        nickname:'jojo',
+        member   : 'bob@hodgemail.us',
+        pin       : '7377',
+    };
 </script>
 
 <script id='notice'>
 console.log(`**** Load notice.js ****`);
 
-	_minionLogic.notice = {
-		SUBJECT: 'OPEN-ORDER',
-		
-		TASK: {
-			activity : 'orderMinion',
-			startTime: 'now',
-			ifDelayed: 'cancel',
-			reference: 'job210.step27',
-		},
-		
-		OPTIONS: {			
-			minionName   : 'minionLogic_helloWorld_example_v1',
-			minionCommand: 'fill',
-			message:          'HELLO WORLD MINIONS!',		
-			//queryTopics  : ['Description', 'Usage', 'Example', 'Availability', 'About', 'Support'],
-		},
-	};
+    _minionLogic.notice = {
+        SUBJECT: 'OPEN-ORDER',
+        
+        TASK: {
+            activity : 'orderMinion',
+            startTime: 'now',
+            ifDelayed: 'cancel',
+            reference: 'job210.step27',
+        },
+        
+        OPTIONS: {          
+            minionName      : 'minionLogic_helloWorld_example_v1',
+            minionCommand   : 'fill',
+            helloMessage    : 'HELLO FROM MINION WORLD!',
+            textColor       : 'white',
+            bannerColor     : 'yellow',     
+            screenColor     : 'blue',       
+            bannerSize      : '400px',      
+            bannerLocation  : '-200px',     
+        },
+    };
 </script>
 </head>
 
