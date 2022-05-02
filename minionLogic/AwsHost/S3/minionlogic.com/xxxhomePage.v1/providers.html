@@ -13,7 +13,26 @@
     <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway:100,100i,200,200i,300,300i,400,400i,500,500i,600,600i,700,700i,800,800i,900,900i&amp;display=swap">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lora:400,400i,700,700i&amp;display=swap">
+    <link rel="stylesheet" href="assets/css/untitled.css">
 <link rel="SHORTCUT ICON" href="\assets\img\holding puzzle.jpg" type="image/x-icon">
+
+<script>
+function clipboardCopy() {
+  /* Get the text field */
+  var copyText = document.getElementById("minionExample");
+
+  /* Select the text field */
+  copyText.select();
+  copyText.setSelectionRange(0, 99999); /* For mobile devices */
+
+   /* Copy the text inside the text field */
+  navigator.clipboard.writeText(copyText.value);
+
+  /* Alert the copied text */
+    copyText.selectionEnd =  copyText.selectionStart;
+  alert("Copied text to clipBoard " );
+}
+</script>
 </head>
 
 <body style="background: url(&quot;assets/img/robot%20background.jpg&quot;);">
@@ -23,7 +42,7 @@
             <div class="collapse navbar-collapse" id="navbarResponsive">
                 <ul class="navbar-nav mx-auto">
                     <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
-                    <li class="nav-item"><a class="nav-link" href="providers.html">Providers</a><a class="nav-link" href="https://minionlogic.freeforums.net/">forums</a></li>
+                    <li class="nav-item"><a class="nav-link" href="providers.html">Providers</a><a class="nav-link" href="examples.html">example usage</a><a class="nav-link" href="https://minionlogic.freeforums.net/">forums</a></li>
                     <li class="nav-item"></li>
                     <li class="nav-item"></li>
                 </ul>
@@ -48,12 +67,14 @@
             </div>
         </div>
     </section>
-    <footer class="text-center footer text-faded py-5">
+    <footer class="text-center footer text-faded py-5" style="padding: 0px;">
         <div class="container">
+            <p class="m-0 small">minionLogic, LLC</p>
             <p class="m-0 small">Copyright&nbsp;©&nbsp;Brand 2022</p>
         </div>
     </footer>
     <script src="assets/bootstrap/js/bootstrap.min.js"></script>
+    <script src="assets/js/clipboardCopy.js"></script>
     <script src="assets/js/current-day.js"></script>
 </body>
 

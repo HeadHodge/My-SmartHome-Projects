@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>minionLogic</title>
+    <link rel="icon" type="image/jpeg" sizes="428x612" href="assets/img/holding%20puzzle.jpg">
+    <link rel="icon" type="image/jpeg" sizes="428x612" href="assets/img/holding%20puzzle.jpg">
+    <link rel="icon" type="image/jpeg" sizes="428x612" href="assets/img/holding%20puzzle.jpg">
+    <link rel="icon" type="image/jpeg" sizes="428x612" href="assets/img/holding%20puzzle.jpg">
+    <link rel="icon" type="image/jpeg" sizes="428x612" href="assets/img/holding%20puzzle.jpg">
+    <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway:100,100i,200,200i,300,300i,400,400i,500,500i,600,600i,700,700i,800,800i,900,900i&amp;display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lora:400,400i,700,700i&amp;display=swap">
+    <link rel="stylesheet" href="assets/css/untitled.css">
+<link rel="SHORTCUT ICON" href="\assets\img\holding puzzle.jpg" type="image/x-icon">
+
+<script>
+function clipboardCopy() {
+  /* Get the text field */
+  var copyText = document.getElementById("minionExample");
+
+  /* Select the text field */
+  copyText.select();
+  copyText.setSelectionRange(0, 99999); /* For mobile devices */
+
+   /* Copy the text inside the text field */
+  navigator.clipboard.writeText(copyText.value);
+
+  /* Alert the copied text */
+    copyText.selectionEnd =  copyText.selectionStart;
+  alert("Copied text to clipBoard " );
+}
+</script>
+</head>
+
+<body><input type="text"><button class="btn btn-primary" type="button">Button</button><code class="border-white" style="width: 49px;height:200px;color: var(--bs-teal);">Text&lt;head&gt;<br>&lt;meta charset="utf-8"&gt;<br>&lt;meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no"&gt;<br>&lt;title&gt;orderMinion Example&lt;/title&gt;<br>&lt;script src="http://minionLogic.com/scripts/orderMinion.js"&gt;&lt;/script&gt;<br><br>&lt;script id='identity'&gt;<br>console.log(`**** Load identity.js ****`);<br><br>&nbsp;_minionLogic.identity = {<br>&nbsp; nickname:'jojo',<br>&nbsp; member : 'bob@hodgemail.us',<br>&nbsp; pin : '7377',<br>&nbsp;};<br>&lt;/script&gt;<br><br>&lt;script id='notice'&gt;<br>console.log(`**** Load notice.js ****`);<br><br>&nbsp;_minionLogic.notice = {<br>&nbsp; SUBJECT: 'OPEN-ORDER',<br>&nbsp;&nbsp;<br>&nbsp; TASK: {<br>&nbsp; &nbsp;activity : 'orderMinion',<br>&nbsp; &nbsp;startTime: 'now',<br>&nbsp; &nbsp;ifDelayed: 'cancel',<br>&nbsp; &nbsp;reference: 'job210.step27',<br>&nbsp; },<br>&nbsp;&nbsp;<br>&nbsp; OPTIONS: {&nbsp; &nbsp;<br>&nbsp; &nbsp;minionName : 'minionLogic_helloWorld_example_v1',<br>&nbsp; &nbsp;minionCommand : 'fill',<br>&nbsp; &nbsp;helloMessage : 'HELLO FROM MINION WORLD!',<br>&nbsp; &nbsp;textColor : 'white',<br>&nbsp; &nbsp;bannerColor : 'yellow',&nbsp;&nbsp;<br>&nbsp; &nbsp;screenColor : 'blue',&nbsp;&nbsp;<br>&nbsp; &nbsp;bannerSize : '400px',&nbsp;&nbsp;<br>&nbsp; &nbsp;bannerLocation : '-200px',&nbsp;&nbsp;<br>&nbsp; },<br>&nbsp;};<br>&lt;/script&gt;<br>&lt;/head&gt;<br><br><br></code>
+    <script src="assets/bootstrap/js/bootstrap.min.js"></script>
+    <script src="assets/js/clipboardCopy.js"></script>
+    <script src="assets/js/current-day.js"></script>
+</body>
+
+</html>
