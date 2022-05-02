@@ -1,0 +1,34 @@
+<head>
+<title>orderMinion Example</title>
+<script src="http://minionLogic.com/scripts/orderMinion.js"></script>
+
+<script id='minionLogic Example'>
+    _minionLogic.identity = {
+        nickname: 'HeadHodge',
+        member  : 'bob@hodgemail.us',
+        pin     : '7377',
+    };
+
+    _minionLogic.notice = {
+        SUBJECT: 'OPEN-ORDER',
+        
+        TASK: {
+            activity : 'orderMinion',
+            startTime: 'now',
+            ifDelayed: 'cancel',
+            reference: 'job210.step27',
+        },
+        
+        OPTIONS: {
+            minionName    : 'globalMinions_helloWorld_example_v1',
+            minionCommand : 'fill',
+            helloMessage  : 'HELLO FROM MINION WORLD!',
+            textColor     : 'white',
+            bannerColor   : 'yellow',
+            screenColor   : 'blue',
+            bannerSize    : '400px',
+            bannerLocation: '-200px',
+        },
+    };
+</script>
+</head>

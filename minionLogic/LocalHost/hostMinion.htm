@@ -1,0 +1,47 @@
+<head>
+<title>orderMinion Example</title>
+<script src="http://minionLogic.com/scripts/hostMinion.js"></script>
+
+<script id='minionLogic Example'>
+    _minionLogic.identity = {
+        nickname : 'KingPin',
+        member   : 'bob@globalminions.com',
+        namespace: 'globalminions',
+        pin      : '95833',
+    };
+
+    _minionLogic.register = {
+        SUBJECT: 'PROVIDER-SERVICES',
+        
+        TASK: {
+            activity : 'registerMinion',
+            startTime: 'now',
+            ifDelayed: 'cancel',
+            reference: 'job210.step27',
+        },
+        
+        OPTIONS: {
+            minionName: 'helloWorld',
+            minionType: 'example',
+            minionVersion: '1.0',
+            member: "globalMinions@hodgemail.us",
+            royalty: "exclusive",
+            description: "A simple minion to display a hello message.",
+        },
+    };
+
+    _minionLogic.fill = {
+        Result : 'FILLED',
+
+        Console: 'minion completed task succesfully',
+
+        View   : ``,
+
+        Data   : ``,
+
+        Script : `alert('Incoming Minion Message');`,
+
+        Style  : ``,                 
+    };
+</script>
+</head>

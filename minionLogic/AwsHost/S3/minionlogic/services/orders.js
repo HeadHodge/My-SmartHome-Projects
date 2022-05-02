@@ -5,7 +5,7 @@ console.log(`***Load orders service...`);
 
 ///////////////////////////////////////////////////////////////////
 var closeOrder = async function(filledOrder) {
-console.log(`closeOrder, progress: ${filledOrder.CONSOLE.progress}`);
+console.log(`closeOrder, progress: ${filledOrder.REPORT.progress}`);
 
 //get order
 	global.activeOrder = filledOrder.TICKET.orderReference;
@@ -78,25 +78,34 @@ var fillOrder = async function(openedOrder, providerConnection) {
 ///////////////////////////////////////////////////////////////////
 console.log(`postProxyNotice: `, openedOrder);
 
-//debit billed orders
-//billList = await services.systemService.listObjects(`minions/${openedOrder.TICKET.minionName}/minion.js`);
-//console.log(`MINIONLIST`, billList);
-
-
 //load minion
 	try {
 		var minion = await global.services.bootService.loadModule(`minions/${openedOrder.TICKET.minionName}/`, 'minion.js');
 	} catch {
-		return await global.services.bootService.postNotice(openedOrder, providerConnection);
+		await global.services.bootService.postNotice(openedOrder, providerConnection);
+
+    //confirm order
+        var confirmation = {
+            SUBJECT: 'TASK-UPDATE',
+        
+            TICKET: openedOrder.TICKET,
+        
+            REPORT: {           
+                progress  : 'FORWARDED',
+                console   : 'Order opened and forwarded to minion provider to fill.',
+            },
+        };
+   
+		return await global.services.bootService.postNotice(confirmation);
 	}
 
 	var product = await minion(openedOrder);
 	var filledOrder = {};
 	
-	filledOrder.SUBJECT = 'CLOSE-ORDER';
+	filledOrder.SUBJECT = openedOrder.SUBJECT;
 	filledOrder.TICKET = openedOrder.TICKET;
 	filledOrder.PRODUCT = product;
-	filledOrder.CONSOLE = {
+	filledOrder.REPORT = {
 		progress: "FILLED",
 			note: "Minion Order Complete. Thank You for using minionLogic!",
 	};

@@ -26,7 +26,7 @@ var endpoint;
 	
 	////// new WebSocket //////member
 	_session = `${Date.now()}`;
-	_endpoint = `wss://providers.minionLogic.com?nickname=${_minionLogic.identity.nickname}&member=${_minionLogic.identity.member}&pin=${_minionLogic.identity.pin}&session=${_session}`;
+	_endpoint = `wss://providers.minionLogic.com?member=${_minionLogic.identity.member}&nickname=${_minionLogic.identity.nickname}&namespace=${_minionLogic.identity.namespace}&pin=${_minionLogic.identity.pin}&session=${_session}`;
 	_socket = new WebSocket(_endpoint);
 	
 	////// onopen //////
@@ -38,12 +38,25 @@ var endpoint;
 	
 	////// onmessage //////
 	_socket.onmessage = function(event) {
-		console.log(`\n****Received Notice: `, event.data);
+		console.log(`\n****Received Notice****`);
 		
 		//filter received data
 		var notice = JSON.parse(event.data);
 		
         console.log(notice);
+        
+        if(notice.SUBJECT != 'MINION-ORDER') return;
+        
+        var filledOrder = {};
+        filledOrder.SUBJECT = notice.SUBJECT;
+        filledOrder.TICKET = notice.TICKET;
+        filledOrder.PRODUCT = _minionLogic.fill;
+        filledOrder.REPORT = {
+            progress: "FILLED",
+			note    : "Minion Order Complete. Thank You for using minionLogic!",
+        };
+
+       _socket.send(JSON.stringify(filledOrder)); 
 	};
 	
 	////// onerror //////
