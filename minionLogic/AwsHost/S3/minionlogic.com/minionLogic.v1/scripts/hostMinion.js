@@ -50,7 +50,7 @@ var endpoint;
         var filledOrder = {};
         filledOrder.SUBJECT = notice.SUBJECT;
         filledOrder.TICKET = notice.TICKET;
-        filledOrder.PRODUCT = _minionLogic.fill;
+        filledOrder.PRODUCT = _minionLogic.fillOrder(notice);
         filledOrder.REPORT = {
             progress: "FILLED",
 			note    : "Minion Order Complete. Thank You for using minionLogic!",

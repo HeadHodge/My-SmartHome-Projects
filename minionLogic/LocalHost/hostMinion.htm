@@ -30,18 +30,15 @@
         },
     };
 
-    _minionLogic.fill = {
-        Result : 'FILLED',
-
-        Console: 'minion completed task succesfully',
-
-        View   : ``,
-
-        Data   : ``,
-
-        Script : `alert('Incoming Minion Message');`,
-
-        Style  : ``,                 
+    _minionLogic.fillOrder = function(minionOrder) { 
+        return {
+            Result : 'FILLED',
+            Console: 'minion completed task succesfully',
+            View   : ``,
+            Data   : ``,
+            Style  : ``,
+            Script : `alert('Incoming Minion Message');`,
+        };
     };
 </script>
 </head>

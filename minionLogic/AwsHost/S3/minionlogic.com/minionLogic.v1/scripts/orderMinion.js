@@ -67,7 +67,7 @@ var installProduct = async function(filledOrder) {
 ///////////////////////////////////////////////////////////////////
 console.log(`installProduct`);
 
-var nameSpace = filledOrder.TICKET.minionName;
+var nameSpace = filledOrder.TICKET.minionName.split('_')[0];
 var content = ``;
 
 //validate session
