@@ -56,7 +56,8 @@ var endpoint;
 			note    : "Minion Order Complete. Thank You for using minionLogic!",
         };
 
-       _socket.send(JSON.stringify(filledOrder)); 
+        console.log(`Filled: `, filledOrder);
+        _socket.send(JSON.stringify(filledOrder)); 
 	};
 	
 	////// onerror //////

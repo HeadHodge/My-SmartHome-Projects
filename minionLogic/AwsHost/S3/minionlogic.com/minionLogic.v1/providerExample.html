@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>About us - Brand</title>
+    <link rel="icon" type="image/jpeg" sizes="428x612" href="assets/img/holding%20puzzle.jpg">
+    <link rel="icon" type="image/jpeg" sizes="428x612" href="assets/img/holding%20puzzle.jpg">
+    <link rel="icon" type="image/jpeg" sizes="428x612" href="assets/img/holding%20puzzle.jpg">
+    <link rel="icon" type="image/jpeg" sizes="428x612" href="assets/img/holding%20puzzle.jpg">
+    <link rel="icon" type="image/jpeg" sizes="428x612" href="assets/img/holding%20puzzle.jpg">
+    <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway:100,100i,200,200i,300,300i,400,400i,500,500i,600,600i,700,700i,800,800i,900,900i&amp;display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lora:400,400i,700,700i&amp;display=swap">
+    <link rel="stylesheet" href="assets/css/untitled.css">
+<link rel="SHORTCUT ICON" href="\assets\img\holding puzzle.jpg" type="image/x-icon">
+
+<script>
+function clipboardCopy(elementID) {
+  /* Get the text field */
+  var copyText = document.getElementById(elementID);
+
+  /* Copy the textarea field */
+  copyText.focus();
+  copyText.select();
+
+  document.execCommand('copy');
+  copyText.setSelectionRange(0, 0); /* For mobile devices */
+  alert("Copied text to clipBoard " );
+}
+</script>
+</head>
+
+<body style="background: url(&quot;assets/img/robot%20background%202.jpg&quot;);">
+    <h1 class="text-center text-white d-none d-lg-block site-heading"><span class="text-primary site-heading-upper mb-3">A Free Bootstrap 5 Business Theme&nbsp;</span><span class="site-heading-lower">Business Casual</span></h1>
+    <nav class="navbar navbar-dark navbar-expand-lg bg-dark py-lg-4" id="mainNav">
+        <div class="container"><a class="navbar-brand d-lg-none text-expanded" href="index.html#" target="_top">minionLogic</a><button data-bs-toggle="collapse" class="navbar-toggler" data-bs-target="#navbarResponsive"><span class="visually-hidden">Toggle navigation</span><span class="navbar-toggler-icon"></span></button>
+            <div class="collapse navbar-collapse" id="navbarResponsive">
+                <ul class="navbar-nav mx-auto">
+                    <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="providers.html">Providers</a><a class="nav-link" href="clientExample.html">minion user example</a><a class="nav-link" href="providerExample.html">minion provider example</a><a class="nav-link" href="https://minionlogic.freeforums.net/">forums</a></li>
+                    <li class="nav-item"></li>
+                    <li class="nav-item"></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <section class="page-section about-heading" style="opacity: 1;">
+        <div class="container" style="background: var(--bs-blue);opacity: 0.95;border-radius: 23px;"><img class="rounded-circle img-fluid rounded about-heading-img mb-3 mb-lg-0" src="assets/img/holding%20puzzle.jpg" style="transform: perspective(2080px) translate(97px);opacity: 0.77;margin-top: 17px;width: 441px;height: 517.6px;">
+            <div class="about-heading-content">
+                <div class="row">
+                    <div class="col-lg-10 col-xl-9 mx-auto" style="margin-bottom: 28px;">
+                        <div class="bg-faded rounded p-5" style="opacity: 1;width: 689px;padding: 46px;">
+                            <h2 class="section-heading mb-4"><span class="section-heading-upper" style="text-align: center;">a simple exampLe to make your own minion</span><span class="text-center section-heading-lower">hello world</span></h2>
+                            <div style="text-align: right;"><button class="btn btn-primary" type="button" style="background: var(--bs-blue);" onclick="clipboardCopy(&#39;providerExample&#39;)">Copy to Clipboard</button></div>
+                            <div style="text-align: center;"></div><textarea id='providerExample' readonly style="font-size: 10pt; font-family: 'Courier New', monospace; width: 100%;white-space: pre;height: 500px;">
+<head>
+<title>providerMinion Example</title>
+<script src="http://minionLogic.com/scripts/hostMinion.js"></script>
+
+<script id='minionLogic Example'>
+    _minionLogic.identity = {
+        nickname : 'KingPin',
+        member   : 'bob@globalminions.com',
+        namespace: 'globalminions',
+        pin      : '95833',
+    };
+
+    _minionLogic.register = {
+        SUBJECT: 'PROVIDER-SERVICES',
+        
+        TASK: {
+            activity : 'registerMinion',
+            startTime: 'now',
+            ifDelayed: 'cancel',
+            reference: 'job210.step27',
+        },
+        
+        OPTIONS: {
+            minionName: 'helloWorld',
+            minionType: 'example',
+            minionVersion: '1.0',
+            member: "globalMinions@hodgemail.us",
+            royalty: "exclusive",
+            description: "A simple minion to display a hello message.",
+        },
+    };
+
+    _minionLogic.fillOrder = function(minionOrder) { 
+        return {
+            Result : 'FILLED',
+            Console: 'minion completed task succesfully',
+            View   : ``,
+            Data   : ``,
+            Style  : ``,
+            Script : `alert('Incoming Minion Message');`,
+        };
+    };
+</script>
+</head>
+</textarea>
+                            <p><strong>Step1 </strong>- Make sure the client example works first.</p>
+                            <p class="mb-0"><strong>Step2 </strong>- Create and edit a new .htm Click on the 'Copy to Clipboard' Button above and paste contents into your new .htm file.</p>
+                            <p class="mb-0" style="margin-top: 16px;"><strong>Step3 </strong>- <strong>Important:</strong> Before saving your .htm file, change the follow sample values to valid ones for your identity and minion.<br></p>
+                            <p class="mb-0" style="margin-top: 16px;font-size: 10pt;font-family: 'Courier New', monospace;opacity: 1;background: var(--bs-gray-400);"><strong>Replace sample Identity values with yours...</strong><br><br><strong>&nbsp; nickname:</strong> Use a '<strong>one word public name'</strong>, that others will know you as.&nbsp;<br><br><strong>&nbsp; member:</strong> Use a '<strong>valid email address' </strong>(Note: must be different than email used in client example)<br><br>&nbsp;&nbsp;<strong>namespace:</strong> a '<strong>one word name'</strong> to isolate your minion from others. (many use their business name or last name').<br><br><strong>&nbsp; pin:</strong> a four digit or more&nbsp;number that is easy to remember.<br><br><strong>Replace sample Minion values with yours...</strong><br><br>&nbsp; <strong>minionName:</strong>&nbsp;a <strong>one word</strong> name for your minion,<br><br>&nbsp;&nbsp;<strong>minionType:</strong>&nbsp;a <strong>one word</strong> category for your minion (i.e. gif, form, ...),<br><br>&nbsp;&nbsp;<strong>minionVersion:</strong> a <strong>number </strong>that indicates this minions version,<br><br>&nbsp; <strong>description:</strong> a <strong>short description</strong> of your minions functionality,<br><br></p>
+                            <p class="mb-0" style="margin-top: 16px;"><strong>Step4&nbsp;</strong>- Save&nbsp;the changes you made to your .htm file. Your minion should now be ready to roll! Open your .htm file in your web browser (I use Chrome). Open the bowsers console and if all went well you should see your minion is registered , running, and waiting for clients to use your minion!<br><br><strong>NOTE: </strong>To use your minion, you will need it's minionSku. Your minionSku is the combination of the following fields you changed in your .htm file:&nbsp;<br><strong>'namespace_minionName_minionType_minionVersion'.</strong><br><br><strong>&nbsp;&nbsp;</strong>Using the example field values, the minionSku would be:<br>&nbsp;<strong>'globalminions_hellowWorld_example_1.0'</strong><br><br>Again, your minionSku is derived from the field values you used in your .htm file.<br></p>
+                            <p class="mb-0" style="margin-top: 16px;"><strong>Step5&nbsp;</strong>- To test your minion, change the minionSku in your working Client example with <strong>your</strong> minionSku. Save your change and run the Client example in a new web browser window. Now both your client and your minion should be talking to each other to display your minion's message. Monitor both browser console's activities.<br><br><strong>WARNING:</strong> The members email used for the Client and Minion must not be the same.</p>
+                            <p class="mb-0" style="margin-top: 16px;"><strong>Troubles?</strong> Double check the changes you made for syntax or spelling issues. Look at your browser's console looking for any errors logged there. Or talk to us at our forum, so we can personally help out.&nbsp;<a href="https://minionlogic.freeforums.net/">https://minionlogic.freeforums.net/</a></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <footer class="text-center footer text-faded py-5" style="padding: 0px;">
+        <div class="container">
+            <p class="m-0 small">minionLogic, LLC</p>
+            <p class="m-0 small">Copyright&nbsp;©&nbsp;Brand 2022</p>
+        </div>
+    </footer>
+    <script src="assets/bootstrap/js/bootstrap.min.js"></script>
+    <script src="assets/js/clipboardCopy.js"></script>
+    <script src="assets/js/current-day.js"></script>
+</body>
+
+</html>

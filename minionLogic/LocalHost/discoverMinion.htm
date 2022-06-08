@@ -1,0 +1,43 @@
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+<title>orderMinion Example</title>
+<script src="http://minionLogic.com/scripts/openJob.js"></script>
+
+<script id='identity'>
+console.log(`**** Load identity.js ****`);
+
+    _minionLogic.identity = {
+        nickname:'jojo',
+        member   : 'bob@hodgemail.us',
+        pin       : '7377',
+    };
+</script>
+
+<script id='notice'>
+console.log(`**** Load notice.js ****`);
+
+    _minionLogic.notice = {
+        SUBJECT: 'MINION-ORDER',
+        
+        TASK: {
+            activity : 'orderMinion',
+            startTime: 'now',
+            ifDelayed: 'cancel',
+            reference: 'job210.step27',
+        },
+        
+        OPTIONS: {          
+            minionName      : 'minionLogic_helloWorld_example_v1',
+            minionCommand   : 'fill',
+            helloMessage    : 'HELLO FROM MINION WORLD!',
+            textColor       : 'white',
+            bannerColor     : 'yellow',     
+            screenColor     : 'blue',       
+            bannerSize      : '400px',      
+            bannerLocation  : '-200px',     
+        },
+    };
+</script>
+</head>
+

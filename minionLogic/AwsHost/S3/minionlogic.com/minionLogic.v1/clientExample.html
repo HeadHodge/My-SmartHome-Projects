@@ -32,7 +32,7 @@ function clipboardCopy(elementID) {
 </script>
 </head>
 
-<body style="background: url(&quot;assets/img/robot%20background.jpg&quot;);">
+<body style="background: url(&quot;assets/img/robot%20background%202.jpg&quot;);">
     <h1 class="text-center text-white d-none d-lg-block site-heading"><span class="text-primary site-heading-upper mb-3">A Free Bootstrap 5 Business Theme&nbsp;</span><span class="site-heading-lower">Business Casual</span></h1>
     <nav class="navbar navbar-dark navbar-expand-lg bg-dark py-lg-4" id="mainNav">
         <div class="container"><a class="navbar-brand d-lg-none text-expanded" href="index.html#" target="_top">minionLogic</a><button data-bs-toggle="collapse" class="navbar-toggler" data-bs-target="#navbarResponsive"><span class="visually-hidden">Toggle navigation</span><span class="navbar-toggler-icon"></span></button>
@@ -47,17 +47,53 @@ function clipboardCopy(elementID) {
         </div>
     </nav>
     <section class="page-section about-heading" style="opacity: 1;">
-        <div class="container" style="background: var(--bs-blue);opacity: 0.91;border-radius: 23px;"><img class="rounded-circle img-fluid rounded about-heading-img mb-3 mb-lg-0" src="assets/img/cloudtalkingRobot.jpg" style="transform: perspective(2080px) translate(22px);opacity: 0.77;margin-top: 17px;">
+        <div class="container" style="background: var(--bs-blue);opacity: 0.95;border-radius: 23px;"><img class="rounded-circle img-fluid rounded about-heading-img mb-3 mb-lg-0" src="assets/img/holding%20puzzle.jpg" style="transform: perspective(2080px) translate(97px);opacity: 0.77;margin-top: 17px;width: 441px;height: 517.6px;">
             <div class="about-heading-content">
                 <div class="row">
                     <div class="col-lg-10 col-xl-9 mx-auto" style="margin-bottom: 28px;">
-                        <div class="bg-faded rounded p-5" style="opacity: 0.99;">
-                            <h2 class="section-heading mb-4"><span class="section-heading-upper" style="text-align: center;color: var(--bs-gray-100);background: var(--bs-red);"><strong>*!!!*</strong>alert*!!!<strong>*</strong>&nbsp; &nbsp;to all code slingers&nbsp; &nbsp;<strong>*!!!*ALERT*!!!*</strong><br></span><span class="text-center section-heading-lower">&nbsp;We want you!</span></h2>
-                            <p>Are you tired of coding for others on team projects that aren't challenging, satisfying, or make money? Or maybe you're a hobbyist who loves to use their imagination to create new and exiting things? Then consider becoming an independent distributed web component provider! Here we simply call those Minions and their providers Minion Makers.</p>
-                            <p class="mb-0">A Minion Maker designs, develops, their own Minions to do anything they want on there own equipment and language of choice to produce Minions that are useful to the Clients that will use them.</p>
-                            <p class="mb-0" style="margin-top: 16px;">Minions are easy to make and you serve them from your equipment full-time via standardized web sockets protocols and JSON serialized objects. When a Client orders your Minion, you will receive a JSON order for you to fill. Once filled, you return the Minion JSON results back to the Client. When the Client receives your Minions work, minionLogic will bill and collect usage fees from the Client</p>
-                            <p class="mb-0" style="margin-top: 16px;">The best part, is that for every billable client that uses your Minion, you will be able to receive a royalty from the Clients that use your Minion! You can elect to receive one of three royalty rates. You can elect a usage royalty rate, an exclusive usage rate, or for a limited time, a founders royalty rate.&nbsp;</p>
-                            <p class="mb-0" style="margin-top: 16px;">Don't delay and become a Minion Maker Today! Jump over to our forum and we'll get you everything you need to get started.</p>
+                        <div class="bg-faded rounded p-5" style="opacity: 1;width: 689px;padding: 46px;">
+                            <h2 class="section-heading mb-4"><span class="section-heading-upper" style="text-align: center;">here is an easy example of client minion usage</span><span class="text-center section-heading-lower">hello world</span></h2>
+                            <div style="text-align: right;"><button class="btn btn-primary" type="button" style="background: var(--bs-blue);" onclick="clipboardCopy(&#39;clientExample&#39;)">Copy to Clipboard</button></div>
+                            <div style="text-align: center;"><textarea id='clientExample' readonly style="font-size: 10pt; font-family: 'Courier New', monospace; width: 100%;white-space: pre;height: 500px;">
+<head>
+<title>orderMinion Example</title>
+<script src="http://minionLogic.com/scripts/orderMinion.js"></script>
+
+<script id='minionLogic Example'>
+    _minionLogic.identity = {
+        nickname: 'xxxx',
+        member  : 'xxxx@xxxxx.com',
+        pin     : '01234',
+    };
+
+    _minionLogic.notice = {
+        SUBJECT: 'OPEN-ORDER',
+        
+        TASK: {
+            activity : 'orderMinion',
+            startTime: 'now',
+            ifDelayed: 'cancel',
+            reference: 'job210.step27',
+        },
+        
+        OPTIONS: {
+            minionSku     : 'minionLogic_helloWorld_example_v1',
+            minionCommand : 'fill',
+            helloMessage  : 'HELLO FROM MINION WORLD!',
+            textColor     : 'white',
+            bannerColor   : 'yellow',
+            screenColor   : 'blue',
+            bannerSize    : '400px',
+            bannerLocation: '-200px',
+        },
+    };
+</script>
+</head>
+</textarea></div>
+                            <p><strong>Step1 </strong>- On your computer, create and edit an .htm file (i.e. 'hello.htm').</p>
+                            <p class="mb-0"><strong>Step2 </strong>- Copy the above code to the clipBoard then paste clipBoard contents to your .htm file. IMPORTANT:&nbsp; In your .htm file, change the&nbsp;nickname: 'xxxx', member&nbsp;: 'xxxx@xxxx.com', and&nbsp;pin: '1234' to valid values. Nickname is any unique one word name other members will know you by. Member is any valid email address you use. Pin is 4 or more digits that you can remember for future logins. (Example &gt;&gt; nickname: 'BillyBob', member: 'jimmy@gmail.com', pin: '92109').</p>
+                            <p class="mb-0" style="margin-top: 16px;"><strong>Step3 </strong>- Once your changes are made, save your .htm file to any convenient place on your computer. Now open your .htm file in your web Browser (I use Chrome by right clicking on the .htm file and selecting open). If all goes well, you should get the results of running your minion displayed on your browser!</p>
+                            <p class="mb-0" style="margin-top: 16px;"><strong>Troubles?</strong> Double check the changes you made for syntax or spelling issues. Look at your browser's console looking for any errors logged there. Or talk to us at our forum, so we can personally help out.&nbsp;https://minionlogic.freeforums.net/</p>
                         </div>
                     </div>
                 </div>

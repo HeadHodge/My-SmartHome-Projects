@@ -1,16 +1,16 @@
 ///////////////////////////////////////////////////////////
-// 		orderMinion.js
+// 		              openTicket
 ///////////////////////////////////////////////////////////
-console.log(`**** Load orderMinion.js ****`);
+console.log(`**** Load openTicket.js ****`);
 
-//// module globals ////
+///module globals
 var _minionLogic = {};
 
 ///////////////////Create nameSpace////////////////////////
 (function(_minionLogic){
 ///////////////////////////////////////////////////////////
 
-//// nameSpace globals ////
+///nameSpace globals
 var _socket = undefined;
 var _isConnected = undefined;
 var _session = undefined;
@@ -24,41 +24,40 @@ var endpoint;
 
 	if(_isConnected) return;
 	
-	////// new WebSocket //////member
+	///new WebSocket
 	_session = `${Date.now()}`;
 	_endpoint = `wss://clients.minionLogic.com?nickname=${_minionLogic.identity.nickname}&member=${_minionLogic.identity.member}&pin=${_minionLogic.identity.pin}&session=${_session}`;
 	_socket = new WebSocket(_endpoint);
 	
-	////// onopen //////
+	///onopen
 	_socket.onopen = function(event) {
-		console.log(`\n**** Endpoint: ${_endpoint}, connected, send notice ****`);
+		console.log(`\n**** Endpoint: ${_endpoint}, connected, send ticket ****`);
 		_isConnected = true;
-		_socket.send(JSON.stringify(_minionLogic.notice));
+		_socket.send(JSON.stringify(_minionLogic.ticket));
 	};
 	
-	////// onmessage //////
+	///onmessage
 	_socket.onmessage = function(event) {
-		console.log(`\n****Received Notice: `, event.data);
+		console.log(`\n****Received: `, event.data);
 		
 		//filter received data
-		var notice = JSON.parse(event.data);
+		var ticket = JSON.parse(event.data);
 		
-		if(notice.PRODUCT){
-			installProduct(notice);
+		if(ticket.PRODUCT){
+			installProduct(ticket);
 		}
 	};
 	
-	////// onerror //////
+	///onerror
 	_socket.onerror = function(error) {
 		console.log(`\n****Endpoint Error: `, error);
 	};
 	
-	////// onclose //////
+	///onclose
 	_socket.onclose = function(event) {
 		console.log(`\n****Endpoint Closed****`);
 		_socket = null;
 		_isConnected = null;
-		//location.reload();
 	};
 }
 
@@ -109,9 +108,9 @@ var content = ``;
 //       MAIN
 /////////////////////
 	window.addEventListener("load", function(event) {
-		console.log(`**** Start orderMinion ****`);
+		console.log(`**** Start openTicket ****`);
 		
-		//alert(`start orderMinion`);
+		//alert(`start openTicket`);
 		openConnection();
 	});
 	

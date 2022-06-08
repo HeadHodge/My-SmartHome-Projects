@@ -4,17 +4,17 @@
 console.log(`***Load clients service...`);
 
 ///////////////////////////////////////////////
-var receivedNotice = async function(createdOrder) {
+var orderMinionService = async function(ticket) {
 ///////////////////////////////////////////////
-console.log(`***receivedNotice: `, createdOrder);
+console.log(`***orderMinionService: `, ticket);
 
 //create order
-	await global.services.orderService.openOrder(createdOrder);
+	await global.services.orderService.createOrder(ticket);
 };
 
 //////////////////////////////////////////////////////////
 module.exports = {
 //////////////////////////////////////////////////////////
-    name          : 'clientServices',
-	receivedNotice: receivedNotice,
+    name              : 'clientServices',
+	orderMinionService: orderMinionService,
 };

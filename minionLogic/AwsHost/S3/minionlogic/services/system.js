@@ -115,10 +115,14 @@ console.log(`***loadObject: ${objectKey}`);
         Key   : objectKey,
     };
   
-  console.log(`loadObject, params: : `, params);
-  var object = await s3Client.getObject(params).promise();
-  
-  return JSON.parse(object.Body.toString('utf-8')); 
+    try {
+        console.log(`loadObject, params: : `, params);
+        var object = await s3Client.getObject(params).promise();
+    } catch(err) {
+        throw new Error(`***ABORT loadObject, Invalid s3Object key: ${params.Key}, ${params.Bucket}`);
+    }
+
+    return JSON.parse(object.Body.toString('utf-8')); 
 };
 
 //////////////////////////////////////////////////////////
