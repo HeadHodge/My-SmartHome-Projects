@@ -1,9 +1,9 @@
 console.log(`***Load minionLogic.helloWorld.example/minion.js`);
 
 /////////////////////// MAIN //////////////////////////////////////
-var query = async function(workOrder) {
+var query = async function(ticket) {
 ///////////////////////////////////////////////////////////////////
-console.log(`***Start minionLogic.helloWorld.example/minion.js, workOrder: ${workOrder}`);
+console.log(`***Start minionLogic.helloWorld.example/minion.js`);
 
     var product = {
             Result : 'ANSWER',
@@ -36,9 +36,9 @@ console.log(`***Start minionLogic.helloWorld.example/minion.js, workOrder: ${wor
 };
  
 /////////////////////// MAIN //////////////////////////////////////
-var fill = async function(workOrder) {
+var createProduct = async function(ticket) {
 ///////////////////////////////////////////////////////////////////
-console.log(`***Start minionLogic.helloWorld.example.v1/minion.js, workOrder: ${workOrder}`);
+console.log(`***Start minionLogic.helloWorld.example.v1/minion.js, workOrder`);
    
     var product = {
             Result : 'FILLED',
@@ -85,15 +85,15 @@ console.log(`***Start minionLogic.helloWorld.example.v1/minion.js, workOrder: ${
 };
  
 /////////////////////// MAIN //////////////////////////////////////
-module.exports = async function(workOrder) {
+module.exports = async function(ticket) {
 ///////////////////////////////////////////////////////////////////
-console.log(`***Start minionLogic.helloWorld.example/minion.js, workOrder: ${workOrder}`);
+console.log(`***Start minionLogic.helloWorld.example/minion.js`);
 var product;
 
-    if(workOrder.OPTIONS.minionCommand == 'query') {
-        product = query(workOrder);
+    if(ticket.DETAILS.command == 'createProduct') {
+        product = query(ticket);
     } else {
-        product = fill(workOrder);
+        product = createProduct(ticket);
     }
    
    console.log('product', product);

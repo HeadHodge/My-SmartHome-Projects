@@ -4,12 +4,12 @@
 console.log(`***Load orders service...`);
 
 ///////////////////////////////////////////////////////////////////
-var closeOrder = async function(filledOrder) {
-console.log(`closeOrder, progress: ${filledOrder.REPORT.progress}`);
+var closeOrder = async function(ticket) {
+console.log(`closeOrder, progress: ${ticket.REPORT.progress}`);
 
 //get order
-	global.activeOrder = filledOrder.TICKET.orderReference;
-	var order = await services.systemService.loadObject(`orders/active/${filledOrder.TICKET.orderReference}.json`);
+	global.activeOrder = ticket.TASK.Options.orderTag;
+	var order = await services.systemService.loadObject(`orders/active/${ticket.TASK.Options.orderTag}.json`);
 
 //get client connection
 	var clientInfo = await services.systemService.loadObject(`members/${order.CONTRACT.clientName}/${order.CONTRACT.clientName}.json`);
@@ -37,18 +37,18 @@ console.log(`closeOrder, progress: ${filledOrder.REPORT.progress}`);
 		minutesBilled : minutesBilled,
 	};
 	
-	filledOrder.BILL = order.BILL;
+	ticket.BILL = order.BILL;
 	
 //deliver order	to client
-	await global.services.bootService.postNotice(filledOrder, clientConnection);
+	await global.services.bootService.postNotice(ticket, clientConnection);
 	
 //delete order	
-	await services.systemService.deleteObject(`orders/active/${order.TICKET.orderReference}.json`);
+	await services.systemService.deleteObject(`orders/active/${ticket.TASK.Options.orderTag}.json`);
 
 //save order
-	await services.systemService.saveObject(`orders/closed/${order.TICKET.orderReference}.json`, order);
-	await services.systemService.saveObject(`members/${order.CONTRACT.clientName}/orders/${order.CONTRACT.billingMode}/${filledOrder.TICKET.orderReference}/`);
-	await services.systemService.saveObject(`members/${order.CONTRACT.providerName}/orders/${order.CONTRACT.billingMode}/${filledOrder.TICKET.orderReference}/`);
+	await services.systemService.saveObject(`orders/closed/${ticket.TASK.Options.orderTag}.json`, order);
+	await services.systemService.saveObject(`members/${order.CONTRACT.clientName}/orders/${order.CONTRACT.billingMode}/${ticket.TASK.Options.orderTag}/`);
+	await services.systemService.saveObject(`members/${order.CONTRACT.providerName}/orders/${order.CONTRACT.billingMode}/${ticket.TASK.Options.orderTag}/`);
 
 //debit billed orders
 billList = await services.systemService.listObjects(`members/${clientName}/orders/billable/`);
@@ -74,21 +74,21 @@ var totalDebit = 0, order = {};
 };
 
 ///////////////////////////////////////////////////////////////////
-var fillOrder = async function(openedOrder, providerConnection) {
+var fillOrder = async function(ticket, providerConnection) {
 ///////////////////////////////////////////////////////////////////
-console.log(`postProxyNotice: `, openedOrder);
+console.log(`fillOrder: `, ticket.TASK);
 
 //load minion
 	try {
-		var minion = await global.services.bootService.loadModule(`minions/${openedOrder.TICKET.minionName}/`, 'minion.js');
+		var minion = await global.services.bootService.loadModule(`minions/${ticket.DETAILS.sku}/`, 'minion.js');
+        console.log(`fillOrder locally`);
 	} catch {
-		await global.services.bootService.postNotice(openedOrder, providerConnection);
+        console.log(`fillOrder from provider`);
+        await global.services.bootService.postNotice(ticket, providerConnection);
 
-    //confirm order
+        //confirm order
         var confirmation = {
             SUBJECT: 'TASK-UPDATE',
-        
-            TICKET: openedOrder.TICKET,
         
             REPORT: {           
                 progress  : 'FORWARDED',
@@ -98,12 +98,13 @@ console.log(`postProxyNotice: `, openedOrder);
    
 		return await global.services.bootService.postNotice(confirmation);
 	}
-
-	var product = await minion(openedOrder);
+    
+//startMinion
+    console.log(`fillOrder: `, ticket);
+	var product = await minion(ticket);
 	var filledOrder = {};
 	
-	filledOrder.SUBJECT = openedOrder.SUBJECT;
-	filledOrder.TICKET = openedOrder.TICKET;
+	filledOrder.TASK = ticket.TASK;
 	filledOrder.PRODUCT = product;
 	filledOrder.REPORT = {
 		progress: "FILLED",
@@ -117,19 +118,19 @@ console.log(`postProxyNotice: `, openedOrder);
 ///////////////////////////////////////////////////////////////////
 var createOrder = async function(ticket) {
 ///////////////////////////////////////////////////////////////////
-console.log(`openOrder: `, ticket);
+console.log(`createOrder: `, ticket.TASK);
 var order = {};
 
-//BUILD ORDER
-
+    ticket.TASK.Options.orderTag =`${Date.now()}`;
+    
 //get member names	
 	var clientConnection = global.services.bootService.event.requestContext.connectionId;
 	var connectionInfo = await services.systemService.loadObject(`connections/${clientConnection}.json`);
 	var clientInfo = await services.systemService.loadObject(`members/${connectionInfo.member}/${connectionInfo.member}.json`);
 	var clientName = clientInfo.member;
 	
-	var minionName = ticket.OPTIONS.minionName;
-	var minionInfo = await services.systemService.loadObject(`minions/${ticket.TASK.Details.Sku}/minion.json`);
+	var minionSku = ticket.DETAILS.sku;
+	var minionInfo = await services.systemService.loadObject(`minions/${ticket.DETAILS.sku}/minion.json`);
 	var providerInfo = await services.systemService.loadObject(`members/${minionInfo.member}/${minionInfo.member}.json`);
 	var providerName = providerInfo.member;
 	var providerConnection = providerInfo.connection;
@@ -139,31 +140,23 @@ var order = {};
 		throw new Error('*** ABORT openOrder, Insufficient timeBalance to open order. Increase your timeBalance and try again.');
 	}
 
-//add taskName
-	order.TASK = ticket.TASK;
+//add TASK
+	//order.TASK = ticket.TASK;
 	
-//create ticket
-	order.TICKET = {
-		minionName: minionName,
-		clientCode: ticket.TASK.From.acctCode,
-		orderCode :`${Date.now()}`,
-		session   : connectionInfo.session,
-	};
-
 //create contract	
 	order.CONTRACT = {
-		orderReference: order.TICKET.orderCode,
-		clientName    : clientName,
-		providerName  : providerName,
-		minionName    : minionName,
-		minionLocation: minionInfo.location,
-		billingMode   : minionInfo.mode,
-		startStamp    : `${Date.now()}`,
+		clientTag   : ticket.TASK.Options.clientTag,       
+		orderTag    : ticket.TASK.Options.orderTag,
+		clientName  : clientName,
+		providerName: providerName,
+		minionSku   : minionSku,
+		billingMode : minionInfo.mode,
+		startStamp  : `${Date.now()}`,
 	};
 
 //save order
-	await services.systemService.saveObject(`orders/active/${order.TICKET.orderReference}.json`, order);
-	 global.services.activeOrder = order.TICKET.orderReference;
+	await services.systemService.saveObject(`orders/active/${order.CONTRACT.orderTag}.json`, order);
+    global.services.activeOrder = order.CONTRACT.orderAcctCode;
 	
 //send ticket to provider
 	//ticket.TICKET = order.TICKET;

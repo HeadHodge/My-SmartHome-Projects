@@ -62,21 +62,23 @@ var endpoint;
 }
 
 ///////////////////////////////////////////////////////////////////
-var installProduct = async function(filledOrder) {
+var installProduct = async function(ticket) {
 ///////////////////////////////////////////////////////////////////
 console.log(`installProduct`);
 
-var nameSpace = filledOrder.TICKET.minionName.split('_')[0];
+var nameSpace = ticket.TASK.Options.productSku.split('_')[0];
 var content = ``;
 
 //validate session
-	if(filledOrder.TICKET.session != _session){
-		console.log(filledOrder.TICKET.session + ',' + _session);
+/*
+	if(ticket.TICKET.session != _session){
+		console.log(ticket.TICKET.session + ',' + _session);
 		console.log(`********************************`);
 		console.log(`***ABORT: CONTENT HAS EXPIRED***`);
 		console.log(`********************************`);
 		return;
 	};
+*/
 	
 //create shadow host
 	var div = document.createElement('div');
@@ -86,18 +88,18 @@ var content = ``;
 	
 //create style
 	var style = document.createElement('style');
-	style.textContent = filledOrder.PRODUCT.Style;
-	root.innerHTML = style.outerHTML + filledOrder.PRODUCT.View;
+	style.textContent = ticket.PRODUCT.Style;
+	root.innerHTML = style.outerHTML + ticket.PRODUCT.View;
 
 //create private/public script
 	var script = document.createElement('script');
 	script.type = 'text/javascript';
 	
 	var content = ``;
-	content += `console.log('${filledOrder.PRODUCT.Console}');\r\n`;
+	content += `console.log('${ticket.PRODUCT.Console}');\r\n`;
 	content += `var ${nameSpace} = {};\r\n`;
 	content += `(function($publicObject) {\r\n`;
-	content += `${filledOrder.PRODUCT.Script}\r\n`;
+	content += `${ticket.PRODUCT.Script}\r\n`;
 	content += `})(${nameSpace});\r\n`;
 	script.textContent = content;
 	

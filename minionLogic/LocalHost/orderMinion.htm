@@ -18,31 +18,21 @@ console.log(`**** Load identity.js ****`);
 console.log(`**** Load ticket ****`);
 
     _minionLogic.ticket = {      
-        TASK: {
-            From: {
-                memberName: 'bob@hodgemail.us',
-                acctCode  : 'job210.step27',
-            },
-            
-            To: {
-                memberName: 'clientSupport',
-                acctCode  : null,
-            },
-            
-            Details: {
-                Subject  : 'orderMinionService',    
-                Sku      : 'minionLogic_helloWorld_example_v1',
-            },
-            
+        TASK: {          
+            Contact: 'clientSupport',
+            Action : 'orderMinionService',          
             Options: {
-                startTime: 'now',
-                ifDelayed: 'cancel',
+                productSku: 'minionLogic_helloWorld_example_v1',
+                clientTag : 'job210.step27',
+                startTime : 'now',
+                ifDelayed : 'cancel',
             },
         },
                 
         DETAILS: {          
-            command       : 'createProduct',
-            message       : 'hello from minion world!',
+            sku    : 'minionLogic_helloWorld_example_v1',
+            command: 'createProduct',
+            message: 'hello from minion world!',
         },
                 
         OPTIONS: {          
