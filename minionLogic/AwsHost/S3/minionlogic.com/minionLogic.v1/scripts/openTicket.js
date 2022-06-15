@@ -43,7 +43,7 @@ var endpoint;
 		//filter received data
 		var ticket = JSON.parse(event.data);
 		
-		if(ticket.PRODUCT){
+		if(ticket.MINION.Product){
 			installProduct(ticket);
 		}
 	};
@@ -66,7 +66,7 @@ var installProduct = async function(ticket) {
 ///////////////////////////////////////////////////////////////////
 console.log(`installProduct`);
 
-var nameSpace = ticket.TASK.Options.productSku.split('_')[0];
+var nameSpace = ticket.MINION.Sku.split('_')[0];
 var content = ``;
 
 //validate session
@@ -88,18 +88,18 @@ var content = ``;
 	
 //create style
 	var style = document.createElement('style');
-	style.textContent = ticket.PRODUCT.Style;
-	root.innerHTML = style.outerHTML + ticket.PRODUCT.View;
+	style.textContent = ticket.MINION.Product.Style;
+	root.innerHTML = style.outerHTML + ticket.MINION.Product.View;
 
 //create private/public script
 	var script = document.createElement('script');
 	script.type = 'text/javascript';
 	
 	var content = ``;
-	content += `console.log('${ticket.PRODUCT.Console}');\r\n`;
+	content += `console.log('${ticket.MINION.Product.Console}');\r\n`;
 	content += `var ${nameSpace} = {};\r\n`;
 	content += `(function($publicObject) {\r\n`;
-	content += `${ticket.PRODUCT.Script}\r\n`;
+	content += `${ticket.MINION.Product.Script}\r\n`;
 	content += `})(${nameSpace});\r\n`;
 	script.textContent = content;
 	

@@ -38,16 +38,12 @@ console.log(`***Start minionLogic.helloWorld.example/minion.js`);
 /////////////////////// MAIN //////////////////////////////////////
 var createProduct = async function(ticket) {
 ///////////////////////////////////////////////////////////////////
-console.log(`***Start minionLogic.helloWorld.example.v1/minion.js, workOrder`);
+console.log(`***createProduct`, ticket);
    
     var product = {
-            Result : 'FILLED',
-
-            Console: 'minion completed task succesfully',
-
             View   : `
                     <div class='container'>
-                        <div class='hello'>${workOrder.OPTIONS.helloMessage}</div>
+                        <div class='hello'>${ticket.MINION.Details.message}</div>
                     </div>`,
 
             Data   : ``,
@@ -56,15 +52,15 @@ console.log(`***Start minionLogic.helloWorld.example.v1/minion.js, workOrder`);
 
             Style  : `
                     div.container {
-                        color: ${workOrder.OPTIONS.textColor};
-                        background-color: ${workOrder.OPTIONS.screenColor};
+                        color: ${ticket.MINION.Options.textColor};
+                        background-color: ${ticket.MINION.Options.screenColor};
                         position: absolute;
                         left: 50%;
                         top: 50%;
-                        width: ${workOrder.OPTIONS.bannerSize};
-                        height: ${workOrder.OPTIONS.bannerSize};
-                        margin-left: ${workOrder.OPTIONS.bannerLocation};
-                        margin-top: ${workOrder.OPTIONS.bannerLocation};
+                        width: ${ticket.MINION.Options.bannerSize};
+                        height: ${ticket.MINION.Options.bannerSize};
+                        margin-left: ${ticket.MINION.Options.bannerLocation};
+                        margin-top: ${ticket.MINION.Options.bannerLocation};
                      }
                      
                      div.hello {
@@ -88,12 +84,13 @@ console.log(`***Start minionLogic.helloWorld.example.v1/minion.js, workOrder`);
 module.exports = async function(ticket) {
 ///////////////////////////////////////////////////////////////////
 console.log(`***Start minionLogic.helloWorld.example/minion.js`);
+
 var product;
 
-    if(ticket.DETAILS.command == 'createProduct') {
-        product = query(ticket);
+    if(ticket.MINION.Details.command == 'createProduct') {
+        product = await createProduct(ticket);
     } else {
-        product = createProduct(ticket);
+        product = await query(ticket);
     }
    
    console.log('product', product);

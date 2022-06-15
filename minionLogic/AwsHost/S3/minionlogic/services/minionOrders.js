@@ -5,11 +5,11 @@ console.log(`***Load orders service...`);
 
 ///////////////////////////////////////////////////////////////////
 var closeOrder = async function(ticket) {
-console.log(`closeOrder, progress: ${ticket.REPORT.progress}`);
+console.log(`closeOrder, progress: `);
 
 //get order
-	global.activeOrder = ticket.TASK.Options.orderTag;
-	var order = await services.systemService.loadObject(`orders/active/${ticket.TASK.Options.orderTag}.json`);
+	global.activeOrder = ticket.agentApproval;
+	var order = await services.systemService.loadObject(`orders/active/${ticket.agentApproval}.json`);
 
 //get client connection
 	var clientInfo = await services.systemService.loadObject(`members/${order.CONTRACT.clientName}/${order.CONTRACT.clientName}.json`);
@@ -43,12 +43,12 @@ console.log(`closeOrder, progress: ${ticket.REPORT.progress}`);
 	await global.services.bootService.postNotice(ticket, clientConnection);
 	
 //delete order	
-	await services.systemService.deleteObject(`orders/active/${ticket.TASK.Options.orderTag}.json`);
+	await services.systemService.deleteObject(`orders/active/${ticket.agentApproval}.json`);
 
 //save order
-	await services.systemService.saveObject(`orders/closed/${ticket.TASK.Options.orderTag}.json`, order);
-	await services.systemService.saveObject(`members/${order.CONTRACT.clientName}/orders/${order.CONTRACT.billingMode}/${ticket.TASK.Options.orderTag}/`);
-	await services.systemService.saveObject(`members/${order.CONTRACT.providerName}/orders/${order.CONTRACT.billingMode}/${ticket.TASK.Options.orderTag}/`);
+	await services.systemService.saveObject(`orders/closed/${ticket.agentApproval}.json`, order);
+	await services.systemService.saveObject(`members/${order.CONTRACT.clientName}/orders/${order.CONTRACT.billingMode}/${ticket.agentApproval}/`);
+	await services.systemService.saveObject(`members/${order.CONTRACT.providerName}/orders/${order.CONTRACT.billingMode}/${ticket.agentApproval}/`);
 
 //debit billed orders
 billList = await services.systemService.listObjects(`members/${clientName}/orders/billable/`);
@@ -80,7 +80,7 @@ console.log(`fillOrder: `, ticket.TASK);
 
 //load minion
 	try {
-		var minion = await global.services.bootService.loadModule(`minions/${ticket.DETAILS.sku}/`, 'minion.js');
+		var minion = await global.services.bootService.loadModule(`minions/${ticket.MINION.Sku}/`, 'minion.js');
         console.log(`fillOrder locally`);
 	} catch {
         console.log(`fillOrder from provider`);
@@ -102,17 +102,26 @@ console.log(`fillOrder: `, ticket.TASK);
 //startMinion
     console.log(`fillOrder: `, ticket);
 	var product = await minion(ticket);
-	var filledOrder = {};
-	
-	filledOrder.TASK = ticket.TASK;
-	filledOrder.PRODUCT = product;
-	filledOrder.REPORT = {
-		progress: "FILLED",
-			note: "Minion Order Complete. Thank You for using minionLogic!",
+
+    var productTicket = {
+        deliverTo     : 'client',
+        subject       : 'orderCompleted',
+        clientApproval: ticket.clientApproval,
+        agentApproval : ticket.agentApproval,
+        
+        MINION: {
+           Name   : ticket.MINION.Name,
+           Sku    : ticket.MINION.Sku,          
+           Product: product,
+           Status : {
+                progress: 'COMPLETED',
+                note    : 'Minion completed product succesfully.',
+            },
+        },
 	};
 
 //complete order
-	await closeOrder(filledOrder);	
+	await closeOrder(productTicket);	
 };
   
 ///////////////////////////////////////////////////////////////////
@@ -121,7 +130,7 @@ var createOrder = async function(ticket) {
 console.log(`createOrder: `, ticket.TASK);
 var order = {};
 
-    ticket.TASK.Options.orderTag =`${Date.now()}`;
+    ticket.agentApproval =`${Date.now()}`;
     
 //get member names	
 	var clientConnection = global.services.bootService.event.requestContext.connectionId;
@@ -129,8 +138,8 @@ var order = {};
 	var clientInfo = await services.systemService.loadObject(`members/${connectionInfo.member}/${connectionInfo.member}.json`);
 	var clientName = clientInfo.member;
 	
-	var minionSku = ticket.DETAILS.sku;
-	var minionInfo = await services.systemService.loadObject(`minions/${ticket.DETAILS.sku}/minion.json`);
+	var minionSku = ticket.MINION.Sku;
+	var minionInfo = await services.systemService.loadObject(`minions/${ticket.MINION.Sku}/minion.json`);
 	var providerInfo = await services.systemService.loadObject(`members/${minionInfo.member}/${minionInfo.member}.json`);
 	var providerName = providerInfo.member;
 	var providerConnection = providerInfo.connection;
@@ -145,8 +154,8 @@ var order = {};
 	
 //create contract	
 	order.CONTRACT = {
-		clientTag   : ticket.TASK.Options.clientTag,       
-		orderTag    : ticket.TASK.Options.orderTag,
+		clientTag   : ticket.clientApproval,       
+		orderTag    : ticket.agentApproval,
 		clientName  : clientName,
 		providerName: providerName,
 		minionSku   : minionSku,

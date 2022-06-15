@@ -18,29 +18,29 @@ console.log(`**** Load identity.js ****`);
 console.log(`**** Load ticket ****`);
 
     _minionLogic.ticket = {      
-        TASK: {          
-            Contact: 'clientSupport',
-            Action : 'orderMinionService',          
-            Options: {
-                productSku: 'minionLogic_helloWorld_example_v1',
-                clientTag : 'job210.step27',
-                startTime : 'now',
-                ifDelayed : 'cancel',
+        deliverTo     : 'clientSupport',
+        subject       : 'orderMinionService',          
+        clientApproval: 'job210.step27',
+        agentApproval : undefined,
+        
+        MINION: {
+            Name   : 'Hello World',
+            Sku    : 'minionLogic_helloWorld_example_v1',
+            
+            Details: {          
+                command: 'createProduct',
+                message: 'hello from minion world!',
             },
-        },
-                
-        DETAILS: {          
-            sku    : 'minionLogic_helloWorld_example_v1',
-            command: 'createProduct',
-            message: 'hello from minion world!',
-        },
-                
-        OPTIONS: {          
-            textcolor     : 'white',
-            bannercolor   : 'yellow',     
-            screencolor   : 'blue',       
-            bannersize    : '400px',      
-            bannerlocation: '-200px',     
+            
+            Options: {          
+                startTime     : 'now',
+                ifDelayed     : 'cancel',                
+                textColor     : 'white',
+                screenColor   : 'blue',       
+                bannerColor   : 'yellow',     
+                bannerSize    : '400px',      
+                bannerLocation: '-200px',     
+            },
         },
     };
 </script>
