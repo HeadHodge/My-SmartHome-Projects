@@ -4,12 +4,12 @@
 console.log(`***Load orders service...`);
 
 ///////////////////////////////////////////////////////////////////
-var closeOrder = async function(ticket) {
-console.log(`closeOrder, progress: `);
+var completeOrder = async function(ticket) {
+console.log(`completeOrder, progress: `);
 
 //get order
-	global.activeOrder = ticket.agentApproval;
-	var order = await services.systemService.loadObject(`orders/active/${ticket.agentApproval}.json`);
+	global.activeOrder = ticket.ticketKey;
+	var order = await services.systemService.loadObject(`orders/active/${ticket.ticketKey}.json`);
 
 //get client connection
 	var clientInfo = await services.systemService.loadObject(`members/${order.CONTRACT.clientName}/${order.CONTRACT.clientName}.json`);
@@ -43,12 +43,12 @@ console.log(`closeOrder, progress: `);
 	await global.services.bootService.postNotice(ticket, clientConnection);
 	
 //delete order	
-	await services.systemService.deleteObject(`orders/active/${ticket.agentApproval}.json`);
+	await services.systemService.deleteObject(`orders/active/${ticket.ticketKey}.json`);
 
 //save order
-	await services.systemService.saveObject(`orders/closed/${ticket.agentApproval}.json`, order);
-	await services.systemService.saveObject(`members/${order.CONTRACT.clientName}/orders/${order.CONTRACT.billingMode}/${ticket.agentApproval}/`);
-	await services.systemService.saveObject(`members/${order.CONTRACT.providerName}/orders/${order.CONTRACT.billingMode}/${ticket.agentApproval}/`);
+	await services.systemService.saveObject(`orders/completed/${ticket.ticketKey}.json`, order);
+	await services.systemService.saveObject(`members/${order.CONTRACT.clientName}/orders/${order.CONTRACT.billingMode}/${ticket.ticketKey}/`);
+	await services.systemService.saveObject(`members/${order.CONTRACT.providerName}/orders/${order.CONTRACT.billingMode}/${ticket.ticketKey}/`);
 
 //debit billed orders
 billList = await services.systemService.listObjects(`members/${clientName}/orders/billable/`);
@@ -61,7 +61,7 @@ var totalDebit = 0, order = {};
 		var orderPrefix = billList.CommonPrefixes[bill].Prefix
 		var orderRef = billList.CommonPrefixes[bill].Prefix.split('/')[4];
 
-		order = await services.systemService.loadObject(`orders/closed/${orderRef}.json`);
+		order = await services.systemService.loadObject(`orders/completed/${orderRef}.json`);
 		await services.systemService.saveObject(`members/${clientName}/orders/debited/${orderRef}/`);
 		await services.systemService.deleteObject(`members/${clientName}/orders/billable/${orderRef}/`);
 
@@ -74,16 +74,16 @@ var totalDebit = 0, order = {};
 };
 
 ///////////////////////////////////////////////////////////////////
-var fillOrder = async function(ticket, providerConnection) {
+var buildOrder = async function(ticket, providerConnection) {
 ///////////////////////////////////////////////////////////////////
-console.log(`fillOrder: `, ticket.TASK);
+console.log(`makeOrder: `, ticket.TASK);
 
 //load minion
 	try {
 		var minion = await global.services.bootService.loadModule(`minions/${ticket.MINION.Sku}/`, 'minion.js');
-        console.log(`fillOrder locally`);
+        console.log(`makeOrder locally`);
 	} catch {
-        console.log(`fillOrder from provider`);
+        console.log(`makeOrder from provider`);
         await global.services.bootService.postNotice(ticket, providerConnection);
 
         //confirm order
@@ -104,35 +104,33 @@ console.log(`fillOrder: `, ticket.TASK);
 	var product = await minion(ticket);
 
     var productTicket = {
-        deliverTo     : 'client',
-        subject       : 'orderCompleted',
-        clientApproval: ticket.clientApproval,
-        agentApproval : ticket.agentApproval,
+        deliverTo: 'client',
+        subject  : 'minionCompleted',
+        taskKey  : ticket.taskKey,
+        ticketKey: ticket.ticketKey,
         
         MINION: {
            Name   : ticket.MINION.Name,
            Sku    : ticket.MINION.Sku,          
            Product: product,
            Status : {
-                progress: 'COMPLETED',
-                note    : 'Minion completed product succesfully.',
+                progress: 'BUILT',
+                note    : 'Minion built product succesfully.',
             },
         },
 	};
 
 //complete order
-	await closeOrder(productTicket);	
+	await completeOrder(productTicket);	
 };
   
 ///////////////////////////////////////////////////////////////////
 var createOrder = async function(ticket) {
 ///////////////////////////////////////////////////////////////////
-console.log(`createOrder: `, ticket.TASK);
-var order = {};
-
-    ticket.agentApproval =`${Date.now()}`;
+console.log(`createOrder: `, ticket);
+    var order = {};
     
-//get member names	
+//get order information
 	var clientConnection = global.services.bootService.event.requestContext.connectionId;
 	var connectionInfo = await services.systemService.loadObject(`connections/${clientConnection}.json`);
 	var clientInfo = await services.systemService.loadObject(`members/${connectionInfo.member}/${connectionInfo.member}.json`);
@@ -148,14 +146,13 @@ var order = {};
 	if(minionInfo.mode == 'billable' && parseFloat(clientInfo.timeBalance) <= 0) {
 		throw new Error('*** ABORT openOrder, Insufficient timeBalance to open order. Increase your timeBalance and try again.');
 	}
-
-//add TASK
-	//order.TASK = ticket.TASK;
 	
 //create contract	
+    ticket.ticketKey =`${Date.now()}`;
+
 	order.CONTRACT = {
-		clientTag   : ticket.clientApproval,       
-		orderTag    : ticket.agentApproval,
+		taskKey     : ticket.taskKey,       
+		ticketKey   : ticket.ticketKey,
 		clientName  : clientName,
 		providerName: providerName,
 		minionSku   : minionSku,
@@ -164,19 +161,17 @@ var order = {};
 	};
 
 //save order
-	await services.systemService.saveObject(`orders/active/${order.CONTRACT.orderTag}.json`, order);
+	await services.systemService.saveObject(`orders/active/${order.CONTRACT.ticketKey}.json`, order);
     global.services.activeOrder = order.CONTRACT.orderAcctCode;
 	
 //send ticket to provider
-	//ticket.TICKET = order.TICKET;
-	//await global.services.bootService.postNotice(ticket, providerConnection);
-	await fillOrder(ticket, providerConnection);
+	await buildOrder(ticket, providerConnection);
 };	
 		
 //////////////////////////////////////////////////////////
 module.exports = {
 //////////////////////////////////////////////////////////
-    name       : 'orderServices',
-	createOrder: createOrder,
-	closeOrder : closeOrder,
+    name         : 'orderServices',
+	createOrder  : createOrder,
+	completeOrder: completeOrder,
 };

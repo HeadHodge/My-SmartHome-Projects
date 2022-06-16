@@ -6,10 +6,6 @@ var query = async function(ticket) {
 console.log(`***Start minionLogic.helloWorld.example/minion.js`);
 
     var product = {
-            Result : 'ANSWER',
-            
-            Console: 'minion query completed succesfully',
-            
             View   : `<div id='Topics'>\r\n
                          <div id='Description'>Query result: Description</div>\r\n
                          <div id='Usage'>Query result: Usage</div>\r\n

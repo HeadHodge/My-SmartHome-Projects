@@ -41,11 +41,8 @@ var endpoint;
 		console.log(`\n****Received: `, event.data);
 		
 		//filter received data
-		var ticket = JSON.parse(event.data);
-		
-		if(ticket.MINION.Product){
-			installProduct(ticket);
-		}
+		var ticket = JSON.parse(event.data);		
+		if(ticket.subject == 'minionCompleted') installProduct(ticket);
 	};
 	
 	///onerror
