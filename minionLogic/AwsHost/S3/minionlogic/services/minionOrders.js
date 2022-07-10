@@ -8,8 +8,8 @@ var completeOrder = async function(ticket) {
 console.log(`completeOrder, progress: `);
 
 //get order
-	global.activeOrder = ticket.ticketKey;
-	var order = await services.systemService.loadObject(`orders/active/${ticket.ticketKey}.json`);
+	global.activeOrder = ticket.sellersKey;
+	var order = await services.systemService.loadObject(`orders/active/${ticket.sellersKey}.json`);
 
 //get client connection
 	var clientInfo = await services.systemService.loadObject(`members/${order.CONTRACT.clientName}/${order.CONTRACT.clientName}.json`);
@@ -43,12 +43,12 @@ console.log(`completeOrder, progress: `);
 	await global.services.bootService.postNotice(ticket, clientConnection);
 	
 //delete order	
-	await services.systemService.deleteObject(`orders/active/${ticket.ticketKey}.json`);
+	await services.systemService.deleteObject(`orders/active/${ticket.sellersKey}.json`);
 
 //save order
-	await services.systemService.saveObject(`orders/completed/${ticket.ticketKey}.json`, order);
-	await services.systemService.saveObject(`members/${order.CONTRACT.clientName}/orders/${order.CONTRACT.billingMode}/${ticket.ticketKey}/`);
-	await services.systemService.saveObject(`members/${order.CONTRACT.providerName}/orders/${order.CONTRACT.billingMode}/${ticket.ticketKey}/`);
+	await services.systemService.saveObject(`orders/completed/${ticket.sellersKey}.json`, order);
+	await services.systemService.saveObject(`members/${order.CONTRACT.clientName}/orders/${order.CONTRACT.billingMode}/${ticket.sellersKey}/`);
+	await services.systemService.saveObject(`members/${order.CONTRACT.providerName}/orders/${order.CONTRACT.billingMode}/${ticket.sellersKey}/`);
 
 //debit billed orders
 billList = await services.systemService.listObjects(`members/${clientName}/orders/billable/`);
@@ -76,7 +76,7 @@ var totalDebit = 0, order = {};
 ///////////////////////////////////////////////////////////////////
 var buildOrder = async function(ticket, providerConnection) {
 ///////////////////////////////////////////////////////////////////
-console.log(`makeOrder: `, ticket.TASK);
+console.log(`makeOrder: `);
 
 //load minion
 	try {
@@ -104,10 +104,10 @@ console.log(`makeOrder: `, ticket.TASK);
 	var product = await minion(ticket);
 
     var productTicket = {
-        deliverTo: 'client',
-        subject  : 'minionCompleted',
-        taskKey  : ticket.taskKey,
-        ticketKey: ticket.ticketKey,
+        deliverTo : 'client',
+        subject   : 'minionCompleted',
+        buyersKey : ticket.buyersKey,
+        sellersKey: ticket.sellersKey,
         
         MINION: {
            Name   : ticket.MINION.Name,
@@ -148,11 +148,11 @@ console.log(`createOrder: `, ticket);
 	}
 	
 //create contract	
-    ticket.ticketKey =`${Date.now()}`;
+    ticket.sellersKey =`${Date.now()}`;
 
 	order.CONTRACT = {
-		taskKey     : ticket.taskKey,       
-		ticketKey   : ticket.ticketKey,
+		buyersKey   : ticket.buyersKey,       
+		sellersKey  : ticket.sellersKey,
 		clientName  : clientName,
 		providerName: providerName,
 		minionSku   : minionSku,
@@ -161,7 +161,7 @@ console.log(`createOrder: `, ticket);
 	};
 
 //save order
-	await services.systemService.saveObject(`orders/active/${order.CONTRACT.ticketKey}.json`, order);
+	await services.systemService.saveObject(`orders/active/${order.CONTRACT.sellersKey}.json`, order);
     global.services.activeOrder = order.CONTRACT.orderAcctCode;
 	
 //send ticket to provider
