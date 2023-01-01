@@ -1,0 +1,63 @@
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+<title>orderMinion Example</title>
+<xscript src="http://minionLogic.com/scripts/openTicket.js"></script>
+
+<script id='identity'>
+console.log(`**** Load identity.js ****`);
+
+    _minionLogic.identity = {
+        nickname :'jojo',
+        member   : 'bob@hodgemail.us',
+        pin      : '7377',
+    };
+</script>
+
+<script id='ticket'>
+console.log(`**** Load ticket ****`);
+
+    _minionLogic.ticket = {      
+        deliverTo : 'clientSupport',
+        subject   : 'orderMinionService',          
+        buyersKey : 'job210.step27',
+        sellersKey: undefined,
+        
+        MINION: {
+            Name   : 'Hello World',
+            Sku    : 'minionLogic_helloWorld_example_v1',
+            
+            Details: {          
+                command: 'createProduct',
+                message: 'hello from minion world!',
+            },
+            
+            Options: {          
+                startTime     : 'now',
+                ifDelayed     : 'cancel',                
+                textColor     : 'white',
+                screenColor   : 'blue',       
+                bannerColor   : 'yellow',     
+                bannerSize    : '400px',      
+                bannerLocation: '-200px',     
+            },
+        },
+    };
+</script>
+</head>
+<body>
+<minionLogic>
+    <task>
+        <options>
+            <option name='opt1' value='value1'></option>
+            <option name='opt2' value='value2'></option>
+        </options>
+    </task>
+</minionLogic>
+
+<script>
+var task = document.querySelector('minionLogic');
+    alert(JSON.stringify(task.innerHTML));
+</script>
+</body>
+
