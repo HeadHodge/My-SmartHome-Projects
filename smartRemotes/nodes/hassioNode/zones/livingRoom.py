@@ -4,13 +4,13 @@
 print('Load hassioNode livingRoom commandWord map')
 
 wordMap = {
-    "Media": {
-        "Louder": [
-            {"id": 0, "type": "call_service", "domain": "media_player", "service": "volume_up", "service_data": {"entity_id": "media_player.living_room"}},
-        ],
-        
+    "Media": {       
         "Softer": [
             {"type": "call_service", "domain": "media_player", "service": "volume_down", "service_data": {"entity_id": "media_player.living_room"}},
+        ],
+        
+        "Louder": [
+            {"id": 0, "type": "call_service", "domain": "media_player", "service": "volume_up", "service_data": {"entity_id": "media_player.living_room"}},
         ],
                 
         "Silence": [
@@ -46,7 +46,7 @@ wordMap = {
         "Off": [
         #Turn off TV
             {"type": "call_service", "domain": "remote", "service": "send_command", "service_data": {"entity_id": "remote.broadlink_ir_hub_downstairs_remote", "device": "Insignia FireTV", "command": "On/Off"}},
-            {"type": "call_service", "domain": "media_player", "service": "volume_mute", "service_data": {"entity_id": "media_player.living_room", "is_volume_muted": True}},
+            {"type": "call_service", "domain": "remote", "service": "send_command", "service_data": {"entity_id": "remote.broadlink_ir_hub_downstairs_remote", "device": "Insignia FireTV", "command": "On/Off"}},
         ],
          
         "On": [

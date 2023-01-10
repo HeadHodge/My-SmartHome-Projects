@@ -3,7 +3,7 @@ Description=smartRemotes mediaNode
 After=network.target
 
 [Service]
-ExecStart=python3 -u /smartRemotes/nodes/zoneNode/zoneNode.py
+ExecStart=python3 -u /smartRemotes/nodes/zoneNode/zoneNode.py livingRoom
 
 [Install]
 WantedBy=multi-user.target

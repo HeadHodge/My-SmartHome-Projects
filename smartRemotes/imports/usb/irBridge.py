@@ -4,16 +4,16 @@
 print('Load irBridge')
 
 import os, sys, time, json, threading, traceback, asyncio
-import broadlink
 
 _parent = sys.modules["__main__"]
         
 ##########################
-async def deliverCommand(connection, command):
+async def deliverCommand(command):
 ##########################
     try:
-        #print(f'***deliverCommand: {command}')
-        connection.send_data(command)
+        print(f'***deliverCommand: ir-ctl --send={command}')
+        reply = os.system(f'ir-ctl --send={command}')
+        print(f'reply: {reply}')
     except:
         print('Abort deliverCommand', sys.exc_info()[0])
         traceback.print_exc()
@@ -23,21 +23,7 @@ async def deliverCommand(connection, command):
 ###################
 def start(options={}):
     try:    
-        print(f'Start irBridge')
-
-        deviceDetails = options.get('deviceDetails', None)
-        
-        if(deviceDetails == None):
-            print('Abort irBridge: no deviceDetails provided')
-            return
-            
-        #devices = broadlink.discover(timeout=5)
-        device = broadlink.gendevice(*deviceDetails)
-        device.auth()    
-        print(f"device available: {device}")
-        
-        onConnect = options.get('onConnect', None)
-        if(onConnect != None): asyncio.run(onConnect(device))
+        print(f'Start irBridge: {options}')
     except:
         print('Abort irBridge', sys.exc_info()[0])
         traceback.print_exc()

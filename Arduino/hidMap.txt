@@ -1,0 +1,203 @@
+						
+HID Consumer Page (hidKey.hidCode = 0x0c)
+HID Usage	HID Usage Name	LKC	Linux Key Code Name	Version	AKC	Android Key Code Name	Notes
+    hidKey.keyUsage = hidKey.hidCode =; hidKey.keyCode = 0x0034;; hidKey.androidCode = 0x001a; hidKey.keyWord = ""POWER"; return hidKey;	
+
+    {"word",  {"keyboard", 0, "word", "{}", 0}}, 
+    
+    {"MENU",  {"consumer", 0x0040, "MENU", "{}", 0x0052}}, 
+    {"WINDOW",  {"consumer", 0x0067, "WINDOW", "{}", 0x00ab}}, 
+    {"PROG_RED",  {"consumer", 0x0069, "PROG_RED", "{}", 0x00b7}}, 
+    {"PROG_GREEN",  {"consumer", 0x006a, "PROG_GREEN", "{}", 0x00b8}}, 
+    {"PROG_BLUE",  {"consumer", 0x006b, "PROG_BLUE", "{}", 0x00ba}}, 
+    {"PROG_YELLOW",  {"consumer", 0x006c, "PROG_YELLOW", "{}", 0x00b9}}, 
+    {"LAST_CHANNEL",  {"consumer", 0x0083, "LAST_CHANNEL", "{}", 0x00e5}}, 
+    {"TV",  {"consumer", 0x0089, "TV", "{}", 0x00aa}}, 
+    {"EXPLORER",  {"consumer", 0x008a, "EXPLORER", "{}", 0x0040}}, 
+    {"CALL",  {"consumer", 0x008c, "CALL", "{}", 0x0005}}, 
+    {"GUIDE",  {"consumer", 0x008d, "GUIDE", "{}", 0x00ac}}, 
+    {"CAPTIONS",  {"consumer", 0x0061, "CAPTIONS", "{}", 0x00af}}, 
+    {"CHANNEL_UP",  {"consumer", 0x009c, "CHANNEL_UP", "{}", 0x00a6}}, 
+    {"CHANNEL_DOWN",  {"consumer", 0x009d, "CHANNEL_DOWN", "{}", 0x00a7}}, 
+    {"MEDIA_PLAY",  {"consumer", 0x00b0, "MEDIA_PLAY", "{}", 0x007e}}, 
+    {"BREAK",  {"consumer", 0x00b1, "BREAK", "{}", 0x0079}}, 
+    {"MEDIA_RECORD",  {"consumer", 0x00b2, "MEDIA_RECORD", "{}", 0x0082}}, 
+    {"MEDIA_FAST_FORWARD",  {"consumer", 0x00b3, "MEDIA_FAST_FORWARD", "{}", 0x005a}}, 
+    {"MEDIA_REWIND",  {"consumer", 0x00b4, "MEDIA_REWIND", "{}", 0x0059}}, 
+    {"MEDIA_NEXT",  {"consumer", 0x00b5, "MEDIA_NEXT", "{}", 0x0057}}, 
+    {"MEDIA_PREVIOUS",  {"consumer", 0x00b6, "MEDIA_PREVIOUS", "{}", 0x0058}}, 
+    {"MEDIA_STOP",  {"consumer", 0x00b7, "MEDIA_STOP", "{}", 0x0056}}, 
+    {"MEDIA_EJECT",  {"consumer", 0x00b8, "MEDIA_EJECT", "{}", 0x0081}}, 
+    {"MEDIA_PLAY_PAUSE",  {"consumer", 0x00cd, "MEDIA_PLAY_PAUSE", "{}", 0x0055}}, 
+    {"VOLUME_MUTE",  {"consumer", 0x00e2, "VOLUME_MUTE", "{}", 0x00a4}}, 
+    {"VOLUME_UP",  {"consumer", 0x00e9, "VOLUME_UP", "{}", 0x0018}}, 
+    {"VOLUME_DOWN",  {"consumer", 0x00ea, "VOLUME_DOWN", "{}", 0x0019}}, 
+    {"BOOKMARK",  {"consumer", 0x0182, "BOOKMARK", "{}", 0x00ae}}, 
+    {"MUSIC",  {"consumer", 0x0183, "MUSIC", "{}", 0x00d1}}, 
+    {"ENVELOPE",  {"consumer", 0x018a, "ENVELOPE", "{}", 0x0041}}, 
+    {"CONTACTS",  {"consumer", 0x018d, "CONTACTS", "{}", 0x00cf}}, 
+    {"CALENDAR",  {"consumer", 0x018e, "CALENDAR", "{}", 0x00d0}}, 
+    {"CALCULATOR",  {"consumer", 0x0192, "CALCULATOR", "{}", 0x00d2}}, 
+    {"EXPLORER",  {"consumer", 0x0196, "EXPLORER", "{}", 0x0040}}, 
+    {"POWER",  {"consumer", 0x019e, "POWER", "{}", 0x001a}}, 
+    {"HEADSETHOOK",  {"consumer", 0x01b6, "HEADSETHOOK", "{}", 0x004f}}, 
+    {"MUSIC",  {"consumer", 0x01b7, "MUSIC", "{}", 0x00d1}}, 
+    {"SEARCH",  {"consumer", 0x0221, "SEARCH", "{}", 0x0054}}, 
+    {"HOME",  {"consumer", 0x0223, "HOME", "{}", 0x0003}}, 
+    {"BACK",  {"consumer", 0x0224, "BACK", "{}", 0x0004}}, 
+    {"FORWARD",  {"consumer", 0x0225, "FORWARD", "{}", 0x007d}}, 
+    {"MEDIA_STOP",  {"consumer", 0x0226, "MEDIA_STOP", "{}", 0x0056}}, 
+    {"BOOKMARK",  {"consumer", 0x022a, "BOOKMARK", "{}", 0x00ae}}, 
+    {"PAGE_UP",  {"consumer", 0x0233, "PAGE_UP", "{}", 0x005c}}, 
+    {"PAGE_DOWN",  {"consumer", 0x0234, "PAGE_DOWN", "{}", 0x005d}},
+
+    {"word",  {"keyboard", 0, 0x0000, "word", "{}", 5, 5, 0x0000}}, 
+
+    {"A",  {"keyboard", 0, 0x0004, "A", "{}", 5, 5, 0x001d}}, 
+    {"B",  {"keyboard", 0, 0x0005, "B", "{}", 5, 5, 0x001e}}, 
+    {"C",  {"keyboard", 0, 0x0006, "C", "{}", 5, 5, 0x001f}}, 
+    {"D",  {"keyboard", 0, 0x0007, "D", "{}", 5, 5, 0x0020}}, 
+    {"E",  {"keyboard", 0, 0x0008, "E", "{}", 5, 5, 0x0021}}, 
+    {"F",  {"keyboard", 0, 0x0009, "F", "{}", 5, 5, 0x0022}}, 
+    {"G",  {"keyboard", 0, 0x000a, "G", "{}", 5, 5, 0x0023}}, 
+    {"H",  {"keyboard", 0, 0x000b, "H", "{}", 5, 5, 0x0024}}, 
+    {"I",  {"keyboard", 0, 0x000c, "I", "{}", 5, 5, 0x0025}}, 
+    {"J",  {"keyboard", 0, 0x000d, "J", "{}", 5, 5, 0x0026}}, 
+
+   {"K",  {"keyboard", 0, 0x000e, "K", "{}", 5, 5, 0x0027}}, 
+   {"L",  {"keyboard", 0, 0x000f, "L", "{}", 5, 5, 0x0028}}, 
+   {"M",  {"keyboard", 0, 0x0010, "M", "{}", 5, 5, 0x0029}}, 
+   {"N",  {"keyboard", 0, 0x0011, "N", "{}", 5, 5, 0x002a}}, 
+   {"O",  {"keyboard", 0, 0x0012, "O", "{}", 5, 5, 0x002b}}, 
+   {"P",  {"keyboard", 0, 0x0013, "P", "{}", 5, 5, 0x002c}}, 
+   {"Q",  {"keyboard", 0, 0x0014, "Q", "{}", 5, 5, 0x002d}}, 
+   {"R",  {"keyboard", 0, 0x0015, "R", "{}", 5, 5, 0x002e}}, 
+   {"S",  {"keyboard", 0, 0x0016, "S", "{}", 5, 5, 0x002f}}, 
+   {"T",  {"keyboard", 0, 0x0017, "T", "{}", 5, 5, 0x0030}}, 
+   {"U",  {"keyboard", 0, 0x0018, "U", "{}", 5, 5, 0x0031}}, 
+
+    {"V",  {"keyboard", 0, 0x0019, "V", "{}", 5, 5, 0x0032}}, 
+    {"W",  {"keyboard", 0, 0x001a, "W", "{}", 5, 5, 0x0033}}, 
+    {"X",  {"keyboard", 0, 0x001b, "X", "{}", 5, 5, 0x0034}}, 
+    {"Y",  {"keyboard", 0, 0x001c, "Y", "{}", 5, 5, 0x0035}}, 
+    {"Z",  {"keyboard", 0, 0x001d, "Z", "{}", 5, 5, 0x0036}}, 
+    {"1",  {"keyboard", 0, 0x001e, "1", "{}", 5, 5, 0x0008}}, 
+    {"2",  {"keyboard", 0, 0x001f, "2", "{}", 5, 5, 0x0009}}, 
+    {"3",  {"keyboard", 0, 0x0020, "3", "{}", 5, 5, 0x000a}}, 
+    {"4",  {"keyboard", 0, 0x0021, "4", "{}", 5, 5, 0x000b}}, 
+    {"5",  {"keyboard", 0, 0x0022, "5", "{}", 5, 5, 0x000c}}, 
+    {"6",  {"keyboard", 0, 0x0023, "6", "{}", 5, 5, 0x000d}}, 
+    {"7",  {"keyboard", 0, 0x0024, "7", "{}", 5, 5, 0x000e}}, 
+    {"8",  {"keyboard", 0, 0x0025, "8", "{}", 5, 5, 0x000f}}, 
+    {"9",  {"keyboard", 0, 0x0026, "9", "{}", 5, 5, 0x0010}}, 
+    {"0",  {"keyboard", 0, 0x0027, "0", "{}", 5, 5, 0x0007}},
+
+    
+    {"ENTER",  {"keyboard", 0, 0x0028, "ENTER", "{}", 5, 5, 0x0042}}, 
+    {"ESCAPE",  {"keyboard", 0, 0x0029, "ESCAPE", "{}", 5, 5, 0x006f}}, 
+    {"DPAD_RIGHT",  {"keyboard", 0, 0x004f, "DPAD_RIGHT", "{}", 5, 5, 0x0016}}, 
+    {"DPAD_LEFT",  {"keyboard", 0, 0x0050, "DPAD_LEFT", "{}", 5, 5, 0x0015}}, 
+    {"DPAD_DOWN",  {"keyboard", 0, 0x0051, "DPAD_DOWN", "{}", 5, 5, 0x0014}}, 
+    {"DPAD_UP",  {"keyboard", 0, 0x0052, "DPAD_UP", "{}", 5, 5, 0x0013}},
+    
+    {"word",  {"keyboard", 0, 0x0000, "word", "{}", 5, 5, 0x0000}}, 
+
+HID Keyboard and Keypad Page (hidKey.hidCode = 0x07)
+HID Usage	HID Usage Name	LKC	Linux Key Code Name	Version	AKC	Android Key Code Name	Notes
+hidKey.hidCode = 0x002a; hidKey.androidCode = 0x0043; hidKey.keyWord = "DEL"; return hidKey;	
+hidKey.hidCode = 0x002b; hidKey.androidCode = 0x003d; hidKey.keyWord = "TAB"; return hidKey;	
+hidKey.hidCode = 0x002c; hidKey.androidCode = 0x003e; hidKey.keyWord = "SPACE"; return hidKey;	
+hidKey.hidCode = 0x002d; hidKey.androidCode = 0x0045; hidKey.keyWord = "MINUS"; return hidKey;
+hidKey.hidCode = 0x002e; hidKey.androidCode = 0x0046; hidKey.keyWord = "EQUALS"; return hidKey;
+hidKey.hidCode = 0x002f; hidKey.androidCode = 0x0047; hidKey.keyWord = "LEFT_BRACKET"; return hidKey;
+hidKey.hidCode = 0x0030; hidKey.androidCode = 0x0048; hidKey.keyWord = "RIGHT_BRACKET"; return hidKey;
+hidKey.hidCode = 0x0031; hidKey.androidCode = 0x0049; hidKey.keyWord = "BACKSLASH"; return hidKey;
+hidKey.hidCode = 0x0032; hidKey.androidCode = 0x0049; hidKey.keyWord = "HASHTAG"; return hidKey;
+hidKey.hidCode = 0x0033; hidKey.androidCode = 0x004a; hidKey.keyWord = "SEMICOLON"; return hidKey;
+hidKey.hidCode = 0x0034; hidKey.androidCode = 0x004b; hidKey.keyWord = "APOSTROPHE"; return hidKey;
+hidKey.hidCode = 0x0035; hidKey.androidCode = 0x0044; hidKey.keyWord = "GRAVE"; return hidKey;
+hidKey.hidCode = 0x0036; hidKey.androidCode = 0x0037; hidKey.keyWord = "COMMA"; return hidKey;
+hidKey.hidCode = 0x0037; hidKey.androidCode = 0x0038; hidKey.keyWord = "PERIOD"; return hidKey;
+hidKey.hidCode = 0x0038; hidKey.androidCode = 0x004c; hidKey.keyWord = "SLASH"; return hidKey;
+hidKey.hidCode = 0x0039; hidKey.androidCode = 0x0073; hidKey.keyWord = "CAPS_LOCK"; return hidKey;	
+hidKey.hidCode = 0x003a; hidKey.androidCode = 0x0083; hidKey.keyWord = "F1"; return hidKey;	
+hidKey.hidCode = 0x003b; hidKey.androidCode = 0x0084; hidKey.keyWord = "F2"; return hidKey;	
+hidKey.hidCode = 0x003c; hidKey.androidCode = 0x0085; hidKey.keyWord = "F3"; return hidKey;	
+hidKey.hidCode = 0x003d; hidKey.androidCode = 0x0086; hidKey.keyWord = "F4"; return hidKey;	
+hidKey.hidCode = 0x003e; hidKey.androidCode = 0x0087; hidKey.keyWord = "F5"; return hidKey;	
+hidKey.hidCode = 0x003f; hidKey.androidCode = 0x0088; hidKey.keyWord = "F6"; return hidKey;	
+hidKey.hidCode = 0x0040; hidKey.androidCode = 0x0089; hidKey.keyWord = "F7"; return hidKey;	
+hidKey.hidCode = 0x0041; hidKey.androidCode = 0x008a; hidKey.keyWord = "F8"; return hidKey;	
+hidKey.hidCode = 0x0042; hidKey.androidCode = 0x008b; hidKey.keyWord = "F9"; return hidKey;	
+hidKey.hidCode = 0x0043; hidKey.androidCode = 0x008c; hidKey.keyWord = "F10"; return hidKey;	
+hidKey.hidCode = 0x0044; hidKey.androidCode = 0x008d; hidKey.keyWord = "F11"; return hidKey;	
+hidKey.hidCode = 0x0045; hidKey.androidCode = 0x008e; hidKey.keyWord = "F12"; return hidKey;	
+hidKey.hidCode = 0x0046; hidKey.androidCode = 0x0078; hidKey.keyWord = "SYSRQ"; return hidKey;	
+hidKey.hidCode = 0x0047; hidKey.androidCode = 0x0074; hidKey.keyWord = "SCROLL_LOCK"; return hidKey;	
+hidKey.hidCode = 0x0048; hidKey.androidCode = 0x0079; hidKey.keyWord = "BREAK"; return hidKey;	
+hidKey.hidCode = 0x0049; hidKey.androidCode = 0x007c; hidKey.keyWord = "INSERT"; return hidKey;	
+hidKey.hidCode = 0x004a; hidKey.androidCode = 0x007a; hidKey.keyWord = "MOVE_HOME"; return hidKey;	
+hidKey.hidCode = 0x004b; hidKey.androidCode = 0x005c; hidKey.keyWord = "PAGE_UP"; return hidKey;	
+hidKey.hidCode = 0x004c; hidKey.androidCode = 0x0070; hidKey.keyWord = "FORWARD_DEL"; return hidKey;	
+hidKey.hidCode = 0x004d; hidKey.androidCode = 0x007b; hidKey.keyWord = "MOVE_END"; return hidKey;	
+hidKey.hidCode = 0x004e; hidKey.androidCode = 0x005d; hidKey.keyWord = "PAGE_DOWN"; return hidKey;	
+hidKey.hidCode = 0x0053; hidKey.androidCode = 0x008f; hidKey.keyWord = "NUM_LOCK"; return hidKey;	
+hidKey.hidCode = 0x0054; hidKey.androidCode = 0x009a; hidKey.keyWord = "NUMPAD_DIVIDE"; return hidKey;	
+hidKey.hidCode = 0x0055; hidKey.androidCode = 0x009b; hidKey.keyWord = "NUMPAD_MULTIPLY"; return hidKey;	
+hidKey.hidCode = 0x0056; hidKey.androidCode = 0x009c; hidKey.keyWord = "NUMPAD_SUBTRACT"; return hidKey;	
+hidKey.hidCode = 0x0057; hidKey.androidCode = 0x009d; hidKey.keyWord = "NUMPAD_ADD"; return hidKey;	
+hidKey.hidCode = 0x0058; hidKey.androidCode = 0x00a0; hidKey.keyWord = "NUMPAD_ENTER"; return hidKey;	
+hidKey.hidCode = 0x0059; hidKey.androidCode = 0x0091; hidKey.keyWord = "NUMPAD_1"; return hidKey;	
+hidKey.hidCode = 0x005a; hidKey.androidCode = 0x0092; hidKey.keyWord = "NUMPAD_2"; return hidKey;	
+hidKey.hidCode = 0x005b; hidKey.androidCode = 0x0093; hidKey.keyWord = "NUMPAD_3"; return hidKey;	
+hidKey.hidCode = 0x005c; hidKey.androidCode = 0x0094; hidKey.keyWord = "NUMPAD_4"; return hidKey;	
+hidKey.hidCode = 0x005d; hidKey.androidCode = 0x0095; hidKey.keyWord = "NUMPAD_5"; return hidKey;	
+hidKey.hidCode = 0x005e; hidKey.androidCode = 0x0096; hidKey.keyWord = "NUMPAD_6"; return hidKey;	
+hidKey.hidCode = 0x005f; hidKey.androidCode = 0x0097; hidKey.keyWord = "NUMPAD_7"; return hidKey;	
+hidKey.hidCode = 0x0060; hidKey.androidCode = 0x0098; hidKey.keyWord = "NUMPAD_8"; return hidKey;	
+hidKey.hidCode = 0x0061; hidKey.androidCode = 0x0099; hidKey.keyWord = "NUMPAD_9"; return hidKey;	
+hidKey.hidCode = 0x0062; hidKey.androidCode = 0x0090; hidKey.keyWord = "NUMPAD_0"; return hidKey;	
+hidKey.hidCode = 0x0063; hidKey.androidCode = 0x009e; hidKey.keyWord = "NUMPAD_DOT"; return hidKey;	
+hidKey.hidCode = 0x0064; hidKey.androidCode = 0x0049; hidKey.keyWord = "BACKSLASH"; return hidKey;
+hidKey.hidCode = 0x0065; hidKey.androidCode = 0x0052; hidKey.keyWord = "MENU"; return hidKey;	
+hidKey.hidCode = 0x0066; hidKey.androidCode = 0x001a; hidKey.keyWord = "POWER"; return hidKey;	
+hidKey.hidCode = 0x0067; hidKey.androidCode = 0x00a1; hidKey.keyWord = "NUMPAD_EQUALS"; return hidKey;	
+hidKey.hidCode = 0x0078; hidKey.androidCode = 0x0056; hidKey.keyWord = "MEDIA_STOP"; return hidKey;	
+hidKey.hidCode = 0x007f; hidKey.androidCode = 0x00a4; hidKey.keyWord = "VOLUME_MUTE"; return hidKey;	
+hidKey.hidCode = 0x0080; hidKey.androidCode = 0x0018; hidKey.keyWord = "VOLUME_UP"; return hidKey;	
+hidKey.hidCode = 0x0081; hidKey.androidCode = 0x0019; hidKey.keyWord = "VOLUME_DOWN"; return hidKey;	
+hidKey.hidCode = 0x0085; hidKey.androidCode = 0x009f; hidKey.keyWord = "NUMPAD_COMMA"; return hidKey;	
+hidKey.hidCode = 0x00b6; hidKey.androidCode = 0x00a2; hidKey.keyWord = "NUMPAD_LEFT_PAREN"; return hidKey;	
+hidKey.hidCode = 0x00b7; hidKey.androidCode = 0x00a3; hidKey.keyWord = "NUMPAD_RIGHT_PAREN"; return hidKey;	
+hidKey.hidCode = 0x00e0; hidKey.androidCode = 0x0071; hidKey.keyWord = "CTRL_LEFT"; return hidKey;	
+hidKey.hidCode = 0x00e1; hidKey.androidCode = 0x003b; hidKey.keyWord = "SHIFT_LEFT"; return hidKey;	
+hidKey.hidCode = 0x00e2; hidKey.androidCode = 0x0039; hidKey.keyWord = "ALT_LEFT"; return hidKey;	
+hidKey.hidCode = 0x00e3; hidKey.androidCode = 0x0075; hidKey.keyWord = "META_LEFT"; return hidKey;	
+hidKey.hidCode = 0x00e4; hidKey.androidCode = 0x0072; hidKey.keyWord = "CTRL_RIGHT"; return hidKey;	
+hidKey.hidCode = 0x00e5; hidKey.androidCode = 0x003c; hidKey.keyWord = "SHIFT_RIGHT"; return hidKey;	
+hidKey.hidCode = 0x00e6; hidKey.androidCode = 0x003a; hidKey.keyWord = "ALT_RIGHT"; return hidKey;	
+hidKey.hidCode = 0x00e7; hidKey.androidCode = 0x0076; hidKey.keyWord = "META_RIGHT"; return hidKey;	
+hidKey.hidCode = 0x00e8; hidKey.androidCode = 0x0055; hidKey.keyWord = "MEDIA_PLAY_PAUSE"; return hidKey;	
+hidKey.hidCode = 0x00e9; hidKey.androidCode = 0x0056; hidKey.keyWord = "MEDIA_STOP"; return hidKey;	
+hidKey.hidCode = 0x00ea; hidKey.androidCode = 0x0058; hidKey.keyWord = "MEDIA_PREVIOUS"; return hidKey;	
+hidKey.hidCode = 0x00eb; hidKey.androidCode = 0x0057; hidKey.keyWord = "MEDIA_NEXT"; return hidKey;	
+hidKey.hidCode = 0x00ec; hidKey.androidCode = 0x0081; hidKey.keyWord = "MEDIA_EJECT"; return hidKey;	
+hidKey.hidCode = 0x00ed; hidKey.androidCode = 0x0018; hidKey.keyWord = "VOLUME_UP"; return hidKey;	
+hidKey.hidCode = 0x00ee; hidKey.androidCode = 0x0019; hidKey.keyWord = "VOLUME_DOWN"; return hidKey;	
+hidKey.hidCode = 0x00ef; hidKey.androidCode = 0x00a4; hidKey.keyWord = "VOLUME_MUTE"; return hidKey;	
+hidKey.hidCode = 0x00f0; hidKey.androidCode = 0x0040; hidKey.keyWord = "EXPLORER"; return hidKey;	
+hidKey.hidCode = 0x00f1; hidKey.androidCode = 0x0004; hidKey.keyWord = "BACK"; return hidKey;	
+hidKey.hidCode = 0x00f2; hidKey.androidCode = 0x007d; hidKey.keyWord = "FORWARD"; return hidKey;	
+hidKey.hidCode = 0x00f3; hidKey.androidCode = 0x0056; hidKey.keyWord = "MEDIA_STOP"; return hidKey;	
+hidKey.hidCode = 0x00f5; hidKey.androidCode = 0x005c; hidKey.keyWord = "PAGE_UP"; return hidKey;	
+hidKey.hidCode = 0x00f6; hidKey.androidCode = 0x005d; hidKey.keyWord = "PAGE_DOWN"; return hidKey;	
+hidKey.hidCode = 0x00f9; hidKey.androidCode = 0x001a; hidKey.keyWord = "POWER"; return hidKey;	
+hidKey.hidCode = 0x00fb; hidKey.androidCode = 0x00d2; hidKey.keyWord = "CALCULATOR"; return hidKey;	
+
+
+HID Generic Desktop Page (0x01)
+HID Usage	HID Usage Name	LKC	Linux Key Code Name	Version	AKC	Android Key Code Name	Notes
+0x01 0x0081; hidKey.androidCode = 0x001a; hidKey.keyWord = "POWER"; return hidKey;	
+0x01 0x0082; hidKey.androidCode = 0x001a; hidKey.keyWord = "POWER"; return hidKey;	
+0x01 0x0083; hidKey.androidCode = 0x001a; hidKey.keyWord = "POWER"; return hidKey; 	
+

@@ -8,7 +8,11 @@ webRemote = (function(){ //invoke anonymous self executing function
 //################
 //### Global Variables
 //################
-var _server = "ws://192.168.0.106:8080";
+//var _server = "ws://192.168.0.102:8080";
+var _server = "ws://192.168.0.235:81";
+var _masterBedroomBridge = "ws://192.168.0.219:81";
+var _livingRoomBridge = "ws://192.168.0.235:81";
+
 var _authToken = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiI1YmM0ZGYxNGY4ZGE0MTdkYTNhZjdkNjkwYzg0NDQ2ZSIsImlhdCI6MTYxMzAxMDQ4MiwiZXhwIjoxOTI4MzcwNDgyfQ.MffxNYX4VssITLgdZBPilKTq3p4R9RuoQP2yeeoyyPw';
 var _isKeyDown, _wasMapRecalled;
 var	_case, _filter, _map, _shortcuts, _zone, _category, _skin, _commands, _overlay, _menu;
@@ -56,21 +60,22 @@ console.log("Enter openConnection");
 //################
 //### publishNote
 //################
-function publishNote(author, title, content) {
-console.log(`Enter publishNote, author: ${author}, title: ${title}, content: ${content}`);
+function publishNote(pNote) {
+console.log(`Enter publishNote`);
 
 	if(!_isConnected) return console.log(`Abort: smartRemotes not connected`);
-
+/*
 	note = JSON.stringify({
 		'author': author,
-		'title': title,
-		'host': location.hostname,
+		'title': title,        
+  		'host': location.hostname,
 		'time': new Date().getTime(),
+        'settings': {'from': "webRemote", 'to': content.zone, 'keyWord': content.controlWord, 'keyModifier': parseInt(content.controlModifier)},
 		'content': content
 	});
-
+ */
+	note = JSON.stringify(pNote);
 	console.log(`Note: ${note}`);
-	
 	_socket.send(note);
 }
 
@@ -135,7 +140,15 @@ var name = option.getAttribute('name'), value = option.getAttribute('value'), la
 	case 'zone':
 		if(value == 'exit') break;
 		var skin = option.getAttribute('skin');
-	
+        
+        if(value == 'livingRoom')
+            _server = _livingRoomBridge
+        else
+            _server = _masterBedroomBridge
+        
+        console.log(`Server Address set to: ${_server}`);
+		openConnection();
+
 		_zone.setAttribute('value', value);
 		_zone.setAttribute('text', value);
 		_zone.innerHTML = value;
@@ -191,9 +204,16 @@ var buttons;
 function keyClicked(event) {
 var button = event.currentTarget;
 var keyCode = button.attributes['key'].nodeValue;
+var options = {};
+var keyModifer = 0;
+var deviceTargets = 0;
 
 	if(!keyCode) return;
-	
+	if(button.attributes['targets']) deviceTargets = button.attributes['targets'].nodeValue;
+	if(button.attributes['modifier']) options.keyModifer = button.attributes['modifier'].nodeValue;
+	if(button.attributes['duration']) options.keyDuration = button.attributes['duration'].nodeValue;
+	if(button.attributes['delay']) options.keyDelay = button.attributes['delay'].nodeValue;
+
 	//Simulate Button Press
 	if(button) {
 		button.setAttribute("pressed", "");
@@ -206,7 +226,16 @@ var keyCode = button.attributes['key'].nodeValue;
 	//Check for Open Menu
 	if(document.querySelector('Overlay[open]')) return closeMenu(keyCode);
 
-	publishNote('htmlNode', 'control device request', {'controlWord': keyCode, 'zone': _zone.getAttribute('value')});
+	publishNote({
+        'time'          : new Date().getTime(),
+        'source'        : 'webRemote',
+        'location'      : 'masterBedroom',
+        'targets'       : deviceTargets, //0-default, 1-blehubbridge, 2-usbhubbridge, 3-wshubbridge, 4-wsdevicebridge
+        'event'         : 'keyPressed',       
+        'settings'      : {'keyWord': keyCode},
+        'options'       : options,
+        'variables'     : {},
+    });
 };
 
 //################
@@ -240,7 +269,7 @@ console.log(`Enter loadCase, filePath: ${filePath}`);
 		openMenu();
 		break;
 	default:
-		openConnection();
+		//openConnection();
 		if(!filePath) getFile("/skin/case.htm", loadCase);
 		break;
 	};

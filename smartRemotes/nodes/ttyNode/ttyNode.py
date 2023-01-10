@@ -56,8 +56,7 @@ async def receivedNote(note):
             bytes(keyDownCommand)
         )
         
-        #if(keyDownCommand[1] == 3): return
-        return
+        if(keyDownCommand[1] == 3): return
         
         time.sleep(keyPressSecs)
         

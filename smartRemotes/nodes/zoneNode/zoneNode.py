@@ -33,14 +33,14 @@ def translateWord(controlWord, options):
 ##########################################
     try:
         if(controlWord == 'PowerToggle' and options.isFocusSet == True):
-            controlWord = 'On'
+            controlWord = 'PowerOn'
             options.isOn = True
             options.isFocusSet = False
             #print(f'controlWord translated to: {controlWord}')
             return controlWord
             
         if(controlWord == 'PowerToggle' and options.isFocusSet != True):
-            controlWord = 'Off'
+            controlWord = 'PowerOff'
             options.isOn = False
             options.isFocusSet = False
             #print(f'controlWord translated to: {controlWord}')
@@ -143,6 +143,8 @@ async def receivedNote(note):
         
         options = _zoneOptions[zone]
         controlWord = translateWord(controlWord, options)
+        print(f'Translated controlWord: {controlWord}')
+        
         if(options.isFocusSet): return setFocus(controlWord, zone)
         if(controlWord == 'Focus'): options.isFocusSet = True; print('Set Focus Flag'); return
         controlCommands = options.wordMap[options.controller].get(controlWord, [])

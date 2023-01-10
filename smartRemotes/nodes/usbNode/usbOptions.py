@@ -8,11 +8,11 @@
 
 usbBridge = {
     "zone"    : "masterBedroom",
-    "channels": "1,2,3,5",
+    "channels": "0,1,2,3",
 }
 
 wsClient = {
-    "endPoint": "ws://192.168.0.163:8080/",
+    "endPoint": "ws://192.168.0.102:8080/",
     "onConnection": "hubConnected",
     "onReceived": "receivedNote",
 }
@@ -40,6 +40,6 @@ scanCodeMap = {
     172: {"controlWord": "Home"},
     191: {"controlWord": "PowerToggle"},
     240: {"controlWord": "Focus"},
-    272: {"controlWord": "Home"},
+    272: {"controlWord": "Ok"},
     273: {"controlWord": "Back"},
 }

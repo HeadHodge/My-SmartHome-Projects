@@ -48,23 +48,23 @@ wordMap = {
         ],
         
         "Preset1": [
-            {'device': 'hassioNode', 'controlWord': 'Preset1', 'zone': 'livingRoom', 'focus': 'Media'}
+            {'device': 'hassioNode', 'controlWord': 'Preset1', 'zone': 'masterBedroom', 'focus': 'Media'}
         ],
         
         "Preset2": [
-            {'device': 'hassioNode', 'controlWord': 'Preset2', 'zone': 'livingRoom', 'focus': 'Media'}
+            {'device': 'hassioNode', 'controlWord': 'Preset2', 'zone': 'masterBedroom', 'focus': 'Media'}
         ],
         
         "Preset3": [
-            {'device': 'hassioNode', 'controlWord': 'Preset3', 'zone': 'livingRoom', 'focus': 'Media'}
+            {'device': 'hassioNode', 'controlWord': 'Preset3', 'zone': 'masterBedroom', 'focus': 'Media'}
         ],
         
         "Preset4": [
-            {'device': 'hassioNode', 'controlWord': 'Preset4', 'zone': 'livingRoom', 'focus': 'Media'}
+            {'device': 'hassioNode', 'controlWord': 'Preset4', 'zone': 'masterBedroom', 'focus': 'Media'}
         ],
         
         "Reset": [
-            {'device': 'hassioNode', 'controlWord': 'Reset', 'zone': 'livingRoom', 'focus': 'Media'}
+            {'device': 'hassioNode', 'controlWord': 'Reset', 'zone': 'masterBedroom', 'focus': 'Media'}
         ],
         
         "Backward": [
@@ -80,35 +80,31 @@ wordMap = {
         ],
         
         "Enter": [
-            {'device': 'hassioNode', 'controlWord': 'Enter', 'zone': 'livingRoom', 'focus': 'Media'}
+            {'device': 'hassioNode', 'controlWord': 'Enter', 'zone': 'masterBedroom', 'focus': 'Media'}
         ],
         
         "Stay": [
-            {'device': 'hassioNode', 'controlWord': 'Stay', 'zone': 'livingRoom', 'focus': 'Media'}
+            {'device': 'hassioNode', 'controlWord': 'Stay', 'zone': 'masterBedroom', 'focus': 'Media'}
         ],                
         
         "Exit": [
-            {'device': 'hassioNode', 'controlWord': 'Exit', 'zone': 'livingRoom', 'focus': 'Media'}
-        ],
-        
-        "Louder": [
-            {'device': 'irNode', 'controlWord': 'Louder', 'zone': 'livingRoom', 'focus': 'Media'}
+            {'device': 'hassioNode', 'controlWord': 'Exit', 'zone': 'masterBedroom', 'focus': 'Media'}
         ],
         
         "Softer": [
-            {'device': 'irNode', 'controlWord': 'Softer', 'zone': 'livingRoom', 'focus': 'Media'}
+            {'device': 'hassioNode', 'controlWord': 'Softer', 'zone': 'livingRoom', 'focus': 'Media'}
+        ],
+        
+        "Louder": [
+            {'device': 'hassioNode', 'controlWord': 'Louder', 'zone': 'livingRoom', 'focus': 'Media'}
         ],
                
         "Silence": [
-            {'device': 'irNode', 'controlWord': 'Silence', 'zone': 'livingRoom', 'focus': 'Media'}
+            {'device': 'hassioNode', 'controlWord': 'Silence', 'zone': 'livingRoom', 'focus': 'Media'}
         ],
                 
         "Sound": [
-            {'device': 'irNode', 'controlWord': 'Sound', 'zone': 'livingRoom', 'focus': 'Media'}
-        ],
-                
-        "SoundToggle": [
-            {'device': 'irNode', 'controlWord': 'SoundToggle', 'zone': 'livingRoom', 'focus': 'Media'}
+            {'device': 'hassioNode', 'controlWord': 'Sound', 'zone': 'livingRoom', 'focus': 'Media'}
         ],
                
         "Sleep": [
@@ -123,16 +119,18 @@ wordMap = {
             {'device': 'hassioNode', 'controlWord': 'Wake', 'zone': 'livingRoom', 'focus': 'Media'}
         ],
                 
+        "SoundToggle": [
+            {'device': 'hassioNode', 'controlWord': 'SoundToggle', 'zone': 'livingRoom', 'focus': 'Media'}
+        ],
+                
         "On": [
-            {'device': 'irNode', 'controlWord': 'On', 'zone': 'livingRoom', 'focus': 'Media'}
+            {'device': 'ttyNode', 'controlWord': 'On', 'zone': 'livingRoom', 'focus': 'Media'},
+            {'device': 'hassioNode', 'controlWord': 'On', 'zone': 'livingRoom', 'focus': 'Media'},
         ],
                 
         "Off": [
-            {'device': 'irNode', 'controlWord': 'Off', 'zone': 'livingRoom', 'focus': 'Media'}
-        ],
-                
-        "powerToggle": [
-            {'device': 'irNode', 'controlWord': 'powerToggle', 'zone': 'livingRoom', 'focus': 'Media'}
+             {'device': 'ttyNode', 'controlWord': 'Off', 'zone': 'livingRoom', 'focus': 'Media'},
+             {'device': 'hassioNode', 'controlWord': 'Off', 'zone': 'livingRoom', 'focus': 'Media'},
         ],
     },
 }

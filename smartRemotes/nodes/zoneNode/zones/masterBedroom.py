@@ -91,50 +91,45 @@ wordMap = {
             {'device': 'hassioNode', 'controlWord': 'Exit', 'zone': 'masterBedroom', 'focus': 'Media'}
         ],
         
-        "Louder": [
-            {'device': 'irNode', 'controlWord': 'Louder', 'zone': 'masterBedroom', 'focus': 'Media'}
+        "Softer": [
+            {'device': 'hassioNode', 'controlWord': 'Softer', 'zone': 'masterBedroom', 'focus': 'Media'}
         ],
         
-        "Softer": [
-            {'device': 'irNode', 'controlWord': 'Softer', 'zone': 'masterBedroom', 'focus': 'Media'}
+        "Louder": [
+            {'device': 'hassioNode', 'controlWord': 'Louder', 'zone': 'masterBedroom', 'focus': 'Media'}
         ],
                
         "Silence": [
-            {'device': 'irNode', 'controlWord': 'Silence', 'zone': 'masterBedroom', 'focus': 'Media'}
+            {'device': 'hassioNode', 'controlWord': 'Silence', 'zone': 'masterBedroom', 'focus': 'Media'}
         ],
                 
         "Sound": [
-            {'device': 'irNode', 'controlWord': 'Sound', 'zone': 'masterBedroom', 'focus': 'Media'}
+            {'device': 'hassioNode', 'controlWord': 'Sound', 'zone': 'masterBedroom', 'focus': 'Media'}
         ],
                 
         "SoundToggle": [
-            {'device': 'irNode', 'controlWord': 'SoundToggle', 'zone': 'masterBedroom', 'focus': 'Media'}
+            {'device': 'hassioNode', 'controlWord': 'SoundToggle', 'zone': 'masterBedroom', 'focus': 'Media'}
         ],
-                
-        "Relax": [
-            {'device': 'hassioNode', 'controlWord': 'Relax', 'zone': 'masterBedroom', 'focus': 'Media'}
+                 
+        "PowerOff": [
+            {'device': 'hassioNode', 'controlWord': 'PowerOff', 'zone': 'masterBedroom', 'focus': 'Media'}
+        ],
+                 
+        "PowerOn": [
+            {'device': 'hassioNode', 'controlWord': 'PowerOn', 'zone': 'masterBedroom', 'focus': 'Media'}
         ],
                
         "Sleep": [
-            {'device': 'irNode', 'controlWord': 'Sleep', 'zone': 'masterBedroom', 'focus': 'Media'},
             {'device': 'hassioNode', 'controlWord': 'Sleep', 'zone': 'masterBedroom', 'focus': 'Media'}
+        ],
+               
+        "Relax": [
+            {'device': 'hassioNode', 'controlWord': 'Relax', 'zone': 'masterBedroom', 'focus': 'Media'}
         ],
                 
         "Wake": [
             {'device': 'hassioNode', 'controlWord': 'Wake', 'zone': 'masterBedroom', 'focus': 'Media'}
         ],
-               
-        "On": [
-            {'device': 'irNode', 'controlWord': 'On', 'zone': 'masterBedroom', 'focus': 'Media'},
-        ],
-                
-        "Off": [
-            {'device': 'irNode', 'controlWord': 'Off', 'zone': 'masterBedroom', 'focus': 'Media'}
-        ],
-                 
-        "PowerToggle": [
-            {'device': 'irNode', 'controlWord': 'PowerToggle', 'zone': 'masterBedroom', 'focus': 'Media'}
-        ],
-    },
+    }
 }
     

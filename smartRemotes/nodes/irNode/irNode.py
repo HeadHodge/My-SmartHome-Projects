@@ -27,22 +27,26 @@ async def receivedNote(note):
         
         # validate zone
         zone = note['content'].get('zone', None)
-        if(zone == None): return print(f'Abort receivedNote, invalid zone: {zone}')
+        if(zone == None):
+            return print(f'Abort receivedNote, invalid zone: {zone}')
         
         # validate controlWord
         controlWord = note['content'].get('controlWord', None)
-        if(controlWord == None): return print(f'Abort receivedNote, invalid controlWord: {controlWord}')
+        if(controlWord == None):
+            return print(f'Abort receivedNote, invalid controlWord: {controlWord}')
         
         # validate controlMap
         if(_zones.get(zone, None) == None): _zones[zone] = importlib.import_module(zone)
         if(_zones.get(zone, None) == None): return print(f'Abort receivedNote, invalid zone: {zone}')
 
-        # validate commands
-        commands = _zones[zone].wordMap.get(controlWord, None)
-        if(commands == None): return print(f'Abort commands, invalid commands for {controlWord}')
-
-        print(f'send irCommand: {controlWord}')
-        await irBridge.deliverCommand(irOptions.irBridge['connection'], commands[0]["irCommand"])
+        # validate commandOptions
+        commandOptions = _zones[zone].wordMap.get(controlWord, None)
+        if(commandOptions == None):
+            return print(f'Abort commandOptions, invalid commandOptions for {controlWord}')
+        
+        await irBridge.deliverCommand(
+            commandOptions[0]['rawFile'],
+        )
         
     except:
         print('Abort receivedNote: ', sys.exc_info()[0])
@@ -68,17 +72,6 @@ async def hubConnected():
     except:
         print('Abort hubConnected: ', sys.exc_info()[0])
         traceback.print_exc()
-
-#############################################
-async def bridgeConnected(connection):
-#############################################
-    try:
-        print(f' \n***bridgeConneced')
-        
-        irOptions.irBridge['connection'] = connection
-    except:
-        print('Abort bridgeConneced: ', sys.exc_info()[0])
-        traceback.print_exc()
    
 #############################################
 def start():
@@ -95,17 +88,18 @@ def start():
             print('Abort wsClient: ', sys.exc_info()[0])
             traceback.print_exc()
         
-        time.sleep(3)
+        time.sleep(1)
        
-        # Start irBridge module
+        '''
+        # Start ttyBridge module
         try:            
-            irOptions.irBridge['onConnect'] = bridgeConnected
-            threading.Thread(target=irBridge.start, args=(irOptions.irBridge,)).start()
+            threading.Thread(target=ttyBridge.start, args=(ttyOptions.ttyBridge,)).start()
         except:
-            print('Abort irBridge: ', sys.exc_info()[0])
+            print('Abort ttyBridge: ', sys.exc_info()[0])
             traceback.print_exc()
         
         time.sleep(1)
+        '''
     except:
         print('Abort irNode: ', sys.exc_info()[0])
         traceback.print_exc()

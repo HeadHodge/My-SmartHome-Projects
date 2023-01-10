@@ -13,7 +13,8 @@ sys.path.append(path)
 
 from aioharmony.harmonyapi import HarmonyAPI, SendCommandDevice
 from aioharmony.const import ClientCallbackType, WEBSOCKETS, XMPP
-import wsClient, aioharmony.__main__ as harmonyHub, harmonyOptions, noteTool
+import wsClient, noteTool, harmonyOptions
+import aioharmony.__main__ as harmonyHub
 
 _hubOptions = {}
 
@@ -103,15 +104,26 @@ async def receivedNote(note, connection):
 #############################################
 async def hubConnected(connection):
 #############################################
-    print(f' \n***hubConnected')
-    note = noteTool.publishNote('harmonyNode', 'subscribe', {
-        'title': 'control harmonyHub request'
-    })
-    
-    await wsClient.deliverNote(note, connection)
-    
-    print(f' \n***Wait for \'{note["content"]["title"]}\' notes...')
-    print(f'*********************************************************')
+    try:
+        print(f' \n***hubConnected')
+            
+        if hasattr(harmonyOptions, 'noteFilter'):
+            filter = harmonyOptions.noteFilter
+        else:
+            filter = {}
+
+        note = noteTool.publishNote('harmonyNode', 'subscribe', {
+            'title': 'control harmonyHub request',
+            'filter': filter
+        })
+        
+        await wsClient.deliverNote(connection, note)
+        
+        print(f' \n***Wait for \'{note["content"]["title"]}\' notes...')
+        print(f'*********************************************************')
+    except:
+        print('Abort hubConnected: ', sys.exc_info()[0])
+        traceback.print_exc()
     
 #############################################
 ##                MAIN
