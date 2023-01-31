@@ -11,32 +11,44 @@
 #include <ArduinoJson.h>  // Install from IDE Library manager
 
 #include <BleHidBridge.h>
-//#include <UsbHidBridge.h>
+//#include <UsbHidBridge.h> esp32-c3 doesnt support USB
 #include <WsJsonBridge.h>
 #include <WsHassioBridge.h>
+#include <UsbSerialBridge.h>
 #include <MinionTools.h>
 
 const char* ssid     = "WAP-IOT";
 const char* password = "Pin#92109";
+const int maxMessage = 512;
 
-char*receivedKey(DynamicJsonDocument& pKeyObj){
+char* receivedKey(DynamicJsonDocument& pKeyObj){
+  MinionTools::addLog("receivedKey, keyWord: %s, keyModifier: %i, source: %s, location: %s", (const char *)pKeyObj["required"]["keyWord"], (int)pKeyObj["options"]["keyModifier"], (const char *)pKeyObj["source"], (const char *)pKeyObj["location"]);
+  const char *keyWord = pKeyObj["required"]["keyWord"];
+  int targetDevices = 0;
+ 
+//Bit Flags keyModifier High Word selects Bridge//
+//bit0 0 Default
+//bit1 1 BleHubBridge
+//bit2 2 UsbHubBridge
+//bit4 4 WsHubBridge
+//bit8 8 WsDeviceBridge
+//MinionTools::addLog("targets %i", (pKeyObj["optional"]["targetDevices"] != nullptr));
 
-MinionTools::addLog("receivedKey Event, key: %s, modifier: %i, from: %s, to: %s", (const char *)pKeyObj["keyWord"], (int)pKeyObj["keyModifier"], (const char *)pKeyObj["from"], (const char *)pKeyObj["to"]);
-MinionTools::addLog("receivedKey Event, useAny: %i, useBle: %i, useWs: %i", (int)pKeyObj["keyModifier"] & 56, (int)pKeyObj["keyModifier"] & 8,(int)pKeyObj["keyModifier"] & 32);
-const char *keyWord = pKeyObj["keyWord"];
-  
-    if(((int)pKeyObj["keyModifier"] & 8) != 0) BleHubBridge::controlDevice(pKeyObj);
-    //if(((int)pKeyObj["keyModifier"] & 16) != 0) UsbHubBridge::controlDevice(pKeyObj);
-    if(((int)pKeyObj["keyModifier"] & 32) != 0) WsDeviceBridge::controlDevice(pKeyObj);
-    if(((int)pKeyObj["keyModifier"] & 56) == 0) BleHubBridge::controlDevice(pKeyObj); //default bridge
-
+    if(pKeyObj["optional"]["targetDevices"] != nullptr) targetDevices = (int)pKeyObj["optional"]["targetDevices"];
+    MinionTools::addLog("receivedKey, targets: %i, useBleHub: %i, useUsbHub: %i, useWsHub: %i, WsDevice: %i", targetDevices, targetDevices & 1, targetDevices & 2, targetDevices & 4, targetDevices & 8);
+     
+    if((targetDevices) == 0) BleHubBridge::controlDevice(pKeyObj); //default bridge
+    if((targetDevices & 1) != 0) BleHubBridge::controlDevice(pKeyObj);
+    //if((targetDevices & 2) != 0) UsbHubBridge::controlDevice(pKeyObj);
+    //if((targetDevices & 4) != 0) WsHubBridge::controlDevice(pKeyObj);
+    if((targetDevices & 8) != 0) WsDeviceBridge::controlDevice(pKeyObj);
     return "";
 }
 
 void setup()
 {
-    MinionTools::openLog(115200);
-    
+    UsbSerialBridge::open(115200);
+     
     MinionTools::addLog("%s", "Open BleHubBridge");
     BleHubBridge::openBridge("wsKeyboard-C3");
 
@@ -48,11 +60,13 @@ void setup()
 
     //MinionTools::addLog("%s", "Open UsbHubBridge");
     //UsbHubBridge::openBridge();
-}
+
+} //setup
 
 void loop()
 {
-    //MinionTools::addLog("%s", "wsKeyboard-S3::Loop");
     WsHubBridge::refreshBridge();
     WsDeviceBridge::refreshBridge();
+
+    UsbSerialBridge::refresh();
 }

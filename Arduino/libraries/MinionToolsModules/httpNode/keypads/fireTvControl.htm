@@ -1,0 +1,59 @@
+<head>
+<link rel="stylesheet" type="text/css" href="./style.css"  />
+
+<style>
+Skin.container {
+	margin-top: 20%;
+	margin-bottom: 50%;
+}
+</style>
+</head>
+
+<div class="row background1">
+ 	<div class="box"></div>
+	<div class="box button" key="Focus">Focus</div>
+	<div class="box"></div>
+</div>
+<div class="row background1">
+ 	<div class="box button" key="NAV_BACK" usage="consumer" targets=1>Back</div>
+	<div class="box button" key="NAV_HOME" usage="consumer" targets=1>Home</div>
+	<div class="box button" key="NAV_MENU" usage="consumer" targets=1>Menu</div>
+</div>
+<div class="row background2">
+	<div class="box"></div>
+	<div class="box button" key="NAV_UP" usage="consumer" targets=1>^</div>  
+	<div class="box"></div>
+</div>
+<div class="row background2">
+	<div class="box button" key="NAV_LEFT" usage="consumer" targets=1><</div>
+	<div class="box button" key="NAV_SELECT" usage="consumer" targets=1>OK</div>  
+	<div class="box button" key="NAV_RIGHT" usage="consumer" targets=1>></div>
+</div>
+<div class="row background2">
+	<div class="box"></div>
+	<div class="box button" key="NAV_DOWN" usage="consumer" targets=1>v</div>  
+	<div class="box"></div>
+</div>
+<div class="row background1">
+	<div class="box button" key="VOLUME_DOWN" usage="consumer" targets=8>Volume -</div>
+	<div class="box button" key="VOLUME_MUTE" usage="consumer" targets=8>Mute</div>  
+	<div class="box button" key="VOLUME_UP" usage="consumer" targets=8>Volume +</div>
+</div>
+<div class="row background1">
+	<div class="box button" key="MEDIA_REVERSE" usage="consumer" targets=1><< Rewind</div>
+	<div class="box button" key="MEDIA_PLAY" usage="consumer" targets=1>Play/Pause >||</div>
+	<div class="box button" key="MEDIA_FORWARD" usage="consumer" targets=1>Forward >></div>
+</div>
+
+<script>
+alert('fetch');
+
+  const myRequest = new Request(`test.txt`, {mode: 'no-cors'});
+  fetch(myRequest)
+    .then((response) => response.text())
+    .then((text) => {
+      console.log = text;
+    });
+  
+</script>
+  

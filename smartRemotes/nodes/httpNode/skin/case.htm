@@ -259,7 +259,7 @@ Commands .button {
    
 	<Commands class="row commands">
 		<div class="button" key="[">INPUT</div>  
-		<div class="button" key="POWER" targets=8>I/0</div>  
+		<div class="button" key required='{"keyWord": "DEVICE_POWER"}',  optional='{"keyMap": "consumer", "targetDevices": 8}'>I/0</div>  
 	</Commands>
 </Case>
 

@@ -99,8 +99,45 @@ HID Usage	HID Usage Name	LKC	Linux Key Code Name	Version	AKC	Android Key Code Na
     {"DPAD_LEFT",  {"keyboard", 0, 0x0050, "DPAD_LEFT", "{}", 5, 5, 0x0015}}, 
     {"DPAD_DOWN",  {"keyboard", 0, 0x0051, "DPAD_DOWN", "{}", 5, 5, 0x0014}}, 
     {"DPAD_UP",  {"keyboard", 0, 0x0052, "DPAD_UP", "{}", 5, 5, 0x0013}},
+
+
     
-    {"word",  {"keyboard", 0, 0x0000, "word", "{}", 5, 5, 0x0000}}, 
+    KEYMAP {{0x52,"UP"},{0x51,"DOWN"},{0x50,"LEFT"},{0x4f,"RIGHT"},
+           {0x21,"VOICE"},{0x66,"POWER"},{0xf1,"BACK"},{0x23,"HOME"},
+           {0x40,"MENU"},{0xb4,"REWIND"},{0xcd,"PLAY_PAUSE"},{0xb3,"FAST_FORWARD"},
+           {0xe9,"VOL_UP"},{0xea,"VOL_DOWN"},{0xe2,"MUTE"}, {0x58,"ENTER"}}; 
+    
+    {"NAV_RIGHT",  {"keyboard", 0, 0x004f, "DPAD_RIGHT", "{}", 5, 5, 0x0016}}, 
+    {"NAV_LEFT",  {"keyboard", 0, 0x0050, "DPAD_LEFT", "{}", 5, 5, 0x0015}}, 
+    {"NAV_DOWN",  {"keyboard", 0, 0x0051, "DPAD_DOWN", "{}", 5, 5, 0x0014}}, 
+    {"NAV_UP",  {"keyboard", 0, 0x0052, "DPAD_UP", "{}", 5, 5, 0x0013}},
+    {"NAV_SELECT",  {"keyboard", 0, 0x0058, "KEYCODE_NUMPAD_ENTER", "{}", 5, 5, 0x0000}}, 
+    {"NAV_HOME",  {"keyboard", 0, 0x0023, "KEY_6", "{}", 5, 5, 0x0000}}, 
+    {"NAV_BACK",  {"keyboard", 0, 0x00f1, "KEY_BACK", "{}", 5, 5, 0x0000}}, 
+    {"NAV_MENU",  {"keyboard", 0, 0x0040, "KEYCODE_F7", "{}", 5, 5, 0x0000}}, 
+    {"VOLUME_MUTE",  {"keyboard", 0, 0x00e2, "KEY_LEFTALT", "{}", 5, 5, 0x0000}}, 
+    {"VOLUME_UP",  {"keyboard", 0, 0x00e9, "KEYCODE_MEDIA_STOP", "{}", 5, 5, 0x0000}}, 
+    {"VOLUME_DOWN",  {"keyboard", 0, 0x00ea, "KEYCODE_MEDIA_PREVIOUS", "{}", 5, 5, 0x0000}}, 
+    {"MEDIA_PLAYTOGGLE",  {"keyboard", 0, 0x00cd, "Keypad Space", "{}", 5, 5, 0x0000}}, 
+    {"MEDIA_REVERSE",  {"keyboard", 0, 0x00b4, "Currency Unit", "{}", 5, 5, 0x0000}}, 
+    {"MEDIA_FORWARD",  {"keyboard", 0, 0x00b3, "Decimal Separator", "{}", 5, 5, 0x0000}}, 
+    {"VOICE_QUERY",  {"keyboard", 0, 0x0021, "KEY_4", "{}", 5, 5, 0x0000}}, 
+    {"DEVICE_POWERTOGGLE",  {"keyboard", 0, 0x0066, "KEY_POWER", "{}", 5, 5, 0x0000}}, 
+
+
+0x07 	Keyboard 4 and $	0x0005		1.6	0x000b	
+0x07 	Keyboard Power	0x0074		1.6	0x001a	KEYCODE_POWER
+0x07 	Keyboard 6 and ^	0x0007		1.6	0x000d	KEYCODE_6
+0x07 		0x009e		1.6	0x0004	KEYCODE_BACK
+0x07 	Keyboard F7	0x0041		3.0	0x0089	
+0x07 	Keypad Space	
+0x07 	Currency Unit	
+0x07 	Decimal Separator	
+0x07 	Keyboard Left Alt	0x0038		1.6	0x0039	KEYCODE_ALT_LEFT	
+0x07 		0x00a6	KEY_STOPCD	3.0	0x0056	
+0x07 		0x00a5	KEY_PREVIOUSSONG	3.0	0x0058	
+0x07 	Keypad ENTER	0x0060	KEY_KPENTER	3.0	0x00a0		
+
 
 HID Keyboard and Keypad Page (hidKey.hidCode = 0x07)
 HID Usage	HID Usage Name	LKC	Linux Key Code Name	Version	AKC	Android Key Code Name	Notes

@@ -10,34 +10,35 @@ Skin.container {
 	<div class="box"></div>
 </div>
 <div class="row background1">
- 	<div class="box button" key="BACK" targets=1>Back</div>
-	<div class="box button" key="HOME" targets=1>Home</div>
-	<div class="box button" key="MENU" targets=1>Menu</div>
+ 	<div class="box button" key required='{"keyWord": "NAV_BACK"}', optional='{"keyMap": "consumer", "targetDevices": 1}'>Back</div>
+	<div class="box button" key required='{"keyWord": "NAV_HOME"}', optional='{"keyMap": "consumer", "targetDevices": 1}'>Home</div>
+	<div class="box button" key required='{"keyWord": "NAV_MENU"}', optional='{"keyMap": "consumer", "targetDevices": 1}'>Menu</div>
 </div>
 <div class="row background2">
 	<div class="box"></div>
-	<div class="box button" key="DPAD_UP" targets=1>^</div>  
+	<div class="box button" key required='{"keyWord": "NAV_UP"}', optional='{"keyMap": "consumer", "targetDevices": 1}'>^</div>  
 	<div class="box"></div>
 </div>
 <div class="row background2">
-	<div class="box button" key="DPAD_LEFT" targets=1><</div>
-	<div class="box button" key="ENTER">OK</div>  
-	<div class="box button" key="DPAD_RIGHT" targets=1>></div>
+	<div class="box button" key required='{"keyWord": "NAV_LEFT"}',   optional='{"keyMap": "consumer", "targetDevices": 1}'><</div>
+	<div class="box button" key required='{"keyWord": "NAV_SELECT"}', optional='{"keyMap": "consumer", "targetDevices": 1}'>OK</div>  
+	<div class="box button" key required='{"keyWord": "NAV_RIGHT"}',  optional='{"keyMap": "consumer", "targetDevices": 1}'>></div>
 </div>
 <div class="row background2">
 	<div class="box"></div>
-	<div class="box button" key="DPAD_DOWN" targets=1>v</div>  
+	<div class="box button" key required='{"keyWord": "NAV_DOWN"}', optional='{"keyMap": "consumer", "targetDevices": 1}'>v</div>  
 	<div class="box"></div>
 </div>
 <div class="row background1">
-	<div class="box button" key="VOLUME_DOWN" targets=8>Volume -</div>
-	<div class="box button" key="VOLUME_MUTE" targets=8>Mute</div>  
-	<div class="box button" key="VOLUME_UP" targets=8>Volume +</div>
+	<div class="box button" key required='{"keyWord": "VOLUME_DOWN"}', optional='{"keyMap": "consumer", "targetDevices": 8}'>Volume -</div>
+	<div class="box button" key required='{"keyWord": "VOLUME_MUTE"}', optional='{"keyMap": "consumer", "targetDevices": 8}'>Mute</div>  
+	<div class="box button" key required='{"keyWord": "VOLUME_UP"}',   optional='{"keyMap": "consumer", "targetDevices": 8}'>Volume +</div>
 </div>
 <div class="row background1">
-	<div class="box button" key="MEDIA_REWIND" targets=1><< Rewind</div>
-	<div class="box button" key="MEDIA_PLAY_PAUSE" targets=1>Play/Pause >||</div>
-	<div class="box button" key="MEDIA_FAST_FORWARD" duration=500 targets=1>Forward >></div>
+	<div class="box button" key required='{"keyWord": "MEDIA_REVERSE"}', optional='{"keyMap": "consumer", "targetDevices": 1}'><< Rewind</div>
+	<div class="box button" key required='{"keyWord": "MEDIA_PLAY"}',    optional='{"keyMap": "consumer", "targetDevices": 1}'>Play/Pause >||</div>
+	<div class="box button" key required='{"keyWord": "MEDIA_FORWARD"}', optional='{"keyMap": "consumer", "targetDevices": 1}'>Forward >></div>
 </div>
+
 
   

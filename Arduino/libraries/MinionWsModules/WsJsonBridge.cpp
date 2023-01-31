@@ -23,8 +23,6 @@ bool isConnected = false;
 DynamicJsonDocument messageObj(512);
 
 char *messageReceived(unsigned char *pMessageJson){
-    MinionTools::addLog("%s", "WsJsonBridge::messageReceived");
-       
     deserializeJson(messageObj, pMessageJson);
       
     if(messageObj["event"] == nullptr) {
@@ -37,18 +35,18 @@ char *messageReceived(unsigned char *pMessageJson){
         return "";
     }
    
-    if(messageObj["settings"] == nullptr) {
-        MinionTools::addLog("%s", "WsJsonBridge::messageReceived Abort: 'settings' values missing in message");
+    if(messageObj["required"] == nullptr) {
+        MinionTools::addLog("%s", "WsJsonBridge::messageReceived Abort: 'required' values missing in message");
         return "";
     }
    
-    if(messageObj["settings"]["keyWord"] == nullptr) {
-        MinionTools::addLog("%s", "WsJsonBridge::messageReceived Abort: 'settings.keyWord' value missing in message");
+    if(messageObj["required"]["keyWord"] == nullptr) {
+        MinionTools::addLog("%s", "WsJsonBridge::messageReceived Abort: 'required.keyWord' value missing in message");
         return "";
     }
     
-    if(messageObj["options"] == nullptr) {
-        MinionTools::addLog("%s", "WsJsonBridge::messageReceived Abort: 'options' values missing in message");
+    if(messageObj["optional"] == nullptr) {
+        MinionTools::addLog("%s", "WsJsonBridge::messageReceived Abort: 'optional' values missing in message");
         return "";
     }
     
@@ -56,9 +54,7 @@ char *messageReceived(unsigned char *pMessageJson){
     
     if(messageObj["location"] == nullptr) messageObj["location"] = "";
     
-    if(messageObj["targets"] == nullptr) messageObj["targets"] = 0;
-    
-    if(messageObj["options"]["keyModifier"] == nullptr) messageObj["options"]["keyModifier"] = 0;
+    //if(messageObj["targets"] == nullptr) messageObj["targets"] = 0;
     
     receivedKey(messageObj);
     return "";

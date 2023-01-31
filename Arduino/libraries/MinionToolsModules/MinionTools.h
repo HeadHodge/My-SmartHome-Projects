@@ -4,21 +4,12 @@
 #include <ArduinoJson.h>  // Install from IDE Library manager
 
 namespace MinionTools
-{   
-    struct hidKey {
-        const char* keyUsage; // 1-keyboard, 2-consuner, 3-mouse
-        int         keyModifier;
-        int         keyCode;
-        const char* keyWord;
-        const char* keyData;
-        int         keyDuration;
-        int         keyDelay;
-        int         androidCode;
-    };
-  
-    hidKey lookupKeyWord(DynamicJsonDocument&);
-    void openLog(int);
+{
+    void lookupKeyWord(DynamicJsonDocument&, DynamicJsonDocument&);
     void addLog(const char*, ...);
+    void sendCommand(const char*);
+    void receivedCommand(const char*);
+    void getOptions(const char*, DynamicJsonDocument&);
 }
 
 #endif

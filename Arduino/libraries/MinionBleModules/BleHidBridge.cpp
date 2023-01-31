@@ -14,24 +14,24 @@ bool isBridgeConnected() {
 }
 
 void controlDevice(DynamicJsonDocument& pKeyObj) {    
-MinionTools::addLog("BleHidBridge::controlDevice with keyWord %s", (const char *)pKeyObj["settings"]["keyWord"]);
-MinionTools::hidKey deviceOptions;
+MinionTools::addLog("BleHidBridge::controlDevice with keyWord %s", (const char *)pKeyObj["required"]["keyWord"]);
+DynamicJsonDocument optionsObj(1024);
 
     if (BleHub::isHubConnected() == false) {
-        MinionTools::addLog("%s", "BleHidBridge::controlDevice Abrted: BleHub not Connected");
+        MinionTools::addLog("%s", "BleHidBridge::controlDevice Aborted: BleHub not Connected");
         return;
     }
     
-    deviceOptions = MinionTools::lookupKeyWord(pKeyObj);
-    MinionTools::addLog("BleHub::controlDevice keyWord: %s keyCode: 0x%X, duration: %i, delay: %i, usage: %s", deviceOptions.keyWord, deviceOptions.keyCode, deviceOptions.keyDuration, deviceOptions.keyDelay, deviceOptions.keyUsage);
+    MinionTools::lookupKeyWord(pKeyObj, optionsObj);
+    MinionTools::addLog("BleHidBridge::controlDevice: %s %i %i, %i, %i", (const char*)optionsObj["keyWord"], (int)optionsObj["keyCode"], (int)optionsObj["keyModifier"], (int)optionsObj["keyDuration"], (int)optionsObj["keyDelay"]);
     
-    if(deviceOptions.keyCode == 0)
+    if((int)optionsObj["keyCode"] == 0)
     {
-        MinionTools::addLog("BleHidBridge::controlDevice Abort: Invalid keyWord '%s'", (const char *)pKeyObj["settings"]["keyWord"]);
+        MinionTools::addLog("BleHidBridge::controlDevice Abort: Invalid keyWord '%s'", (const char *)pKeyObj["required"]["keyWord"]);
         return;
     }
 
-    BleHub::controlDevice(&deviceOptions);
+    BleHub::controlDevice(optionsObj);
 }
 
 void openBridge(const char *pDeviceName) {

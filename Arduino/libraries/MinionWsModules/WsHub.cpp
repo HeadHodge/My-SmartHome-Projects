@@ -101,6 +101,8 @@ void openHub(callBack pCallBack)
         delay(500);
         Serial.print(".");
     }
+    
+    WiFi.setAutoReconnect(true);
 
     MinionTools::addLog("%s", "");
     MinionTools::addLog("WsHub::openHub Connected to wifi AP: '%s', IP address: %s", ssid, WiFi.localIP().toString());

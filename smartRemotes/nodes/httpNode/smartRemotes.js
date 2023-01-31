@@ -10,11 +10,13 @@ webRemote = (function(){ //invoke anonymous self executing function
 //################
 //var _server = "ws://192.168.0.102:8080";
 var _server = "ws://192.168.0.235:81";
-var _masterBedroomBridge = "ws://192.168.0.219:81";
+var _masterBedroomBridge = "ws://192.168.0.214:81";
 var _livingRoomBridge = "ws://192.168.0.235:81";
+var _tvRoomBridge = "ws://192.168.0.241:81";
 
 var _authToken = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiI1YmM0ZGYxNGY4ZGE0MTdkYTNhZjdkNjkwYzg0NDQ2ZSIsImlhdCI6MTYxMzAxMDQ4MiwiZXhwIjoxOTI4MzcwNDgyfQ.MffxNYX4VssITLgdZBPilKTq3p4R9RuoQP2yeeoyyPw';
 var _isKeyDown, _wasMapRecalled;
+var _mouseDownTime=0, _mouseUpTime=0;
 var	_case, _filter, _map, _shortcuts, _zone, _category, _skin, _commands, _overlay, _menu;
 var _socket, _isConnected;
 var _socket = undefined;
@@ -118,10 +120,16 @@ var Skin = document.querySelector('Skin.container');
 
 		for(var button = 0; button < keys.length; button++) {
 			keys[button].addEventListener("click", keyClicked);
+        
+            keys[button].addEventListener("mousedown", function(event) {
+                _mouseDownTime = new Date().getTime();
+            });
+        
+            keys[button].addEventListener("mouseup", function(event) {
+                _mouseUpTime = new Date().getTime();
+            });
 		};
-
-		break;
-	};
+    };
 };
 
 //################
@@ -143,6 +151,8 @@ var name = option.getAttribute('name'), value = option.getAttribute('value'), la
         
         if(value == 'livingRoom')
             _server = _livingRoomBridge
+        else if(value == 'tvRoom')
+            _server = _tvRoomBridge
         else
             _server = _masterBedroomBridge
         
@@ -203,39 +213,59 @@ var buttons;
 //################
 function keyClicked(event) {
 var button = event.currentTarget;
-var keyCode = button.attributes['key'].nodeValue;
-var options = {};
-var keyModifer = 0;
-var deviceTargets = 0;
+var keyChar = '';
+//var options = {};
+//var keyModifer = 0;
+//var deviceTargets = 0;
+var requiredSettings = {}, optionalSettings = {};
 
-	if(!keyCode) return;
-	if(button.attributes['targets']) deviceTargets = button.attributes['targets'].nodeValue;
-	if(button.attributes['modifier']) options.keyModifer = button.attributes['modifier'].nodeValue;
-	if(button.attributes['duration']) options.keyDuration = button.attributes['duration'].nodeValue;
-	if(button.attributes['delay']) options.keyDelay = button.attributes['delay'].nodeValue;
+    //alert(`${_mouseUpTime}, ${_mouseDownTime}, == ${_mouseUpTime - _mouseDownTime}`);
+    
+    if(button.attributes['key']) keyChar = button.attributes['key'].nodeValue;
 
-	//Simulate Button Press
-	if(button) {
-		button.setAttribute("pressed", "");
-		setTimeout(function(){button.removeAttribute("pressed");}, 200);
-	}
-	
 	//Check for Input Key
-	if(keyCode == '[') return openMenu();
+    if(keyChar == '[') return openMenu();
 
 	//Check for Open Menu
-	if(document.querySelector('Overlay[open]')) return closeMenu(keyCode);
+    //alert('*'+keyChar);
+    
+	if(document.querySelector('Overlay[open]')) return closeMenu(keyChar);
+
+    //alert(button.attributes['required'].nodeValue);
+    //alert(button.attributes['optional'].nodeValue);
+
+    if(button.attributes['required']) requiredSettings = JSON.parse(button.attributes['required'].nodeValue);
+    if(button.attributes['optional']) optionalSettings = JSON.parse(button.attributes['optional'].nodeValue);
+    optionalSettings.keyDuration = _mouseUpTime - _mouseDownTime;
+    
+    //if(requiredSettings.keyCode) keyCode = requiredSettings.keyCode;
+    
+	/*
+    if(button.attributes['duration']) options.keyDuration = button.attributes['duration'].nodeValue;
+	if(button.attributes['targets']) deviceTargets = button.attributes['targets'].nodeValue;
+	if(button.attributes['modifier']) options.keyModifer = button.attributes['modifier'].nodeValue;
+	if(button.attributes['delay']) options.keyDelay = button.attributes['delay'].nodeValue;
+	if(button.attributes['code']) options.keyCode = button.attributes['code'].nodeValue;
+	if(button.attributes['usage']) options.keyUsage = button.attributes['usage'].nodeValue;
+    */
+	
+    //if(!keyChar) return;
+   
 
 	publishNote({
         'time'          : new Date().getTime(),
         'source'        : 'webRemote',
         'location'      : 'masterBedroom',
-        'targets'       : deviceTargets, //0-default, 1-blehubbridge, 2-usbhubbridge, 3-wshubbridge, 4-wsdevicebridge
         'event'         : 'keyPressed',       
-        'settings'      : {'keyWord': keyCode},
-        'options'       : options,
-        'variables'     : {},
+        //'targets'       : optionalSettings.deviceTargets, //0-default, 1-blehubbridge, 2-usbhubbridge, 3-wshubbridge, 4-wsdevicebridge
+        'required'      : requiredSettings,
+        'optional'      : optionalSettings,
     });
+    
+    //Simulate Button Press
+	//if(button) {
+	button.setAttribute("pressed", "");
+	setTimeout(function(){button.removeAttribute("pressed");}, 200);
 };
 
 //################

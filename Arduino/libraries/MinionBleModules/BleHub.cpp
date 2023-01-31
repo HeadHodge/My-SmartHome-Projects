@@ -13,9 +13,9 @@
 namespace BleHub
 {
 // Change the below values if desired
-#define BUTTON_PIN 2
-#define MESSAGE "h"
-#define DEVICE_NAME "ESP32-C3-MINI Keyboard"
+//#define BUTTON_PIN 2
+//#define MESSAGE "h"
+//#define DEVICE_NAME "ESP32-C3-MINI Keyboard"
 
 NimBLEHIDDevice* hid;
 NimBLECharacteristic* reportList[3];
@@ -163,59 +163,56 @@ bool isHubConnected() {
 }
 // Message (report) sent when a key is pressed or released
 
-void controlDevice(MinionTools::hidKey* pOptions) {
-    
-MinionTools::addLog("%s", "debug 100");
-delay(10);
-
-MinionTools::addLog("BleHub::controlDevice controlCode: 0x%X, duration: %i, delay: %i, usage: %s", pOptions->keyCode, pOptions->keyDuration, pOptions->keyDelay, pOptions->keyUsage);
-int reportId = -1;
-uint8_t* deviceReportAddress = NULL;
-int deviceReportSize = 0;
+void controlDevice(DynamicJsonDocument& pOptionsObj) {
+  MinionTools::addLog("BleHub::controlDevice keyCode: 0x%X, duration: %i, delay: %i, usage: %s", (int)pOptionsObj["keyCode"], (int)pOptionsObj["keyDuration"], (int)pOptionsObj["keyDelay"], (const char*)pOptionsObj["keyMap"]);
+  const char* keyMap = (const char*)pOptionsObj["keyMap"];
+  int reportId = -1;
+  uint8_t* deviceReportAddress = NULL;
+  int deviceReportSize = 0;
 
     if(isConnected == false) {
         MinionTools::addLog("%s", "BleHub::controlDevice ABORT: Gateway not connected.");
         return;
     };
     
-    if(pOptions->keyUsage == "keyboard") {
+    if(strcmp(keyMap, "keyboard") == 0) {
        //KEYBOARD REPORT
        reportId = 0;
        struct {
             uint8_t keyModifier; // bitmask: CTRL = 1, SHIFT = 2, ALT = 4
             uint8_t keyCode;
-        } report = {pOptions->keyModifier, pOptions->keyCode};
+        } report = {(int)pOptionsObj["keyModifier"], (int)pOptionsObj["keyCode"]};
         
         deviceReportAddress = (uint8_t*)&report;
         deviceReportSize = sizeof(report);
-        MinionTools::addLog("BleHub::controlDevice Send Keyboard Report, keyModifier: %i, keyCode: %i", report.keyModifier, report.keyCode);
+        MinionTools::addLog("BleHub::controlDevice Send Keyboard Report, keyModifier: %i, keyCode: 0x%X", report.keyModifier, report.keyCode);
 
-    } else if(pOptions->keyUsage == "consumer") {
+    } else if(strcmp(keyMap, "consumer") == 0) {
         //CONSUMER REPORT
         reportId = 1;
         struct {
             uint16_t keyCode; // two byte keycode
-        } report = {pOptions->keyCode};
+        } report = {(int)pOptionsObj["keyCode"]};
         
         deviceReportAddress = (uint8_t*)&report;
         deviceReportSize = sizeof(report);
-        MinionTools::addLog("BleHub::controlDevice Send Consumer Report, keyCode: %i", report.keyCode);
+        MinionTools::addLog("BleHub::controlDevice Send Consumer Report, keyCode: 0x%X", report.keyCode);
          
-    } else if(pOptions->keyUsage == "mouse") {       
+    } else if(strcmp(keyMap, "mouse") == 0) {       
         //MOUSE REPORT
         reportId = 2;
         struct mouseReport {
             uint8_t pressedButtons; // one byte buttoncode
             uint8_t xOffset;        // move mouse relative on X-sxis
             uint8_t yOffset;        // move mouse relative on Y-sxis
-        } report = { 0, 100, 100 }; //{pOptions->keyModifiers, pOptions->xOffset, pOptions->yOffset}; TODO
+        } report = { 0, 100, 100 }; //{(int)pOptionsObj["keyModifiers"], (int)pOptionsObj["xOffset"], (int)pOptionsObj["yOffset"]}; TODO
         
         deviceReportAddress = (uint8_t*)&report;
         deviceReportSize = sizeof(report);
-        MinionTools::addLog("BleHub::controlDevice Send Mouse Report, clickModifier: %i, xOffset: %i, yOffset: %i", 0, 100, 100);
+        MinionTools::addLog("BleHub::controlDevice Send Mouse Report, clickModifier: %i, xOffset: 0x%X, yOffset: 0x%X", 0, 100, 100);
         
     } else {
-        MinionTools::addLog("BleHub::controlDevice ABORT: Invalid keyUsage specified '%s'", pOptions->keyUsage);
+        MinionTools::addLog("BleHub::controlDevice ABORT: Invalid keyMap specified '%s'", keyMap);
         return;
     };
         
@@ -223,7 +220,7 @@ int deviceReportSize = 0;
     reportList[reportId]->setValue(deviceReportAddress, deviceReportSize);
     reportList[reportId]->notify();
 
-    delay(pOptions->keyDuration);
+    delay((int)pOptionsObj["keyDuration"]);
 
     // release all keys between two characters; otherwise two identical
     // consecutive characters are treated as just one key press
@@ -232,7 +229,7 @@ int deviceReportSize = 0;
     reportList[reportId]->setValue(deviceReportAddress, deviceReportSize);
     reportList[reportId]->notify();
 
-    delay(pOptions->keyDelay);
+    delay((int)pOptionsObj["keyDelay"]);
  }
  
 void openHub(const char *pDeviceName) {

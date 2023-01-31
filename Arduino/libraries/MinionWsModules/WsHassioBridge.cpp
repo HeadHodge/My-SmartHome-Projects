@@ -61,9 +61,9 @@ void refreshBridge() {
 }
 
 void controlDevice(DynamicJsonDocument& pKeyObj) {
-MinionTools::addLog("WsHassioBridge::controlDevice with keyWord: %s", (const char *)pKeyObj["settings"]["keyWord"]);
-char controlString[512];
-char keyString[512];
+  MinionTools::addLog("WsHassioBridge::controlDevice with keyWord: %s", (const char *)pKeyObj["required"]["keyWord"]);
+  char controlString[512];
+  char keyString[512];
 
     memset (controlString, 0, 512);
     memset (keyString, 0, 512);

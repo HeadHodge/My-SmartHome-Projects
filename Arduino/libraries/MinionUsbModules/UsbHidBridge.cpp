@@ -14,24 +14,24 @@ bool isBridgeConnected() {
 }
 
 void controlDevice(DynamicJsonDocument& pKeyObj) {    
-MinionTools::addLog("UsbHidBridge::controlDevice with keyWord %s", (const char *)pKeyObj["settings"]["keyWord"]);
-MinionTools::hidKey deviceOptions;
+MinionTools::addLog("UsbHidBridge::controlDevice with keyWord %s", (const char *)pKeyObj["required"]["keyWord"]);
+DynamicJsonDocument optionsObj(1024);
 
     if (UsbHub::isHubConnected() == false) {
         MinionTools::addLog("%s", "UsbHidBridge::controlDevice Abrted: UsbHub not Connected");
         return;
     }
     
-    deviceOptions = MinionTools::lookupKeyWord(pKeyObj);
-    MinionTools::addLog("UsbHidBridge::controlDevice keyWord: %s keyCode: 0x%X, duration: %i, delay: %i, usage: %s", deviceOptions.keyWord, deviceOptions.keyCode, deviceOptions.keyDuration, deviceOptions.keyDelay, deviceOptions.keyUsage);
+    MinionTools::lookupKeyWord(pKeyObj, optionsObj);    
+    MinionTools::addLog("UsbHidBridge::controlDevice: %s %i %i, %i, %i", (const char*)optionsObj["keyWord"], (int)optionsObj["keyCode"], (int)optionsObj["keyModifier"], (int)optionsObj["keyDuration"], (int)optionsObj["keyDelay"]);
     
-    if(deviceOptions.keyCode == 0)
+    if((int)optionsObj["keyCode"] == 0)
     {
-        MinionTools::addLog("UsbHidBridge::controlDevice Abort: Invalid keyWord '%s'", (const char *)pKeyObj["settings"]["keyWord"]);
+        MinionTools::addLog("UsbHidBridge::controlDevice Abort: Invalid keyCode '0x%X'", (int)optionsObj["keyCode"]);
         return;
     }
 
-    UsbHub::controlDevice(&deviceOptions);
+    UsbHub::controlDevice(optionsObj);
 }
 void openBridge() {
     UsbHub::openHub();

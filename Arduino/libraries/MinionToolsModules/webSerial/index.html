@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!-- Origin Trial Token, feature = WebUSB (For Chrome M57+), origin = https://webusb.github.io, expires = 2017-06-19 -->
+    <meta http-equiv="origin-trial" data-feature="WebUSB (For Chrome M57+)" data-expires="2017-06-19" content="Ag83MurQOa5N4SKRCqqtSlbycfe08s5LgUiqEI7J3jTk2NEIpRp7SLPz2i+EBDuXyf+AeRMdD6BI++kTSJmGzQEAAABReyJvcmlnaW4iOiJodHRwczovL3dlYnVzYi5naXRodWIuaW86NDQzIiwiZmVhdHVyZSI6IldlYlVTQjIiLCJleHBpcnkiOjE0OTc4OTM2OTV9">
+    <title>Console</title>
+    <script src="console.js"></script>
+  </head>
+  <body>
+    <p>
+      <label for="vid">VendorId:</label>
+      <input id="vid"type="text" name="vid" value="">
+      <label for="pid">ProductId:</label>
+      <input id="pid"type="text" name="pid" value="">
+      <button id="connect">Connect</button><br><br>
+      <label for="message">Message:</label>
+      <input id="message"type="text" name="message">
+      <button id="send">Send</button><br><br>
+      <button id="set">Set Option</button>
+    </p>
+    
+    <textarea id='log' rows=20 cols=100 wrap="soft" autofocus></textarea>
+  </body>
+</html>
