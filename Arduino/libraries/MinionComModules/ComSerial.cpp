@@ -1,11 +1,11 @@
 #define US_KEYBOARD 1
 #include <Arduino.h>
-#include <USB.h>
+//#include <USB.h>
 
 #include <minionTools.h>
-#include <usbCom.h>
+#include <ComSerial.h>
 
-namespace UsbCom
+namespace ComSerial
 {
 bool connectedFlg = false;
 
@@ -36,7 +36,7 @@ void open(int pBaud = 115200) {
     delay(10000);
     connectedFlg = true;
     
-    MinionTools::addLog("%s", "UsbCom::open UsbCom Now Open");
+    MinionTools::addLog("%s", "ComSerial::open ComSerial Now Open");
     delay(1000);
 }
 }

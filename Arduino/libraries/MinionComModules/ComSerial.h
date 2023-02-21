@@ -1,7 +1,7 @@
-#ifndef USBCOM_H
-#define USBCOM_H
+#ifndef COMSERIAL_H
+#define COMSERIAL_H
 
-namespace UsbCom
+namespace ComSerial
 {
     bool isConnected();
     void open(int baudRate);

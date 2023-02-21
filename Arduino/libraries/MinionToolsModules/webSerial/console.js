@@ -251,8 +251,9 @@ document.addEventListener('DOMContentLoaded', event => {
     send    = document.getElementById("send");
     set     = document.getElementById("set");
     
-    vid.value = '0x303A'  //unexpected manufacturing 
-    pid.value = '0x80D6' //featherS3
+    vid.value = '0x10C4'  //unexpected manufacturing 
+    pid.value = '0xEA60' //featherS3
+
     message.disabled = true;
     send.disabled = true;
     set.disabled = true;

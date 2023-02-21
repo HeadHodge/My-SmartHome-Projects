@@ -3,7 +3,7 @@
 #include <ArduinoJson.h>
 #include <Preferences.h>
 
-#include <UsbSerialBridge.h>
+#include <ComSerialBridge.h>
 #include <MinionTools.h>
 
 namespace MinionTools {
@@ -28,7 +28,7 @@ void addLog(const char* format, ...) {
     vsprintf(logBuffer, format, argptr);
     va_end(argptr);
 
-    UsbSerialBridge::logString(logBuffer);    
+    ComSerialBridge::logString(logBuffer);    
 };
 
 void getOptions(const char* pMemKey, DynamicJsonDocument& pOptions) {

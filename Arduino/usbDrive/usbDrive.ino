@@ -133,7 +133,7 @@ static uint8_t msc_disk[DISK_SECTOR_COUNT][DISK_SECTOR_SIZE] =
   README_CONTENTS
 };
 
-bool loadSD() {
+bool enableDrive() {
 
         if(!SD.begin()){
           Serial.println("SD Card Mount Failed");
@@ -166,6 +166,15 @@ bool loadSD() {
         //formatSD();
         listDir(SD, "/", 0);
 
+        MSC.vendorID("ESP32");//max 8 chars
+        MSC.productID("USB_MSC");//max 16 chars
+        MSC.productRevision("1.0");//max 4 chars
+        MSC.onStartStop(onStartStop);
+        MSC.onRead(onRead);
+        MSC.onWrite(onWrite);
+        MSC.mediaPresent(true);
+        MSC.begin(numSectors, sectorSize);
+    
         return true;
 };
 
@@ -205,6 +214,7 @@ static bool onStartStop(uint8_t power_condition, bool start, bool load_eject){
   delay(1000);
   Serial.println("usbCom::onStartStop: EJECTED SD Card");
 
+  enableDrive();
   return true;
 }
 
@@ -267,6 +277,7 @@ void listDir(fs::FS &fs, const char * dirname, uint8_t levels){
             Serial.print("  SIZE: ");
             Serial.println(file.size());
         }
+        
         file = root.openNextFile();
     }
 }
@@ -276,22 +287,13 @@ void setup() {
     //HWSerial.setDebugOutput(true);
     delay(5000);
 
-    loadSD();
+    enableDrive();
    
 //Open USB Devices
     USB.onEvent(usbEventCallback);
     USB.begin();
     
     USBSerial.begin(115200);
-  
-    MSC.vendorID("ESP32");//max 8 chars
-    MSC.productID("USB_MSC");//max 16 chars
-    MSC.productRevision("1.0");//max 4 chars
-    MSC.onStartStop(onStartStop);
-    MSC.onRead(onRead);
-    MSC.onWrite(onWrite);
-    MSC.mediaPresent(true);
-    MSC.begin(numSectors, sectorSize);
 }
 
 void loop() {

@@ -3,7 +3,7 @@
 
 #include <ArduinoJson.h>  // Install from IDE Library manager
 
-namespace UsbSerialBridge
+namespace ComSerialBridge
 {
     bool isOpen();
     void open(int baudRate);
