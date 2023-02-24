@@ -5,8 +5,7 @@
 #include <MinionTools.h>
 #include <UsbhostCDC.hpp>
 
-namespace UsbhostCDC
-{
+namespace UsbhostCDC {
 #define ACTION_NONE             0x00
 #define ACTION_CONNECTDEV       0x01
 #define ACTION_RESETDEV         0x02
@@ -14,22 +13,22 @@ namespace UsbhostCDC
 #define ACTION_ENABLESEND       0x04
 #define ACTION_SENDCMD          0x05
 
-#define EVENT_NONE              0x00
-#define EVENT_INSERTED          0x01
-#define EVENT_REMOVED           0x02
-#define EVENT_CONNECTED         0x03
-#define EVENT_DISCONNECTED      0x04
-#define EVENT_ENABLED           0x05
-#define EVENT_STARTED           0x06
-#define EVENT_STOPPED           0x07
-#define EVENT_OPENING           0x08
-#define EVENT_OPENED            0x09
-#define EVENT_SENDING           0x0a
-#define EVENT_SENT              0x0b
-#define EVENT_RESENT            0x0c
-#define EVENT_RECEIVING         0x0d
-#define EVENT_RECEIVED          0x0e
-#define EVENT_CONFIRMED         0x0f
+#define EVENT_NONE              0
+#define EVENT_INSERTED          1
+#define EVENT_REMOVED           2
+#define EVENT_CONNECTED         3
+#define EVENT_DISCONNECTED      4
+#define EVENT_ENABLED           5
+#define EVENT_STARTED           6
+#define EVENT_STOPPED           7
+#define EVENT_OPENING           8
+#define EVENT_OPENED            9
+#define EVENT_SENDING           10
+#define EVENT_SENT              11
+#define EVENT_RESENT            12
+#define EVENT_RECEIVING         13
+#define EVENT_RECEIVED          14
+#define EVENT_CONFIRMED         15
 
 #define TRANSFERTYPE_CTLIN      0x01
 #define TRANSFERTYPE_CTLOUT     0x02
@@ -37,10 +36,12 @@ namespace UsbhostCDC
 #define TRANSFERTYPE_DATAOUT    0x04
 //#define USB_EP_DESC_GET_MPS(desc_ptr) ((desc_ptr)->wMaxPacketSize & 0x7FF)
 
+void transferData(uint8_t pTranferType, uint8_t* pData, uint8_t pSize);
+
 struct usbClientInfo {
     uint8_t  action;    
     uint32_t event;
-    uint32_t state;    
+    uint32_t step;    
     uint32_t flags;
     
     uint8_t ctl_class;
@@ -67,12 +68,113 @@ struct usbClientInfo {
 };
 
 struct usbClientInfo _clientInfo = {0};
+void (*_statusCallback)(bool) = nullptr;
 esp_err_t _libErr;
 bool _isConnected = false;
+bool _isReady = false;
 
-void connectDevice(void* pClientInfo) {
-  MinionTools::addLog("%s", "clientTask connectDevice");
+/////////////////////////////////////////////////////////////////////////////////////////////////
+void getStringDescriptorData(const usb_str_desc_t *pStringDesc, uint8_t* pDataBuff, uint8_t pMaxSize) {
+    
+    if (pStringDesc == NULL || pDataBuff == nullptr) return;
+    uint8_t dataSize = pStringDesc->bLength/2;
+    if(dataSize > pMaxSize) dataSize = pMaxSize;
+    memset(pDataBuff, 0, pMaxSize);
+
+    uint8_t index = 0;
+    
+    for (int i = 0; i < dataSize; i++) {
+        /*
+        USB String descriptors of UTF-16.
+        Right now We just skip any character larger than 0xFF to stay in BMP Basic Latin and Latin-1 Supplement range.
+        */
+        
+        if (pStringDesc->wData[i] > 0xFF) continue; //skip non utf8 chars
+  
+        pDataBuff[index] = pStringDesc->wData[i];
+        ++index;
+        
+        //printf("%c", (char)pStringDesc->wData[i]);
+    }
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
+bool eventWatch(int pEvent, long pMaxMillisecs = 1000) {
+  MinionTools::addLog("%s, watchEvent: %i", "UsbhostCDC::eventWatch", pEvent);
+  long startMillisecs = millis();
+  
+    while(_clientInfo.event != pEvent) {
+        
+        if((millis() - startMillisecs) > pMaxMillisecs) {
+            MinionTools::addLog("UsbhostCDC::eventWatch ***ABORT***, eventWatch exceeded maxMillisecs: %l", pMaxMillisecs);
+            return false;
+        }
+        
+        usb_host_client_handle_events(_clientInfo.client_hdl, 1);
+        
+        if (usb_host_lib_handle_events(1, &_clientInfo.flags) != ESP_OK) continue;
+        MinionTools::addLog("UsbHostTest usb_host_lib_handle_events, flags: %i", _clientInfo.flags);
+    }
+    
+    return true;
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
+void transferCtlIn_cb(usb_transfer_t *pTransfer)
+{
+    MinionTools::addLog("***clientTask: %s, bytes: %i, data: %s", "transferCtlIn_cb::EVENT_RECEIVED ", pTransfer->actual_num_bytes, pTransfer->data_buffer);
+    transferData(TRANSFERTYPE_CTLIN, nullptr, 0);
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
+void transferDataIn_cb(usb_transfer_t *pTransfer)
+{
+    MinionTools::addLog("***clientTask: %s, bytes: %i, data: %s", "transferDataIn_cb::EVENT_RECEIVED ", pTransfer->actual_num_bytes, pTransfer->data_buffer);
+
+    transferData(TRANSFERTYPE_DATAIN, nullptr, 0); //Listen for input
+
+    _clientInfo.event = EVENT_RECEIVED;
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
+void transferDataOut_cb(usb_transfer_t *pTransfer)
+{
+    MinionTools::addLog("***transferDataOut_cb::EVENT_SENT, sentBytes: %i", pTransfer->actual_num_bytes);
+    
+    _clientInfo.event = EVENT_SENT;
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
+void allocBuffers() {
+    MinionTools::addLog("%s", "UsbHostCDC::allocBuffers"); 
+
+    // allocate dataIn buffer
+    _clientInfo.data_maxIn = 64;
+    _libErr = usb_host_transfer_alloc(_clientInfo.data_maxIn, 0, &_clientInfo.data_transferIn);
+    MinionTools::addLog("UsbHostCDC::allocBuffers, dataIn usb_host_transfer_alloc: %i", _libErr);  
+
+    _clientInfo.data_transferIn->num_bytes = _clientInfo.data_maxIn;
+    _clientInfo.data_transferIn->bEndpointAddress = _clientInfo.data_addrIn;
+    _clientInfo.data_transferIn->callback = transferDataIn_cb;
+    _clientInfo.data_transferIn->device_handle = _clientInfo.dev_hdl;
+    _clientInfo.data_transferIn->context = (void *)&_clientInfo;       
+
+    // allocate dataOut buffer
+    _clientInfo.data_maxOut = 200;            
+    _libErr = usb_host_transfer_alloc(_clientInfo.data_maxOut, 0, &_clientInfo.data_transferOut);
+    MinionTools::addLog("UsbHostCDC::allocBuffers, dataOut usb_host_transfer_alloc: %i", _libErr);  
+        
+    _clientInfo.data_transferOut->num_bytes = _clientInfo.data_maxOut;
+    _clientInfo.data_transferOut->device_handle = _clientInfo.dev_hdl;
+    _clientInfo.data_transferOut->bEndpointAddress = _clientInfo.data_addrOut;
+    _clientInfo.data_transferOut->callback = transferDataOut_cb;
+    _clientInfo.data_transferOut->context = (void *)&_clientInfo;
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
+bool connectDevice(void* pClientInfo) {
   struct usbClientInfo *clientInfo = (struct usbClientInfo *)pClientInfo;
+  MinionTools::addLog("UsbhostCDC::connectDevice, devAddr: %i", clientInfo->dev_addr);
     /*
     open device
         claim interface0 class 0x02
@@ -84,17 +186,31 @@ void connectDevice(void* pClientInfo) {
     
     //Open the device and claim interfaces
     _libErr = usb_host_device_open(clientInfo->client_hdl, clientInfo->dev_addr, &clientInfo->dev_hdl);
-    MinionTools::addLog("connectDevice, usb_host_device_open: %i", _libErr);  
+    MinionTools::addLog("UsbhostCDC::connectDevice, usb_host_device_open: %i", _libErr);  
 
     //Get device descriptors
     _libErr = usb_host_get_device_descriptor(clientInfo->dev_hdl, &clientInfo->dev_desc);
     MinionTools::addLog("connectDevice, usb_host_get_device_descriptor: %i", _libErr);  
-
-    _libErr = usb_host_get_active_config_descriptor(clientInfo->dev_hdl, &clientInfo->dev_config);
-    MinionTools::addLog("connectDevice, usb_host_get_active_config_descriptor: %i", _libErr);  
             
     _libErr = usb_host_device_info(clientInfo->dev_hdl, &clientInfo->dev_info);
-    MinionTools::addLog("connectDevice, usb_host_device_info: %i", _libErr);  
+    MinionTools::addLog("UsbhostCDC::connectDevice, usb_host_device_info: %i", _libErr);
+
+    _libErr = usb_host_get_active_config_descriptor(clientInfo->dev_hdl, &clientInfo->dev_config);
+    MinionTools::addLog("connectDevice, usb_host_get_active_config_descriptor: %i \n", _libErr);  
+
+    uint8_t strBuff[32] = {0};
+    
+    MinionTools::addLog("UsbhostCDC::connectDevice deviceInfo, bDeviceClass %i, bDeviceSubClass %i, idVendor %lu, idProduct %lu", clientInfo->dev_desc->bDeviceClass, clientInfo->dev_desc->bDeviceSubClass, clientInfo->dev_desc->idVendor, clientInfo->dev_desc->idProduct);
+    //MinionTools::addLog("UsbhostCDC::connectDevice deviceInfo, bDeviceClass %i, bDeviceSubClass %i, idVendor %l, idProduct %l, iManufacturer %s, iProduct %s, iSerialNumber %s", clientInfo->dev_desc->bDeviceClass, clientInfo->dev_desc->bDeviceSubClass, clientInfo->dev_desc->idVendor, clientInfo->dev_desc->idProduct, clientInfo->dev_desc->iManufacturer, clientInfo->dev_desc->iProduct, clientInfo->dev_desc->iSerialNumber);
+
+    getStringDescriptorData(clientInfo->dev_info.str_desc_manufacturer, &strBuff[0], sizeof(strBuff));
+    MinionTools::addLog("UsbhostCDC::connectDevice,str_desc_manufacturer: %s", strBuff);
+    
+    getStringDescriptorData(clientInfo->dev_info.str_desc_product, &strBuff[0], sizeof(strBuff));
+    MinionTools::addLog("UsbhostCDC::connectDevice,str_desc_product: %s", strBuff);
+    
+    getStringDescriptorData(clientInfo->dev_info.str_desc_serial_num, &strBuff[0], sizeof(strBuff));
+    MinionTools::addLog("UsbhostCDC::connectDevice,str_desc_serial_num: %s \n", strBuff); 
             
     //get endpoint addresses
     const usb_intf_desc_t *dev_intf;
@@ -138,49 +254,68 @@ void connectDevice(void* pClientInfo) {
         
     _libErr = usb_host_interface_claim(clientInfo->client_hdl, clientInfo->dev_hdl, 1, 0);
     MinionTools::addLog("connectDevice, usb_host_interface_claim 1: %i", _libErr);  
+    
+    allocBuffers();
 
+    // Start listening for dainput
     transferData(TRANSFERTYPE_DATAIN, nullptr, 0);
     MinionTools::addLog("connectDevice, %s \n", "listening for dataIn");  
-
-    //uint8_t ctlCmd[] = {80,6,0,1,0,0,12,0};
-    //transferData(TRANSFERTYPE_CTLIN, &ctlCmd[0], sizeof(ctlCmd));
-    //MinionTools::addLog("connectDevice, %s \n", "listening for ctlIn");
-
     
-    clientInfo->event = EVENT_CONNECTED;      
-    //MinionTools::addLog("connectDevice, Status: %s \n", "OPENED");      
+    clientInfo->event = EVENT_CONNECTED;
+    
+    uint8_t resetCmd[] = {0,0,0,0,0,115};
+    uint8_t openCmd[] = {37,3};
+    
+    transferData(TRANSFERTYPE_DATAOUT, &resetCmd[0], sizeof(resetCmd)); 
+    if(eventWatch(EVENT_RECEIVED) == false) return false;
+     
+    transferData(TRANSFERTYPE_DATAOUT, &openCmd[0], sizeof(openCmd));  
+    if(eventWatch(EVENT_SENT) == false) return false;
+       
+    MinionTools::addLog("connectDevice, Status: %s \n", "OPENED");      
+    _isReady = true;
+    if(_statusCallback != nullptr) _statusCallback(_isReady);
+    return true;
 }
 
-void transferCtlIn_cb(usb_transfer_t *pTransfer)
-{
-    //MinionTools::addLog("%s", "***clientTask transferCtlIn_cb");
-    MinionTools::addLog("***clientTask: %s, bytes: %i, data: %s", "transferCtlIn_cb", pTransfer->actual_num_bytes, pTransfer->data_buffer);
-    //_clientInfo.event = EVENT_RECEIVED;
-    transferData(TRANSFERTYPE_CTLIN, nullptr, 0);
+/////////////////////////////////////////////////////////////////////////////////////////////////
+void transferData(uint8_t pTranferType, uint8_t* pData, uint8_t pSize) {
+   
+    if(pTranferType == TRANSFERTYPE_DATAIN) {
+        MinionTools::addLog("%s, packetSize: %i", "UsbHostCDC::transferData, Type: dataIn", _clientInfo.data_maxIn);
+        memset(_clientInfo.data_transferIn->data_buffer, 0, _clientInfo.data_maxIn);
+
+        usb_host_transfer_submit(_clientInfo.data_transferIn);
+        MinionTools::addLog("%s", "UsbHostCDC::transferData EVENT_SENDING dataIn");
+        
+    } else if(pTranferType == TRANSFERTYPE_DATAOUT) {    
+        MinionTools::addLog("%s, packetSize: %i", "UsbHostCDC::transferData, Type: dataOut", pSize);
+        
+        if(pSize > _clientInfo.data_maxOut) pSize = _clientInfo.data_maxOut;
+        _clientInfo.data_transferOut->num_bytes = pSize;
+        memset(_clientInfo.data_transferOut->data_buffer, 0, _clientInfo.data_maxOut);
+        memcpy(_clientInfo.data_transferOut->data_buffer, pData, pSize);
+    
+        usb_host_transfer_submit(_clientInfo.data_transferOut);
+        _clientInfo.event = EVENT_SENDING;
+        MinionTools::addLog("%s", "UsbHostCDC::transferData EVENT_SENDING dataOut");
+        
+    } else if(pTranferType == TRANSFERTYPE_CTLIN) {
+        MinionTools::addLog("%s, packetSize: %i", "UsbHostCDC::transferData, Type: ctlIn", _clientInfo.ctl_maxIn);
+        memset(_clientInfo.ctl_transferIn->data_buffer, 0, _clientInfo.ctl_maxIn);
+
+        usb_host_transfer_submit(_clientInfo.ctl_transferIn);
+        MinionTools::addLog("%s", "UsbHostCDC::transferData Transferring ctlIn");
+    }    
 }
 
-void transferDataIn_cb(usb_transfer_t *pTransfer)
-{
-    //MinionTools::addLog("%s", "***clientTask transferDataIn_cb");
-    MinionTools::addLog("***clientTask: %s, bytes: %i, data: %s", "transferDataIn_cb", pTransfer->actual_num_bytes, pTransfer->data_buffer);
-    transferData(TRANSFERTYPE_DATAIN, nullptr, 0); //Listen for input
-    _clientInfo.event = EVENT_RECEIVED;
-}
-
-void transferDataOut_cb(usb_transfer_t *pTransfer)
-{
-    MinionTools::addLog("***clientTask::transferDataOut_cb, sentBytes: %i", pTransfer->actual_num_bytes);
-    _clientInfo.event = EVENT_SENT;
-    //transferDataIn();
-}
-
-void client_event_cb(const usb_host_client_event_msg_t *event_msg, void *pClientInfo)
-{
-    MinionTools::addLog("%s, event: %i \n", "clientTask client_event_cb", event_msg->event);
-    struct usbClientInfo *clientInfo = (struct usbClientInfo *)pClientInfo;
+/////////////////////////////////////////////////////////////////////////////////////////////////
+void client_event_cb(const usb_host_client_event_msg_t *event_msg, void *pClientInfo) {
+  MinionTools::addLog("%s, event: %i \n", "clientTask client_event_cb", event_msg->event);
+  struct usbClientInfo* clientInfo = (struct usbClientInfo *)pClientInfo;
    
     //This is function is called from within usb_host_client_handle_events(). Don't block and try to keep it short
-    
+   
     switch (event_msg->event) {
         case USB_HOST_CLIENT_EVENT_NEW_DEV: {
             MinionTools::addLog("client_event_cb: %s", "USB_HOST_CLIENT_EVENT_NEW_DEV");
@@ -188,156 +323,41 @@ void client_event_cb(const usb_host_client_event_msg_t *event_msg, void *pClient
             clientInfo->dev_addr = event_msg->new_dev.address; //Store the address of the new device
     
             clientInfo->event = EVENT_INSERTED;
+            connectDevice(clientInfo);
             break;
         }
+        
         case USB_HOST_CLIENT_EVENT_DEV_GONE: {
             MinionTools::addLog("client_event_cb: %s", "USB_HOST_CLIENT_EVENT_DEV_GONE");
+            
+            _libErr = usb_host_interface_release(clientInfo->client_hdl, clientInfo->dev_hdl, 0);
+            MinionTools::addLog("client_event_cb:disconnect, usb_host_interface_release 0: %i", _libErr);  
+        
+            _libErr = usb_host_interface_release(clientInfo->client_hdl, clientInfo->dev_hdl, 1);
+            MinionTools::addLog("client_event_cb:disconnect, usb_host_interface_release 1: %i", _libErr);  
+
+            _libErr = usb_host_transfer_free(_clientInfo.data_transferIn);
+            MinionTools::addLog("client_event_cb:disconnect, dataOut usb_host_transfer_release: %i", _libErr);  
+
+            _libErr = usb_host_transfer_free(_clientInfo.data_transferOut);
+            MinionTools::addLog("client_event_cb:disconnect, dataOut usb_host_transfer_release: %i", _libErr);  
+    
+            _libErr = usb_host_device_close(clientInfo->client_hdl, clientInfo->dev_hdl);
+            MinionTools::addLog("client_event_cb:disconnect, usb_host_device_close: %i", _libErr);  
+            
+            MinionTools::addLog("%s, DEVICE_REMOVED \n", "client_event_cb:disconnect");  
             clientInfo->event = EVENT_REMOVED;
             break;
         }
+        
         default:
             break;
     }
 }
 
-void transferData(uint8_t pTranferType, uint8_t* pData, uint8_t pSize) {
-     
-    if(pTranferType == TRANSFERTYPE_DATAIN) {
-        MinionTools::addLog("%s, packetSize: %i", "clientTask::transferData, Type: dataIn", _clientInfo.data_maxIn);
-        memset(_clientInfo.data_transferIn->data_buffer, 0, _clientInfo.data_maxIn);
-        _clientInfo.data_transferIn->num_bytes = _clientInfo.data_maxIn;
-        _clientInfo.data_transferIn->bEndpointAddress = _clientInfo.data_addrIn;
-        _clientInfo.data_transferIn->callback = transferDataIn_cb;
-        _clientInfo.data_transferIn->device_handle = _clientInfo.dev_hdl;
-        _clientInfo.data_transferIn->context = (void *)&_clientInfo;
-
-        usb_host_transfer_submit(_clientInfo.data_transferIn);
-        MinionTools::addLog("%s", "clientTask Transferring dataIn");
-        
-    } else if(pTranferType == TRANSFERTYPE_DATAOUT) {    
-        MinionTools::addLog("%s, packetSize: %i", "clientTask::transferData, Type: dataOut", pSize);
-        if(pSize > _clientInfo.data_maxOut) pSize = _clientInfo.data_maxOut;
-        memset(_clientInfo.data_transferOut->data_buffer, 0, _clientInfo.data_maxOut);
-        memcpy(_clientInfo.data_transferOut->data_buffer, pData, pSize);
-    
-        _clientInfo.data_transferOut->num_bytes = pSize;
-        _clientInfo.data_transferOut->device_handle = _clientInfo.dev_hdl;
-        _clientInfo.data_transferOut->bEndpointAddress = _clientInfo.data_addrOut;
-        _clientInfo.data_transferOut->callback = transferDataOut_cb;
-        _clientInfo.data_transferOut->context = (void *)&_clientInfo;
-    
-        usb_host_transfer_submit(_clientInfo.data_transferOut);
-        _clientInfo.event = EVENT_SENDING;
-        MinionTools::addLog("%s", "clientTask Transferring dataOut");
-    } else if(pTranferType == TRANSFERTYPE_CTLIN) {
-        MinionTools::addLog("%s, packetSize: %i", "clientTask::transferData, Type: ctlIn", _clientInfo.ctl_maxIn);
-        memset(_clientInfo.ctl_transferIn->data_buffer, 0, _clientInfo.ctl_maxIn);
-        _clientInfo.ctl_transferIn->num_bytes = _clientInfo.ctl_maxIn;
-        _clientInfo.ctl_transferIn->bEndpointAddress = _clientInfo.ctl_addrIn;
-        _clientInfo.ctl_transferIn->callback = transferCtlIn_cb;
-        _clientInfo.ctl_transferIn->device_handle = _clientInfo.dev_hdl;
-        _clientInfo.ctl_transferIn->context = (void *)&_clientInfo;
-
-        usb_host_transfer_submit(_clientInfo.ctl_transferIn);
-        MinionTools::addLog("%s", "clientTask Transferring ctlIn");
-    }    
-}
-
-void usb_host_state_handle_events() {   
-  if(_clientInfo.event == EVENT_NONE) return;
-  uint8_t action = _clientInfo.action;
-  uint8_t event = _clientInfo.event;
-  
-    _clientInfo.event = EVENT_NONE; //Consume current event
-    
-    if(action == ACTION_CONNECTDEV) {
-        if(event == EVENT_INSERTED) {
-            MinionTools::addLog("ACTION_CONNECTDEV handleEvents: %s", "EVENT_INSERTED");
-            connectDevice(&_clientInfo);            
-        } else if(event == EVENT_CONNECTED) {
-            MinionTools::addLog("ACTION_CONNECTDEV handleEvents: %s", "EVENT_CONNECTED");
-            _isConnected = true;
-            
-            MinionTools::addLog("ACTION_CONNECTDEV handleEvents: %s", "send reset cmd");
-            uint8_t resetCmd[] = {0,0,0,0,0,115,38,37};
-            transferData(TRANSFERTYPE_DATAOUT, &resetCmd[0], sizeof(resetCmd));
-            
-        } else if(event ==  EVENT_SENDING) {
-            MinionTools::addLog("ACTION_CONNECTDEV handleEvents: %s", "EVENT_SENDING");
-            
-        } else if(event == EVENT_SENT) {
-            MinionTools::addLog("ACTION_RESETDEV handleEvents: %s", "EVENT_SENT");
-            
-            //transferDataIn(); //listen for dataIn           
-        } else if(event == EVENT_RECEIVED) {
-            MinionTools::addLog("ACTION_RESETDEV handleEvents: %s \n", "EVENT_RECEIVED");
-            _clientInfo.action = ACTION_SENDCMD;
-            _clientInfo.event = EVENT_ENABLED;
-        }
-        
-    } else if(action == ACTION_ENABLESEND) {
-        if(event == EVENT_ENABLED) {
-            MinionTools::addLog("ACTION_ENABLESEND handleEvents: %s", "EVENT_ENABLED");
-            uint8_t enableCmd[] = {3};
-            transferData(TRANSFERTYPE_DATAOUT, &enableCmd[0], sizeof(enableCmd));            
-        } else if(event == EVENT_SENT) {
-            MinionTools::addLog("ACTION_ENABLESEND handleEvents: %s \n", "EVENT_SENT");
-            //uint8_t sendCmd[] = {1,164,0,206,0,26,0,23,0,26,0,23,0,26,0,74,0,26,0,23,0,26,0,23,0,26,0,23,0,26,0,23,0,26,0,23,0,26,0,74,0,26,0,74,0,26,0,23,0,26,0,74,0,26,0,74,0,26,0,74,0,26,0,74,0,26,0,74,0,26,0,23,0,26,0,23,0,26,0,23,0,26,0,74,0,26,0,23,0,26,0,23,0,26,0,23,0,26,0,23,0,26,0,74,0,26,0,74,0,26,0,74,0,26,0,23,0,26,0,74,0,26,0,74,0,26,0,74,0,26,0,74,0,26,7,102,1,165,0,102,0,26,17,122,1,165,0,102,0,26,17,122,1,165,0,102,0,26,255,255};
-            //transferData(TRANSFERTYPE_DATAOUT, &sendCmd[0], sizeof(sendCmd));
-            _clientInfo.action = ACTION_SENDCMD;
-            _clientInfo.event = EVENT_ENABLED;            
-        }
-        
-    } else if(action == ACTION_SENDCMD) {
-        if(event == EVENT_ENABLED) {
-            MinionTools::addLog("ACTION_SENDCMD handleEvents: %s", "EVENT_ENABLED");
-            _clientInfo.state = 0;
-            _clientInfo.event = EVENT_STARTED;
-            
-        } else if(event == EVENT_STARTED) {
-            ++_clientInfo.state;
-            
-            uint8_t enableCmd[] = {3};
-            transferData(TRANSFERTYPE_DATAOUT, &enableCmd[0], sizeof(enableCmd));
-            
-        } else if(event == EVENT_SENT) {
-            MinionTools::addLog("ACTION_SENDCMD handleEvents: %s \n", "EVENT_SENT");
-            
-            if(_clientInfo.state == 1 || _clientInfo.state == 3) {
-                MinionTools::addLog("ACTION_SENDCMD handleEvents: %s", "Send Command");
-                ++_clientInfo.state;
-                uint8_t sendCmd[] = {1,164,0,206,0,26,0,23,0,26,0,23,0,26,0,74,0,26,0,23,0,26,0,23,0,26,0,23,0,26,0,23,0,26,0,23,0,26,0,74,0,26,0,74,0,26,0,23,0,26,0,74,0,26,0,74,0,26,0,74,0,26,0,74,0,26,0,74,0,26,0,23,0,26,0,23,0,26,0,23,0,26,0,74,0,26,0,23,0,26,0,23,0,26,0,23,0,26,0,23,0,26,0,74,0,26,0,74,0,26,0,74,0,26,0,23,0,26,0,74,0,26,0,74,0,26,0,74,0,26,0,74,0,26,7,102,1,165,0,102,0,26,17,122,1,165,0,102,0,26,17,122,1,165,0,102,0,26,255,255};
-                transferData(TRANSFERTYPE_DATAOUT, &sendCmd[0], sizeof(sendCmd));
-                
-            } else if(_clientInfo.state == 2) {
-                MinionTools::addLog("ACTION_SENDCMD handleEvents: %s \n", "Restart ACTION_SENDCMD");
-                delay(1000);
-                _clientInfo.event = EVENT_STARTED;
-                
-            } else {
-                MinionTools::addLog("ACTION_SENDCMD handleEvents: %s \n", "ACTION_SENDCMD DONE");
-                _clientInfo.action = ACTION_NONE;
-            }
-        }
-    } else if(action == ACTION_NONE) {
-        if(event == EVENT_INSERTED) {
-            MinionTools::addLog("ACTION_NONE handleEvents: %s", "DEVICE CONNECTED");
-            _clientInfo.action = ACTION_CONNECTDEV;
-            _clientInfo.event = EVENT_INSERTED;
-            MinionTools::addLog("ACTION_NONE handleEvents: %s", "Start: ACTION_CONNECTDEV");
-        } else if(event == EVENT_REMOVED) {
-            MinionTools::addLog("ACTION_NONE handleEvents: %s", "DEVICE DISCONNETED");
-            MinionTools::addLog("ACTION_NONE handleEvents: %s", "DEVICE CLOSED");
-        }        
-    }
-
-    if(_clientInfo.event != EVENT_NONE) usb_host_state_handle_events();
-}
-
+/////////////////////////////////////////////////////////////////////////////////////////////////
 void refresh() {
     usb_host_client_handle_events(_clientInfo.client_hdl, 1);
-    
-    usb_host_state_handle_events();
     
     if (usb_host_lib_handle_events(1, &_clientInfo.flags) != ESP_OK) return;
 
@@ -350,8 +370,46 @@ void refresh() {
         MinionTools::addLog("%s", "USB_HOST_LIB_EVENT_FLAGS_ALL_FREE");
 }
 
-void open() {
+/////////////////////////////////////////////////////////////////////////////////////////////////
+bool isReady() {
+    return _isReady;
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
+bool isConnected() {
+    return _isConnected;
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
+bool controlDevice(uint8_t* pDataBuffer, uint8_t pSize) {
+  MinionTools::addLog("%s, packetSize: %i", "UsbhostCDC::controlDevice", pSize);
+    
+    if(_isReady == false) {
+        MinionTools::addLog("%s", "UsbhostCDC::controlDevice ABORT!, Device Not Ready");
+        return false;
+    }
+    
+    uint8_t statusCmd[] = {37};
+    uint8_t openCmd[] = {3};
+  
+    transferData(TRANSFERTYPE_DATAOUT, pDataBuffer, pSize);   
+    if(eventWatch(EVENT_SENT) == false) return false;
+     
+    transferData(TRANSFERTYPE_DATAOUT, &statusCmd[0], sizeof(statusCmd));  
+    if(eventWatch(EVENT_RECEIVED) == false) return false;
+     
+    transferData(TRANSFERTYPE_DATAOUT, &openCmd[0], sizeof(openCmd));  
+    if(eventWatch(EVENT_SENT) == false) return false;
+    
+    MinionTools::addLog("%s", "ALL DONE");
+    return true;
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
+void open(void (*pCallback)(bool)) {
     MinionTools::addLog("%s", "UsbHostTest: open");
+
+    _statusCallback = pCallback;
     
     //Enable and PowerUp Esp32-s3-otg-usb boardclientTask
     gpio_set_direction((gpio_num_t)12, GPIO_MODE_OUTPUT);
@@ -385,19 +443,9 @@ void open() {
 
     _libErr = usb_host_client_register(&clientConfig, &_clientInfo.client_hdl);
     MinionTools::addLog("UsbHostTest, usb_host_client_register: %d", _libErr);
-
-    //_clientInfo.ctl_maxIn = 64;
-    //_libErr = usb_host_transfer_alloc(_clientInfo.ctl_maxIn, 0, &_clientInfo.ctl_transferIn);
-    //MinionTools::addLog("UsbHostTest, ctlIn usb_host_transfer_alloc: %i", _libErr);  
-
-    _clientInfo.data_maxIn = 64;
-    _libErr = usb_host_transfer_alloc(_clientInfo.data_maxIn, 0, &_clientInfo.data_transferIn);
-    MinionTools::addLog("UsbHostTest, dataIn usb_host_transfer_alloc: %i", _libErr);  
-
-    _clientInfo.data_maxOut = 200;            
-    _libErr = usb_host_transfer_alloc(_clientInfo.data_maxOut, 0, &_clientInfo.data_transferOut);
-    MinionTools::addLog("UsbHostTest, dataOut usb_host_transfer_alloc: %i", _libErr);  
     
     MinionTools::addLog("%s \n", "UsbHostTest status: Opened \n"); 
 }
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
 } //namespace UsbhostCDC
