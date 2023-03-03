@@ -1,9 +1,9 @@
-#ifndef MINIONTOOLS_H
-#define MINIONTOOLS_H
+#ifndef MINIONSYSTEM_H
+#define MINIONSYSTEM_H
 
 #include <ArduinoJson.h>  // Install from IDE Library manager
 
-namespace MinionTools
+namespace SysTools
 {
     void lookupKeyWord(DynamicJsonDocument&, DynamicJsonDocument&);
     void addLog(const char*, ...);

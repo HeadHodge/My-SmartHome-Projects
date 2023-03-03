@@ -9,7 +9,7 @@
 #define US_KEYBOARD 1
 #include <Arduino.h>
 
-#include <MinionTools.h>
+#include <SysTools.h>
 #include <WsHub.h>
 #include <WsJsonBridge.h>
 
@@ -26,27 +26,27 @@ char *messageReceived(unsigned char *pMessageJson){
     deserializeJson(messageObj, pMessageJson);
       
     if(messageObj["event"] == nullptr) {
-        MinionTools::addLog("%s", "WsJsonBridge::messageReceived Abort: 'event' value missing in message");
+        SysTools::addLog("%s", "WsJsonBridge::messageReceived Abort: 'event' value missing in message");
         return "";
     }
  
     if(messageObj["event"] != "keyPressed") {
-        MinionTools::addLog("%s", "WsJsonBridge::messageReceived Abort: invalid 'event' value in message");
+        SysTools::addLog("%s", "WsJsonBridge::messageReceived Abort: invalid 'event' value in message");
         return "";
     }
    
     if(messageObj["required"] == nullptr) {
-        MinionTools::addLog("%s", "WsJsonBridge::messageReceived Abort: 'required' values missing in message");
+        SysTools::addLog("%s", "WsJsonBridge::messageReceived Abort: 'required' values missing in message");
         return "";
     }
    
     if(messageObj["required"]["keyWord"] == nullptr) {
-        MinionTools::addLog("%s", "WsJsonBridge::messageReceived Abort: 'required.keyWord' value missing in message");
+        SysTools::addLog("%s", "WsJsonBridge::messageReceived Abort: 'required.keyWord' value missing in message");
         return "";
     }
     
     if(messageObj["optional"] == nullptr) {
-        MinionTools::addLog("%s", "WsJsonBridge::messageReceived Abort: 'optional' values missing in message");
+        SysTools::addLog("%s", "WsJsonBridge::messageReceived Abort: 'optional' values missing in message");
         return "";
     }
     
@@ -72,7 +72,7 @@ void openBridge(receivedKeyCallback pReceivedKey)
 {
     receivedKey = pReceivedKey;
     WsHub::openHub(messageReceived);
-    MinionTools::addLog("%s", "WsJsonBridge::openBridge Bridge is Open");  
+    SysTools::addLog("%s", "WsJsonBridge::openBridge Bridge is Open");  
     return;
 }
 }

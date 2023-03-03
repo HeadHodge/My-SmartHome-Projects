@@ -2,7 +2,7 @@
 #include <Arduino.h>
 //#include <USB.h>
 
-#include <minionTools.h>
+#include <SysTools.h>
 #include <ComSerial.h>
 
 namespace ComSerial
@@ -20,14 +20,14 @@ void controlDevice(const char* pString) {
 }    
  
 void refresh() {
-  //MinionTools::addLog("%s", "UsbCom::refresh");
+  //SysTools::addLog("%s", "UsbCom::refresh");
     if (Serial.available() == false) return;
     const int maxMessage = 512;
     char message[maxMessage];
     
     memset (message, 0, maxMessage);
     Serial.readBytesUntil('\0', message, maxMessage - 1); //leave one safety null char in message buffer
-    MinionTools::receivedCommand((const char*)&message[0]);
+    SysTools::receivedCommand((const char*)&message[0]);
 }
  
 void open(int pBaud = 115200) {
@@ -36,7 +36,7 @@ void open(int pBaud = 115200) {
     delay(10000);
     connectedFlg = true;
     
-    MinionTools::addLog("%s", "ComSerial::open ComSerial Now Open");
+    SysTools::addLog("%s", "ComSerial::open ComSerial Now Open");
     delay(1000);
 }
 }

@@ -103,12 +103,12 @@ class BleKeyboardCallbacks : public BLEServerCallbacks {
 
     void onConnect(BLEServer* server) {
         isConnected = true;
-        MinionTools::addLog("%s", "BleHub::BleKeyboardCallbacks Connected");
+        SysTools::addLog("%s", "BleHub::BleKeyboardCallbacks Connected");
     }
 
     void onDisconnect(BLEServer* server) {
         isConnected = false;
-        MinionTools::addLog("%s", "BleHub::BleKeyboardCallbacks Disconnected");
+        SysTools::addLog("%s", "BleHub::BleKeyboardCallbacks Disconnected");
     }
 };
 
@@ -164,14 +164,14 @@ bool isHubConnected() {
 // Message (report) sent when a key is pressed or released
 
 void controlDevice(DynamicJsonDocument& pOptionsObj) {
-  MinionTools::addLog("BleHub::controlDevice keyCode: 0x%X, duration: %i, delay: %i, usage: %s", (int)pOptionsObj["keyCode"], (int)pOptionsObj["keyDuration"], (int)pOptionsObj["keyDelay"], (const char*)pOptionsObj["keyMap"]);
+  SysTools::addLog("BleHub::controlDevice keyCode: 0x%X, duration: %i, delay: %i, usage: %s", (int)pOptionsObj["keyCode"], (int)pOptionsObj["keyDuration"], (int)pOptionsObj["keyDelay"], (const char*)pOptionsObj["keyMap"]);
   const char* keyMap = (const char*)pOptionsObj["keyMap"];
   int reportId = -1;
   uint8_t* deviceReportAddress = NULL;
   int deviceReportSize = 0;
 
     if(isConnected == false) {
-        MinionTools::addLog("%s", "BleHub::controlDevice ABORT: Gateway not connected.");
+        SysTools::addLog("%s", "BleHub::controlDevice ABORT: Gateway not connected.");
         return;
     };
     
@@ -185,7 +185,7 @@ void controlDevice(DynamicJsonDocument& pOptionsObj) {
         
         deviceReportAddress = (uint8_t*)&report;
         deviceReportSize = sizeof(report);
-        MinionTools::addLog("BleHub::controlDevice Send Keyboard Report, keyModifier: %i, keyCode: 0x%X", report.keyModifier, report.keyCode);
+        SysTools::addLog("BleHub::controlDevice Send Keyboard Report, keyModifier: %i, keyCode: 0x%X", report.keyModifier, report.keyCode);
 
     } else if(strcmp(keyMap, "consumer") == 0) {
         //CONSUMER REPORT
@@ -196,7 +196,7 @@ void controlDevice(DynamicJsonDocument& pOptionsObj) {
         
         deviceReportAddress = (uint8_t*)&report;
         deviceReportSize = sizeof(report);
-        MinionTools::addLog("BleHub::controlDevice Send Consumer Report, keyCode: 0x%X", report.keyCode);
+        SysTools::addLog("BleHub::controlDevice Send Consumer Report, keyCode: 0x%X", report.keyCode);
          
     } else if(strcmp(keyMap, "mouse") == 0) {       
         //MOUSE REPORT
@@ -209,10 +209,10 @@ void controlDevice(DynamicJsonDocument& pOptionsObj) {
         
         deviceReportAddress = (uint8_t*)&report;
         deviceReportSize = sizeof(report);
-        MinionTools::addLog("BleHub::controlDevice Send Mouse Report, clickModifier: %i, xOffset: 0x%X, yOffset: 0x%X", 0, 100, 100);
+        SysTools::addLog("BleHub::controlDevice Send Mouse Report, clickModifier: %i, xOffset: 0x%X, yOffset: 0x%X", 0, 100, 100);
         
     } else {
-        MinionTools::addLog("BleHub::controlDevice ABORT: Invalid keyMap specified '%s'", keyMap);
+        SysTools::addLog("BleHub::controlDevice ABORT: Invalid keyMap specified '%s'", keyMap);
         return;
     };
         
@@ -237,7 +237,7 @@ void openHub(const char *pDeviceName) {
     deviceName = pDeviceName;
     xTaskCreate(bluetoothTask, "bluetooth", 20000, NULL, 5, NULL);
 
-    MinionTools::addLog("BleHub::openHub, Hub: '%s' is Open", pDeviceName);
+    SysTools::addLog("BleHub::openHub, Hub: '%s' is Open", pDeviceName);
     //Serial.print("BleHub '%s' is Open", pDeviceName);
     //Serial.println();
 }

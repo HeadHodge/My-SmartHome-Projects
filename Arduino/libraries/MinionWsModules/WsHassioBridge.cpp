@@ -10,7 +10,7 @@
 #include <Arduino.h>
 #include <ArduinoJson.h>  // Install from IDE Library manager
 
-#include <MinionTools.h>
+#include <SysTools.h>
 #include <WsDevice.h>
 #include <WsHassioBridge.h>
 
@@ -30,22 +30,22 @@ DynamicJsonDocument doc(1024);
       deserializeJson(doc, (const char *)pMessage);  
       messageType = doc["type"];
       if(messageType == NULL) messageType = ""; 
-      MinionTools::addLog("WsHassioBridge::receivedMessage messageType: %s", messageType);
+      SysTools::addLog("WsHassioBridge::receivedMessage messageType: %s", messageType);
  
       if(strcmp(messageType, "auth_required") == 0) {
-        MinionTools::addLog("WsHassioBridge::receivedMessage Send accessToken: %s", accessToken);
+        SysTools::addLog("WsHassioBridge::receivedMessage Send accessToken: %s", accessToken);
         WsDevice::controlDevice(accessToken);
         return "";
       }     
 
       if(strcmp(messageType, "auth_ok") == 0) {
         isOpen = false;
-        MinionTools::addLog("%s", "WsHassioBridge::receivedMessage Bridge is Open");  
+        SysTools::addLog("%s", "WsHassioBridge::receivedMessage Bridge is Open");  
         return "";
       }
 
       if(strcmp(messageType, "result") == 0) {
-        MinionTools::addLog("WsHassioBridge::receivedMessage Command Result: %s", pMessage);
+        SysTools::addLog("WsHassioBridge::receivedMessage Command Result: %s", pMessage);
         return "";
       }
       
@@ -61,7 +61,7 @@ void refreshBridge() {
 }
 
 void controlDevice(DynamicJsonDocument& pKeyObj) {
-  MinionTools::addLog("WsHassioBridge::controlDevice with keyWord: %s", (const char *)pKeyObj["required"]["keyWord"]);
+  SysTools::addLog("WsHassioBridge::controlDevice with keyWord: %s", (const char *)pKeyObj["required"]["keyWord"]);
   char controlString[512];
   char keyString[512];
 
@@ -74,7 +74,7 @@ void controlDevice(DynamicJsonDocument& pKeyObj) {
     refNum = refNum + 1;
     WsDevice::controlDevice(controlString);
     
-    MinionTools::addLog("WsHassioBridge::controlDevice sent controlString %s", controlString);
+    SysTools::addLog("WsHassioBridge::controlDevice sent controlString %s", controlString);
 }
 
 void openBridge(callBack pCallBack)

@@ -1,13 +1,14 @@
-#include "USB.h"
-#include "USBMSC.h"
+//#include "USB.h"
+//#include "USBMSC.h"
 
 #include <ComSerialBridge.h>
 #include <SysTools.h>
-#include <SysCardDisk.h>
+#include <UsbMscCardBridge.h>
 
 #define HWSerial Serial
 
-USBMSC MSC;
+/*
+USBMSC _MSC;
 
 bool enableDrive() {
         SysCardDisk::open(nullptr);
@@ -88,17 +89,19 @@ static void usbEventCallback(void* arg, esp_event_base_t event_base, int32_t eve
     }
   }
 }
+*/
 
 void setup() {
     ComSerialBridge::open(115200);
     delay(2000);
-    SysTools::addLog("%s", "Setup CardDrive");
+    SysTools::addLog("%s", "Setup usbMscCardDrive");
 
-    enableDrive();
+    //enableDrive();
    
 //Open USB Devices
-    USB.onEvent(usbEventCallback);
-    USB.begin();
+    //USB.onEvent(usbEventCallback);
+    //USB.begin();
+    UsbMscCardBridge::open();  
 }
 
 void loop() {

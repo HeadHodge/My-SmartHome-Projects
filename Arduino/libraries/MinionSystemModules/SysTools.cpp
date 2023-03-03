@@ -4,9 +4,9 @@
 #include <Preferences.h>
 
 #include <ComSerialBridge.h>
-#include <MinionTools.h>
+#include <SysTools.h>
 
-namespace MinionTools {
+namespace SysTools {
  
 char* _defaultMap = "settings";
 char  _currentMap[32] = "";
@@ -41,7 +41,7 @@ void getOptions(const char* pMemKey, DynamicJsonDocument& pOptions) {
     jsonErr = deserializeJson(pOptions, memValue);
         
     if(jsonErr) {
-        MinionTools::addLog("MinionTools::getOptions Abort: %s", jsonErr.c_str());
+        SysTools::addLog("SysTools::getOptions Abort: %s", jsonErr.c_str());
         return;
     }
 }
@@ -53,7 +53,7 @@ void setMemMap(const char* pMapName) {
 }
 
 void lookupKeyWord(DynamicJsonDocument& pMessageObj, DynamicJsonDocument& pDeviceObj) { 
-  MinionTools::addLog("MinionTools::lookupKeyWord: '%s'", (const char*)pMessageObj["required"]["keyWord"]);
+  SysTools::addLog("SysTools::lookupKeyWord: '%s'", (const char*)pMessageObj["required"]["keyWord"]);
 
   JsonObject keyOptions = pMessageObj["optional"].as<JsonObject>();
   const char* keyOption;
@@ -63,7 +63,7 @@ void lookupKeyWord(DynamicJsonDocument& pMessageObj, DynamicJsonDocument& pDevic
   String memDefault = String("{\"keyUsage\": \"\", \"keyModifier\": 0, \"keyCode\": 0, \"keyWord\": \"\", \"keyData\": \"\", keyDuration: 0, keyDelay: 0}");
     
     if(pMessageObj["required"]["keyWord"] == nullptr) {
-        MinionTools::addLog("%s", "MinionTools::lookupKeyWord Abort: 'keyWord' value missing in message");
+        SysTools::addLog("%s", "SysTools::lookupKeyWord Abort: 'keyWord' value missing in message");
         return;
     }
     
@@ -74,46 +74,46 @@ void lookupKeyWord(DynamicJsonDocument& pMessageObj, DynamicJsonDocument& pDevic
     
     setMemMap(memMap);
     memValue = _memMap.getString(memKey, memDefault);
-    MinionTools::addLog("MinionTools::lookupKeyWord memKey: %s, memMap: %s, memValue: %s", memKey, memMap, memValue.c_str());
+    SysTools::addLog("SysTools::lookupKeyWord memKey: %s, memMap: %s, memValue: %s", memKey, memMap, memValue.c_str());
     
     DeserializationError jsonErr = deserializeJson(pDeviceObj, memValue.c_str());
     
     if(jsonErr) {
-        MinionTools::addLog("MinionTools::lookupKeyWord Abort: %s", jsonErr.c_str());
+        SysTools::addLog("SysTools::lookupKeyWord Abort: %s", jsonErr.c_str());
         return;
     }
     
     //Override keyOptions from pMessageObj
     for (JsonPair kv : keyOptions) {
         keyOption = kv.key().c_str();
-        MinionTools::addLog("keyOption: %s", keyOption);
+        SysTools::addLog("keyOption: %s", keyOption);
         pDeviceObj[keyOption] = pMessageObj["optional"][keyOption];
     }
     
-    MinionTools::addLog("MinionTools::lookupKeyWord: deviceOptions: %s %i %i, %i, %i", (const char*)pDeviceObj["keyWord"], (int)pDeviceObj["keyCode"], (int)pDeviceObj["keyModifier"], (int)pDeviceObj["keyDuration"], (int)pDeviceObj["keyDelay"]);
+    SysTools::addLog("SysTools::lookupKeyWord: deviceOptions: %s %i %i, %i, %i", (const char*)pDeviceObj["keyWord"], (int)pDeviceObj["keyCode"], (int)pDeviceObj["keyModifier"], (int)pDeviceObj["keyDuration"], (int)pDeviceObj["keyDelay"]);
 };
 
 void receivedCommand(const char* pMessage) {
-  addLog("MinionTools::receivedCommand Message: %s", pMessage);
+  addLog("SysTools::receivedCommand Message: %s", pMessage);
   DynamicJsonDocument messageObj(512);
   const char* memKey;
   const char* memMap;
   String memString;
       
     if(memcmp(pMessage, "SETOPTIONS:", 11) != 0) {
-        MinionTools::addLog("%s", "MinionTools::receivedCommand Abort: Invalid Command.");
+        SysTools::addLog("%s", "SysTools::receivedCommand Abort: Invalid Command.");
         return;
     };
     
     DeserializationError err = deserializeJson(messageObj, pMessage + 11);
         
     if(err) {
-        MinionTools::addLog("MinionTools::receivedCommand Abort: %s", err.c_str());
+        SysTools::addLog("SysTools::receivedCommand Abort: %s", err.c_str());
         return;
     }
 
     if(messageObj["memKey"] == nullptr) {
-        MinionTools::addLog("%s", "MinionTools::receivedCommand Abort: 'memKey' value missing in message");
+        SysTools::addLog("%s", "SysTools::receivedCommand Abort: 'memKey' value missing in message");
         return;
     }
 
@@ -127,7 +127,7 @@ void receivedCommand(const char* pMessage) {
     JsonObject memValueObj = messageObj["memValue"].as<JsonObject>();
     serializeJson(memValueObj, memValue);
     
-    addLog("MinionTools::receivedCommand memKey: %s, memMap: %s, memValue: %s", memKey, memMap, memValue);
+    addLog("SysTools::receivedCommand memKey: %s, memMap: %s, memValue: %s", memKey, memMap, memValue);
     
     setMemMap(memMap);
     _memMap.putString(memKey, memValue);

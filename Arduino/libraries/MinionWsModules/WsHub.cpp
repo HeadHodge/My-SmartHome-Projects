@@ -12,7 +12,7 @@
 #include <WebSocketsServer.h> // Install WebSockets by Markus Sattler from IDE Library manager
 #include <ArduinoJson.h>  // Install from IDE Library manager
 
-#include <MinionTools.h>
+#include <SysTools.h>
 #include <WsHub.h>
 
 namespace WsHub
@@ -27,56 +27,56 @@ WebSocketsServer webSocket = WebSocketsServer(81);
 
 void webSocketEvent(uint8_t num, WStype_t type, uint8_t *message, size_t length)
 {
-    MinionTools::addLog("webSocketEvent(%d, %d, ...)", num, type);
+    SysTools::addLog("webSocketEvent(%d, %d, ...)", num, type);
     
     switch(type) {
     case WStype_DISCONNECTED:
-      MinionTools::addLog("[%u] Disconnected!", type);
+      SysTools::addLog("[%u] Disconnected!", type);
       isConnected = false;
       break;
     case WStype_CONNECTED:
     {
       IPAddress ip = webSocket.remoteIP(num);
-      MinionTools::addLog("[%u] Connected from %d.%d.%d.%d url: %s", type, ip[0], ip[1], ip[2], ip[3], message);
+      SysTools::addLog("[%u] Connected from %d.%d.%d.%d url: %s", type, ip[0], ip[1], ip[2], ip[3], message);
       isConnected = true;
     }
       break;
     case WStype_TEXT:
     {
-      MinionTools::addLog("[%u] Received Message: [%d] %s", type, length, message);
-      MinionTools::addLog("[%u] Reply Message: %s", type, messageReceived(message));
+      SysTools::addLog("[%u] Received Message: [%d] %s", type, length, message);
+      SysTools::addLog("[%u] Reply Message: %s", type, messageReceived(message));
     }
       break;
     case WStype_BIN:
-      MinionTools::addLog("[%u] Binary!", type);
+      SysTools::addLog("[%u] Binary!", type);
       break;
     case WStype_FRAGMENT_TEXT_START:
-      MinionTools::addLog("[%u] Fragment Text Start!", type);
+      SysTools::addLog("[%u] Fragment Text Start!", type);
       break;
     case WStype_FRAGMENT_BIN_START:
-      MinionTools::addLog("[%u] Fragment Binary Start!", type);
+      SysTools::addLog("[%u] Fragment Binary Start!", type);
       break;
     case WStype_FRAGMENT:
-      MinionTools::addLog("[%u] Fragment!", type);
+      SysTools::addLog("[%u] Fragment!", type);
       break;
     case WStype_FRAGMENT_FIN:
-      MinionTools::addLog("[%u] Fragment Finish!", type);
+      SysTools::addLog("[%u] Fragment Finish!", type);
       break;
     case WStype_PING:
-      MinionTools::addLog("[%u] Ping!", type);
+      SysTools::addLog("[%u] Ping!", type);
       break;
     case WStype_PONG:
-      MinionTools::addLog("[%u] Pong!", type);
+      SysTools::addLog("[%u] Pong!", type);
       break;
     case WStype_ERROR:
-      MinionTools::addLog("[%u] Error!", type);
+      SysTools::addLog("[%u] Error!", type);
       break;
     default:
-      MinionTools::addLog("Unknown WStype [%d]", type);
+      SysTools::addLog("Unknown WStype [%d]", type);
       break;
   }
   
-  MinionTools::addLog("%s", "");
+  SysTools::addLog("%s", "");
 }
 
 bool isHubConnected() {
@@ -93,7 +93,7 @@ void openHub(callBack pCallBack)
     messageReceived = pCallBack;
     
     // We start by connecting to a WiFi network
-    MinionTools::addLog("WsHub::openHub Connect to Wifi AP: '%s'", ssid);
+    SysTools::addLog("WsHub::openHub Connect to Wifi AP: '%s'", ssid);
 
     WiFi.begin(ssid, password);
 
@@ -104,12 +104,12 @@ void openHub(callBack pCallBack)
     
     WiFi.setAutoReconnect(true);
 
-    MinionTools::addLog("%s", "");
-    MinionTools::addLog("WsHub::openHub Connected to wifi AP: '%s', IP address: %s", ssid, WiFi.localIP().toString());
+    SysTools::addLog("%s", "");
+    SysTools::addLog("WsHub::openHub Connected to wifi AP: '%s', IP address: %s", ssid, WiFi.localIP().toString());
 
     webSocket.begin();
     webSocket.onEvent(webSocketEvent);
-    MinionTools::addLog("%s", "WsHub::openHub Waiting for Device Connection...");
-    MinionTools::addLog("%s", "WsHub::openHub, Hub is Open");
+    SysTools::addLog("%s", "WsHub::openHub Waiting for Device Connection...");
+    SysTools::addLog("%s", "WsHub::openHub, Hub is Open");
 }
 }

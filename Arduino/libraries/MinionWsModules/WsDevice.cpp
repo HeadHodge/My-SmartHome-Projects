@@ -6,7 +6,7 @@
 #include <WiFiClientSecure.h>
 #include <WebSocketsClient.h>
 
-#include <MinionTools.h>
+#include <SysTools.h>
 #include <WsDevice.h>
 
 namespace WsDevice
@@ -29,22 +29,22 @@ DynamicJsonDocument doc(1024);
       deserializeJson(doc, (const char *)pMessage);  
       messageType = doc["type"];
       if(messageType == NULL) messageType = ""; 
-      MinionTools::addLog("WsDevice::receivedMessage messageType: %s", messageType);
+      SysTools::addLog("WsDevice::receivedMessage messageType: %s", messageType);
  
       if(strcmp(messageType, "auth_required") == 0) {
-        MinionTools::addLog("WsDevice::receivedMessage Send accessToken: %s", accessToken);
+        SysTools::addLog("WsDevice::receivedMessage Send accessToken: %s", accessToken);
         webSocket.sendTXT(accessToken);
         return;
       }     
 
       if(strcmp(messageType, "auth_ok") == 0) {
-        MinionTools::addLog("WsDevice::receivedMessage Send silence command: %s", silenceCommand);
+        SysTools::addLog("WsDevice::receivedMessage Send silence command: %s", silenceCommand);
         webSocket.sendTXT(silenceCommand);
         return;
       }
 
       if(strcmp(messageType, "result") == 0) {
-        MinionTools::addLog("WsDevice::receivedMessage Command Result: %s", pMessage);
+        SysTools::addLog("WsDevice::receivedMessage Command Result: %s", pMessage);
         return;
       }
 }
@@ -54,18 +54,18 @@ void webSocketEvent(WStype_t type, uint8_t * message, size_t length) {
 
 	switch(type) {
 		case WStype_DISCONNECTED:
-			MinionTools::addLog("%s", "WsDevice::webSocketEvent Disconnected!");
+			SysTools::addLog("%s", "WsDevice::webSocketEvent Disconnected!");
             isConnected = false;
 			break;
 		case WStype_CONNECTED:
-			MinionTools::addLog("WsDevice::webSocketEvent Connected to url: %s", message);
+			SysTools::addLog("WsDevice::webSocketEvent Connected to url: %s", message);
             isConnected = true;
 			break;
 		case WStype_TEXT:
             receivedMessage(message);
 			break;
 		case WStype_BIN:
-			MinionTools::addLog("WsDevice::webSocketEvent get binary length: %u", length);
+			SysTools::addLog("WsDevice::webSocketEvent get binary length: %u", length);
 			break;
 		case WStype_ERROR:			
 		case WStype_FRAGMENT_TEXT_START:
@@ -90,7 +90,7 @@ void controlDevice(const char *pControlMessage) {
 
 void openDevice(callBack pCallBack) {
 
-    MinionTools::addLog("WsDevice::openDevice Connect to Wifi AP: '%s'", ssid);
+    SysTools::addLog("WsDevice::openDevice Connect to Wifi AP: '%s'", ssid);
 
     receivedMessage = pCallBack;
     WiFi.begin(ssid, password);
@@ -100,8 +100,8 @@ void openDevice(callBack pCallBack) {
         Serial.print(".");
     }
 
-    MinionTools::addLog("%s", "");
-    MinionTools::addLog("WsDevice::openDevice, Connected to wifi AP: '%s', IP address: %s", ssid, WiFi.localIP().toString());
+    SysTools::addLog("%s", "");
+    SysTools::addLog("WsDevice::openDevice, Connected to wifi AP: '%s', IP address: %s", ssid, WiFi.localIP().toString());
 
   // server address, port and URL
   webSocket.begin("192.168.0.224", 8123, "/api/websocket");
@@ -115,6 +115,6 @@ void openDevice(callBack pCallBack) {
   // try ever 5000 again if connection has failed
   webSocket.setReconnectInterval(5000);
 
-  MinionTools::addLog("%s", "WsDevice::openDevice Device is Open");
+  SysTools::addLog("%s", "WsDevice::openDevice Device is Open");
 }
 }

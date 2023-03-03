@@ -1,7 +1,7 @@
 #define US_KEYBOARD 1
 #include <Arduino.h>
 
-#include <MinionTools.h>
+#include <SysTools.h>
 #include <ComSerial.h>
 #include <ComSerialBridge.h>
 
@@ -14,7 +14,7 @@ bool isConnected() {
 }
 
 void controlDevice(DynamicJsonDocument& pKeyObj) {    
-MinionTools::addLog("ComSerialBridge::controlDevice with keyWord %s", (const char *)pKeyObj["required"]["keyWord"]);
+SysTools::addLog("ComSerialBridge::controlDevice with keyWord %s", (const char *)pKeyObj["required"]["keyWord"]);
 DynamicJsonDocument optionsObj(1024);
 }
 
@@ -31,6 +31,6 @@ void logString(const char* pString) {
 void open(int pBaud = 115200) {
     ComSerial::open(pBaud);
     openFlg = true;
-    MinionTools::addLog("%s", "ComSerialBridge::open, Bridge now Open");
+    SysTools::addLog("%s", "ComSerialBridge::open, Bridge now Open");
 }
 }

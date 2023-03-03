@@ -2,7 +2,7 @@
 #define USBHUB_H
 
 #include <ArduinoJson.h>
-#include <MinionTools.h>
+#include <SysTools.h>
 
 namespace UsbHub
 {
