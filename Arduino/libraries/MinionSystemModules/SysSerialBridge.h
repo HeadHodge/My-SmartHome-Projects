@@ -1,10 +1,9 @@
-#ifndef USBSERIALBRIDGE_H
-#define USBSERIALBRIDGE_H
+#ifndef SYSSERIALBRIDGE_H
+#define SYSSERIALBRIDGE_H
 
 #include <ArduinoJson.h>  // Install from IDE Library manager
 
-namespace ComSerialBridge
-{
+namespace SysSerialBridge {
     bool isOpen();
     void open(int baudRate);
     void refresh();

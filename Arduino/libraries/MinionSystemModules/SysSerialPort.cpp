@@ -3,10 +3,9 @@
 //#include <USB.h>
 
 #include <SysTools.h>
-#include <ComSerial.h>
+#include <SysSerialPort.h>
 
-namespace ComSerial
-{
+namespace SysSerialPort {
 bool connectedFlg = false;
 
 bool isConnected() {
@@ -39,4 +38,4 @@ void open(int pBaud = 115200) {
     SysTools::addLog("%s", "ComSerial::open ComSerial Now Open");
     delay(1000);
 }
-}
+} //namespace

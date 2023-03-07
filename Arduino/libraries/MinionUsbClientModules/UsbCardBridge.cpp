@@ -1,29 +1,14 @@
-//#include "USB.h"
-//#include "USBMSC.h"
+#include "USB.h"
+#include "USBMSC.h"
 
-#include <ComSerialBridge.h>
 #include <SysTools.h>
-#include <UsbMscCardBridge.h>
+#include <SysCardDisk.h>
+#include <UsbCardBridge.h>
 
 #define HWSerial Serial
 
-/*
+namespace UsbCardBridge {
 USBMSC _MSC;
-
-bool enableDrive() {
-        SysCardDisk::open(nullptr);
-
-        MSC.vendorID("ESP32");//max 8 chars
-        MSC.productID("USB_MSC");//max 16 chars
-        MSC.productRevision("1.0");//max 4 chars
-        MSC.onStartStop(onStartStop);
-        MSC.onRead(onRead);
-        MSC.onWrite(onWrite);
-        MSC.mediaPresent(true);
-        MSC.begin(SysCardDisk::getSectorCount(), SysCardDisk::getSectorSize());
-    
-        return true;
-};
 
 static int32_t onWrite(uint32_t pSector, uint32_t pOffset, uint8_t* pBuffer, uint32_t pBuffSize){
   //HWSerial.printf("usbCom::onWrite: Write Sector: 0x%X, Bytes: %u, Offset: %u \n", pSector, pBuffSize, pOffset);
@@ -56,7 +41,7 @@ static bool onStartStop(uint8_t power_condition, bool start, bool load_eject){
   
   HWSerial.println("usbCom::onStartStop: EJECT SD Card");
 
-  MSC.end(); 
+  _MSC.end(); 
   delay(1000);
 
   //SD.end();
@@ -89,21 +74,27 @@ static void usbEventCallback(void* arg, esp_event_base_t event_base, int32_t eve
     }
   }
 }
-*/
 
-void setup() {
-    ComSerialBridge::open(115200);
-    delay(2000);
-    SysTools::addLog("%s", "Setup usbMscCardDrive");
+bool enableDrive() {
+        SysCardDisk::open(nullptr);
 
-    //enableDrive();
+        _MSC.vendorID("ESP32");//max 8 chars
+        _MSC.productID("USB_MSC");//max 16 chars
+        _MSC.productRevision("1.0");//max 4 chars
+        _MSC.onStartStop(onStartStop);
+        _MSC.onRead(onRead);
+        _MSC.onWrite(onWrite);
+        _MSC.mediaPresent(true);
+        _MSC.begin(SysCardDisk::getSectorCount(), SysCardDisk::getSectorSize());
+    
+        return true;
+};
+
+void open() {
+    enableDrive();
    
 //Open USB Devices
-    //USB.onEvent(usbEventCallback);
-    //USB.begin();
-    UsbMscCardBridge::open();  
+    USB.onEvent(usbEventCallback);
+    USB.begin();
 }
-
-void loop() {
-  // put your main code here, to run repeatedly:
 }

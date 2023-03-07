@@ -3,7 +3,6 @@
 #include <ArduinoJson.h>
 #include <Preferences.h>
 
-#include <ComSerialBridge.h>
 #include <SysTools.h>
 
 namespace SysTools {
@@ -19,16 +18,15 @@ void sendCommand(const char* pCommand) {
 }
 
 void addLog(const char* format, ...) {
-  char logBuffer[1024];
- 
-    memset (logBuffer, 0, 1024);
     
     va_list argptr;
     va_start(argptr, format);
-    vsprintf(logBuffer, format, argptr);
+    printf("%s", "LOG: ");
+    //vsprintf(logBuffer, format, argptr);
+    vprintf(format, argptr);
+    printf("%s", "\r\n");
     va_end(argptr);
-
-    ComSerialBridge::logString(logBuffer);    
+    
 };
 
 void getOptions(const char* pMemKey, DynamicJsonDocument& pOptions) {

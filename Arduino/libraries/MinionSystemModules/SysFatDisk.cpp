@@ -1,4 +1,5 @@
-#include <Preferences.h>
+#include "FS.h"
+#include "FFat.h"
 
 #include "SysFlashTools.h"
 #include "SysTools.h"
@@ -8,13 +9,15 @@
 // set to 'Default with ffat' if you have a 4MB ESP32 dev module or
 // set to '16M Fat' if you have a 16MB ESP32 dev module.
 
-namespace SysFlashDisk {
+namespace SysFatDisk {
 // You only need to format FFat the first time you run a test
+#define FFAT_FORMATFLG false
+#define FFAT_SECTORSIZE 512
 #define FFAT_MSCFILE "/mscDrive.bin"
 
-Preferences _disk;
+File _file;
 bool _isReadMode = true;
-uint16_t _sectorCount = 0, _sectorSize = 512;
+uint16_t _sectorCount = 0, _sectorSize = FFAT_SECTORSIZE;
 
 void readFile(const char * path){
     SysTools::addLog("Reading file: %s\r\n", path);
@@ -87,7 +90,7 @@ void deleteFile(const char * path){
 /////////////////////////////////////////////////////////////////////////////////////////////////
 uint32_t readRAW(uint32_t pSector, uint8_t* pBuffer, uint32_t pBufferSize) {
     SysTools::addLog("SysFlashDisk:readRAW, pSector: %lu, pBufferSize: %lu", pSector, pBufferSize);
-/*
+
     if(_isReadMode == false) {
         _file.flush();
         _file.close();
@@ -100,15 +103,13 @@ uint32_t readRAW(uint32_t pSector, uint8_t* pBuffer, uint32_t pBufferSize) {
     SysTools::addLog("SysFlashDisk:readRAW, Seek: %lu, Position: %lu", pSector, _file.position()/512);
     uint32_t bytes = _file.read(pBuffer, pBufferSize);    
     SysTools::addLog("SysFlashDisk:readRAW, Position: %lu, Raw Bytes Read: %lu", _file.position(), bytes);
-*/
-
-    return pBufferSize;
+    return bytes;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 uint32_t writeRAW(uint32_t pSector, uint8_t* pBuffer, uint32_t pBufferSize) {
     SysTools::addLog("SysFlashDisk:writeRAW, pSector: %lu, pBufferSize: %lu", pSector, pBufferSize);
-/*
+
     if(_isReadMode == true) {
         _file.flush();
         _file.close();
@@ -121,8 +122,7 @@ uint32_t writeRAW(uint32_t pSector, uint8_t* pBuffer, uint32_t pBufferSize) {
     SysTools::addLog("SysFlashDisk:writeRAW, Seek: %lu, Position: %lu", pSector, _file.position()/512);
     uint32_t bytes = _file.write(pBuffer, pBufferSize);
     SysTools::addLog("SysFlashDisk:writeRAW, Position: %lu, Raw Bytes Written: %lu, usedBytes: %lu", _file.position(), bytes, FFat.usedBytes());
-*/
-    return pBufferSize;
+    return bytes;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -135,22 +135,30 @@ uint16_t getSectorCount() {
     return _sectorCount;
 ;
 }
-
 /////////////////////////////////////////////////////////////////////////////////////////////////
 bool open(void (*pCallback)(bool)) {
     SysTools::addLog("%s", "SysFlashDisk:open");
     
-    if(!_disk.begin("mscDrive", false)) {
-        SysTools::addLog("%s", "SysFlashDisk::open, ABORT: Open Disk Failed");
+    //if(!SysFlashTools::openDisk()) {
+    //    SysTools::addLog("%s", "SysFlashDisk::open, ABORT: Mount Disk Failed");
+    //    return false;
+    //}
+    
+    _sectorSize = 512;
+    //_sectorCount = (FFat.totalBytes() / _sectorSize);
+    _sectorCount = 32;
+    SysTools::addLog("SysFlashDisk:open, Flash Disk Open, _sectorCount: %i, _sectorSize: %i", _sectorCount, _sectorSize);
+    //SysFlashTools::listDir("/", 0);
+    
+    //Open Msc Drive File
+    SysTools::addLog("SysFlashDisk::open, Open Drive File: '%s' for reading", FFAT_MSCFILE);
+    _file = FFat.open(FFAT_MSCFILE, FILE_READ);   
+    _isReadMode = true;
+    
+    if(!_file){
+        SysTools::addLog("SysFlashDisk::open, ABORT, failed to open file: '%s' for reading", FFAT_MSCFILE);
         return false;
     }
-
-    if(_disk.getUInt("sectorCount") == 0) SysFlashTools::formatDisk(&_disk, 32);
-    SysFlashTools::printSector(&_disk, "3");
-    SysFlashTools::dumpSector(&_disk, "0");
-    //SysTools::addLog("SysFlashDisk:open, sectorCount: %i", _disk.getUInt("sectorCount"));
-    return false;
-
 
     return true;
 }

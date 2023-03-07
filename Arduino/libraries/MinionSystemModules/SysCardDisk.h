@@ -1,9 +1,6 @@
 #ifndef SYSCARDDISK_H
 #define SYSCARDDISK_H
 
-#include "FS.h"
-#include "FFat.h"
-
 namespace SysCardDisk {
     bool open(void (*pCallback)(bool status));
     void readRAW(uint8_t* pBuffer, uint32_t pSector, uint8_t pIndex);

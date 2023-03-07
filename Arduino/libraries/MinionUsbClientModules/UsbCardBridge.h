@@ -1,9 +1,9 @@
-#ifndef USBHIDBRIDGE_H
-#define USBHIDBRIDGE_H
+#ifndef USBCARDBRIDGE_H
+#define USBCARDBRIDGE_H
 
 #include <ArduinoJson.h>  // Install from IDE Library manager
 
-namespace UsbMscCardBridge {
+namespace UsbCardBridge {
     bool isOpen();
     void open();
     //void controlDevice(DynamicJsonDocument&);

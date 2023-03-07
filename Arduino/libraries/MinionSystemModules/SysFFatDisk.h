@@ -1,10 +1,10 @@
-#ifndef SYSFLASHDISK_H
-#define SYSFLASHDISK_H
+#ifndef SYSFATDISK_H
+#define SYSFATDISK_H
 
 #include "FS.h"
 #include "FFat.h"
 
-namespace SysFlashDisk {
+namespace SysFatDisk {
     void deleteFile(const char * path);
     void renameFile(const char * path1, const char * path2);
     void appendFile(const char * path, const char * message);

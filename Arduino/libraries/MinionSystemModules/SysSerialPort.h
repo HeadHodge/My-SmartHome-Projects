@@ -1,12 +1,11 @@
-#ifndef COMSERIAL_H
-#define COMSERIAL_H
+#ifndef SYSSERIALPORT_H
+#define SYSSERIALPORT_H
 
-namespace ComSerial
-{
+namespace SysSerialPort {
     bool isConnected();
     void open(int baudRate);
     void refresh();
     void controlDevice(const char* pString);
-}
+} //namespace
 
 #endif

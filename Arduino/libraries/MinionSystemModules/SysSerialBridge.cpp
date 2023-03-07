@@ -2,15 +2,14 @@
 #include <Arduino.h>
 
 #include <SysTools.h>
-#include <ComSerial.h>
-#include <ComSerialBridge.h>
+#include <SysSerialPort.h>
+#include <SysSerialBridge.h>
 
-namespace ComSerialBridge
-{
+namespace SysSerialBridge {
 bool openFlg = false;
 
 bool isConnected() {
-    return ComSerial::isConnected();
+    return SysSerialPort::isConnected();
 }
 
 void controlDevice(DynamicJsonDocument& pKeyObj) {    
@@ -19,18 +18,18 @@ DynamicJsonDocument optionsObj(1024);
 }
 
 void refresh() {
-    ComSerial::refresh();
+    SysSerialPort::refresh();
 }
 
 void logString(const char* pString) {
-    ComSerial::controlDevice("LOG:");
-    ComSerial::controlDevice(pString);
-    ComSerial::controlDevice(" \r\n");
+    SysSerialPort::controlDevice("LOG:");
+    SysSerialPort::controlDevice(pString);
+    SysSerialPort::controlDevice(" \r\n");
 }
 
 void open(int pBaud = 115200) {
-    ComSerial::open(pBaud);
+    SysSerialPort::open(pBaud);
     openFlg = true;
     SysTools::addLog("%s", "ComSerialBridge::open, Bridge now Open");
 }
-}
+} //namespace
