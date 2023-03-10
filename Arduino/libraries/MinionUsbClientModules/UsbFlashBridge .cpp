@@ -1,30 +1,31 @@
 #include "USB.h"
 #include "USBMSC.h"
 
-#include <UsbFlashBridge.h>
-#include <SysFlashDisk.h>
 #include <SysTools.h>
+#include <SysPartitionDisk.h>
+#include <UsbFlashBridge.h>
 
 namespace UsbFlashBridge {
 USBMSC _MSC;
 
 static int32_t onWrite(uint32_t pSector, uint32_t pOffset, uint8_t* pBuffer, uint32_t pBuffSize){
-  //SysTools::addLog("usbCom::onWrite: Write Sector: 0x%X, Bytes: %u, Offset: %u \n", pSector, pBuffSize, pOffset);
+  SysTools::addLog("usbCom::onWrite: Write Sector: 0x%X, Bytes: %u, Offset: %u", pSector, pBuffSize, pOffset);
   if(pOffset != 0) SysTools::addLog("usbCom::onWrite: ***WARNING*** POffset is non-zero, pOffset: %u\n", pOffset);
 
     //for(int index=0;index<(pBuffSize/512);++index){
     //SD.writeRAW((uint8_t*)pBuffer+(index*512), pSector + index);
-    return SysFlashDisk::writeRAW(pSector, (uint8_t*)pBuffer, pBuffSize);
+    return SysPartitionDisk::writeRAW(pSector, (uint8_t*)pBuffer, pBuffSize);
     //}
+    //return 0;
 }
 
 static int32_t onRead(uint32_t pSector, uint32_t pOffset, void* pBuffer, uint32_t pBuffSize){
-  //SysTools::addLog("usbCom::onRead: pSector: %u, pOffset: %u, pBuffSize: %u\n", pSector, pOffset, pBuffSize);
+  //SysTools::addLog("usbCom::onRead: pSector: %u, pOffset: %u, pBuffSize: %u", pSector, pOffset, pBuffSize);
   if(pOffset != 0) SysTools::addLog("usbCom::onRead: ***WARNING*** POffset is non-zero, pOffset: %u\n", pOffset);
 
     //for(int index=0;index<(pBuffSize/512);++index){
     //SD.readRAW((uint8_t*)pBuffer+(index*512), pSector + index);
-    return SysFlashDisk::readRAW(pSector, (uint8_t*)pBuffer, pBuffSize);
+    return SysPartitionDisk::readRAW(pSector, (uint8_t*)pBuffer, pBuffSize);
     //}
 }
 
@@ -83,13 +84,13 @@ bool open() {
     //Open Flash Disk
     SysTools::addLog("%s", "UsbFlashBridge::open, Open Flash Disk");
  
-    if(!SysFlashDisk::open(nullptr)) {
+    if(!SysPartitionDisk::open(nullptr)) {
         SysTools::addLog("%s", "UsbFlashBridge::open, ABORT: Open Flash Disk Failed");
         return false;       
     };
    
     //Open USB-MSC Interface
-    SysTools::addLog("UsbFlashBridge::open, Open Usb-MSC interface with sectorCount: %i, sectorSize: %i", SysFlashDisk::getSectorCount(), SysFlashDisk::getSectorSize());        
+    SysTools::addLog("UsbFlashBridge::open, Open Usb-MSC interface with sectorCount: %i, sectorSize: %i", SysPartitionDisk::getSectorCount(), SysPartitionDisk::getSectorSize());        
     _MSC.vendorID("ESP32-S3");//max 8 chars
     _MSC.productID("USB_FLASHDRIVE");//max 16 chars
     _MSC.productRevision("1.0");//max 4 chars
@@ -97,7 +98,8 @@ bool open() {
     _MSC.onRead(onRead);
     _MSC.onWrite(onWrite);
     _MSC.mediaPresent(true);
-    _MSC.begin(SysFlashDisk::getSectorCount(), SysFlashDisk::getSectorSize());
+    //_MSC.begin(SysPartitionDisk::getSectorCount(), SysPartitionDisk::getSectorSize());
+    _MSC.begin(16, 512);
     
     SysTools::addLog("%s", "UsbFlashBridge::open, Enable Usb Stack");
     USB.onEvent(onUsbEvent);

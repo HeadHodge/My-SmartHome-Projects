@@ -140,11 +140,12 @@ uint16_t getSectorCount() {
 bool open(void (*pCallback)(bool)) {
     SysTools::addLog("%s", "SysFlashDisk:open");
     
-    if(!_disk.begin("mscDrive", false)) {
+    if(!_disk.begin("mscDrive", false, "ffat")) {
         SysTools::addLog("%s", "SysFlashDisk::open, ABORT: Open Disk Failed");
         return false;
     }
 
+    SysTools::addLog("SysFlashDisk:open, Available Sectors: %lu", _disk.freeEntries()/3);
     if(_disk.getUInt("sectorCount") == 0) SysFlashTools::formatDisk(&_disk, 32);
     SysFlashTools::printSector(&_disk, "3");
     SysFlashTools::dumpSector(&_disk, "0");

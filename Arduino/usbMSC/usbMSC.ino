@@ -180,7 +180,7 @@ void setup() {
   HWSerial.setDebugOutput(true);
 
   USB.onEvent(usbEventCallback);
-  /*
+  
   MSC.vendorID("ESP32");//max 8 chars
   MSC.productID("USB_MSC");//max 16 chars
   MSC.productRevision("1.0");//max 4 chars
@@ -189,8 +189,8 @@ void setup() {
   MSC.onWrite(onWrite);
   MSC.mediaPresent(true);
   MSC.begin(DISK_SECTOR_COUNT, DISK_SECTOR_SIZE);
-  USBSerial.begin();
-  */
+  //USBSerial.begin();
+  
   USB.begin();
 }
 

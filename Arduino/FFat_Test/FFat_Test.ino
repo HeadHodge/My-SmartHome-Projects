@@ -1,7 +1,13 @@
-#include "SysTools.h"
-#include "SysFlashTools.h"
+#include "FS.h"
+#include "FFat.h"
+#include "esp_partition.h"
 
-namespace SysFlashTools {
+// This file should be compiled with 'Partition Scheme' (in Tools menu)
+// set to 'Default with ffat' if you have a 4MB ESP32 dev module or
+// set to '16M Fat' if you have a 16MB ESP32 dev module.
+
+// You only need to format FFat the first time you run a test
+#define FORMAT_FFAT true
 
 #define FAT_U8(v) ((v) & 0xFF)
 #define FAT_U16(v) FAT_U8(v), FAT_U8((v) >> 8)
@@ -14,61 +20,133 @@ namespace SysFlashTools {
 
 #define MSC_DRIVENAME "/mscDrive.bin"
 
-/*
-/////////////////////////////////////////////////////////////////////////////////////////////////
-void listDir(const char * dirname, uint8_t levels){
-    SysTools::addLog("Listing directory: %s", dirname);
+static const uint32_t DISK_SECTOR_COUNT = 2 * 8; // 8KB is the smallest size that windows allow to mount
+static const uint16_t DISK_SECTOR_SIZE = 512;    // Should be 512
+static const uint16_t DISC_SECTORS_PER_TABLE = 1; //each table sector can fit 170KB (340 sectors)
 
-    File root = FFat.open(dirname);
+void listDir(fs::FS &fs, const char * dirname, uint8_t levels){
+    Serial.printf("Listing directory: %s\r\n", dirname);
+
+    File root = fs.open(dirname);
     if(!root){
-        SysTools::addLog("%s", "- failed to open directory");
+        Serial.println("- failed to open directory");
         return;
     }
     if(!root.isDirectory()){
-        SysTools::addLog("%s", " - not a directory");
+        Serial.println(" - not a directory");
         return;
     }
 
     File file = root.openNextFile();
     while(file){
         if(file.isDirectory()){
-            SysTools::addLog("  DIR : %s", file.name());
+            Serial.print("  DIR : ");
+            Serial.println(file.name());
             if(levels){
-                listDir(file.path(), levels -1);
+                listDir(fs, file.path(), levels -1);
             }
         } else {
-            SysTools::addLog("  FILE: %s, SIZE: %lu", file.name(), file.size());
+            Serial.print("  FILE: ");
+            Serial.print(file.name());
+            Serial.print("\tSIZE: ");
+            Serial.println(file.size());
         }
         file = root.openNextFile();
     }
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////////
-void testFileIO(const char* path){
-    SysTools::addLog("Testing file I/O with %s", MSC_DRIVENAME);
-    
+void readFile(fs::FS &fs, const char * path){
+    Serial.printf("Reading file: %s\r\n", path);
+
+    File file = fs.open(path);
+    if(!file || file.isDirectory()){
+        Serial.println("- failed to open file for reading");
+        return;
+    }
+
+    Serial.println("- read from file:");
+    while(file.available()){
+        Serial.write(file.read());
+    }
+    file.close();
+}
+
+void writeFile(fs::FS &fs, const char * path, const char * message){
+    Serial.printf("Writing file: %s\r\n", path);
+
+    File file = fs.open(path, FILE_WRITE);
+    if(!file){
+        Serial.println("- failed to open file for writing");
+        return;
+    }
+    if(file.print(message)){
+        Serial.println("- file written");
+    } else {
+        Serial.println("- write failed");
+    }
+    file.close();
+}
+
+void appendFile(fs::FS &fs, const char * path, const char * message){
+    Serial.printf("Appending to file: %s\r\n", path);
+
+    File file = fs.open(path, FILE_APPEND);
+    if(!file){
+        Serial.println("- failed to open file for appending");
+        return;
+    }
+    if(file.print(message)){
+        Serial.println("- message appended");
+    } else {
+        Serial.println("- append failed");
+    }
+    file.close();
+}
+
+void renameFile(fs::FS &fs, const char * path1, const char * path2){
+    Serial.printf("Renaming file %s to %s\r\n", path1, path2);
+    if (fs.rename(path1, path2)) {
+        Serial.println("- file renamed");
+    } else {
+        Serial.println("- rename failed");
+    }
+}
+
+void deleteFile(fs::FS &fs, const char * path){
+    Serial.printf("Deleting file: %s\r\n", path);
+    if(fs.remove(path)){
+        Serial.println("- file deleted");
+    } else {
+        Serial.println("- delete failed");
+    }
+}
+
+void testFileIO(fs::FS &fs, const char * path){
+    Serial.printf("Testing file I/O with %s\r\n", path);
+
     static uint8_t buf[512];
     size_t len = 0;
-    File file = FFat.open(MSC_DRIVENAME, FILE_WRITE);
+    File file = fs.open(path, FILE_WRITE);
     if(!file){
-        SysTools::addLog("%s", "- failed to open file for writing");
+        Serial.println("- failed to open file for writing");
         return;
     }
 
     size_t i;
-    SysTools::addLog("%s", "- writing..." );
+    Serial.print("- writing" );
     uint32_t start = millis();
     for(i=0; i<2048; i++){
         if ((i & 0x001F) == 0x001F){
-          //SysTools::addLog("%s", ".");
+          Serial.print(".");
         }
         file.write(buf, 512);
     }
+    Serial.println("");
     uint32_t end = millis() - start;
-    SysTools::addLog(" - %u bytes written in %u ms", 2048 * 512, end);
+    Serial.printf(" - %u bytes written in %u ms\r\n", 2048 * 512, end);
     file.close();
 
-    file = FFat.open(MSC_DRIVENAME);
+    file = fs.open(path);
     start = millis();
     end = start;
     i = 0;
@@ -76,7 +154,7 @@ void testFileIO(const char* path){
         len = file.size();
         size_t flen = len;
         start = millis();
-        SysTools::addLog("%s", "- reading..." );
+        Serial.print("- reading" );
         while(len){
             size_t toRead = len;
             if(toRead > 512){
@@ -84,28 +162,30 @@ void testFileIO(const char* path){
             }
             file.read(buf, toRead);
             if ((i++ & 0x001F) == 0x001F){
-              //SysTools::addLog("%s", ".");
+              Serial.print(".");
             }
             len -= toRead;
         }
+        Serial.println("");
         end = millis() - start;
-        SysTools::addLog("- %u bytes read in %u ms", flen, end);
+        Serial.printf("- %u bytes read in %u ms\r\n", flen, end);
         file.close();
-                
-        SysTools::addLog("**Test Complete** \n", flen, end);
-        listDir("/", 0);
     } else {
-        SysTools::addLog("%s", "- failed to open file for reading");
+        Serial.println("- failed to open file for reading");
     }
 }
+
+/*
+typedef struct {
+    esp_flash_t* flash_chip;            //*!< SPI flash chip on which the partition resides /
+    esp_partition_type_t type;          //*!< partition type (app/data) /
+    esp_partition_subtype_t subtype;    //*!< partition subtype /
+    uint32_t address;                   //*!< starting address of the partition in flash /
+    uint32_t size;                      //*!< size of the partition, in bytes /
+    char label[17];                     //*!< partition label, zero-terminated ASCII string /
+    bool encrypted;                     //*!< flag is set to true if partition is encrypted /
+} esp_partition_t;
 */
-
-/////////////////////////////////////////////////////////////////////////////////////////////////
-bool formatDisk(Preferences* pDisk, uint32_t pSectorCount) {
-  SysTools::addLog("SysFlashTools::formatDisk, pSectorCount: %lu", pSectorCount);
-  uint8_t _sectorTables = 1;
-
-  SysTools::addLog("SysFlashTools::formatDisk, create 4 bootSectors");  
   uint8_t bootSectors[4][512] = {
   //------------- Block0: Boot Sector -------------//
   {
@@ -117,9 +197,9 @@ bool formatDisk(Preferences* pDisk, uint32_t pSectorCount) {
     FAT_U16(1),   //reserved_sectors_count
     FAT_U8(1),    //file_alloc_tables_num
     FAT_U16(16),  //max_root_dir_entries
-    FAT_U16(pSectorCount), //fat12_sector_num
+    FAT_U16(DISK_SECTOR_COUNT), //fat12_sector_num
     0xF8,         //media_descriptor
-    FAT_U16(_sectorTables),   //sectors_per_alloc_table;//FAT12 and FAT16
+    FAT_U16(DISC_SECTORS_PER_TABLE),   //sectors_per_alloc_table;//FAT12 and FAT16
     FAT_U16(1),   //sectors_per_track;//A value of 0 may indicate LBA-only access
     FAT_U16(1),   //num_heads
     FAT_U32(0),   //hidden_sectors_count
@@ -212,38 +292,10 @@ bool formatDisk(Preferences* pDisk, uint32_t pSectorCount) {
   }
  };
  
- 
-    //Format disk file
-    SysTools::addLog("%s", "SysFlashTools::formatDisk, Format Disk");
-    uint32_t start = millis();
-    uint8_t nullSector[512] = {0};
-    
-    //Add boot sectors to disk file
-    SysTools::addLog("SysFlashTools::formatDisk, Write %i Boot Sectors...", 4);
-    
-    SysTools::addLog("SysFlashTools::formatDisk, bytesPut: %i", pDisk->putBytes("0", (uint8_t*)&bootSectors[0], sizeof(bootSectors[0])));
-    SysTools::addLog("SysFlashTools::formatDisk, bytesPut: %i", pDisk->putBytes("1", (uint8_t*)&bootSectors[1], sizeof(bootSectors[1])));
-    SysTools::addLog("SysFlashTools::formatDisk, bytesPut: %i", pDisk->putBytes("2", (uint8_t*)&bootSectors[2], sizeof(bootSectors[2])));
-    SysTools::addLog("SysFlashTools::formatDisk, bytesPut: %i", pDisk->putBytes("3", (uint8_t*)&bootSectors[3], sizeof(bootSectors[3])));
-     
-    //All Done
-    pDisk->putUInt("sectorCount", pSectorCount);
-    SysTools::addLog("%s", "SysFlashTools::formatDisk, Create Flash Disk Complete \n");
-    return true;
-}
-
 /////////////////////////////////////////////////////////////////////////////////////////////////
-void dumpSector(Preferences* pDisk, char* pKey, uint32_t pByteCount) {
-  uint16_t sectorSize = pDisk->getBytesLength(pKey);
-  uint8_t _sector[sectorSize] = {0};
-
-    if(pByteCount > sectorSize) pByteCount = sectorSize;
-
-    if(pDisk->getBytes(pKey, (uint8_t*)&_sector, sectorSize) != sectorSize) {
-        SysTools::addLog("SysFlashTools::dumpSector, ABORT: Unable to read sector: %s", pKey);
-        return;
-    }
-    
+void dumpSector(uint8_t* pSector, uint32_t pByteCount) {
+  uint32_t sectorSize = 512;
+  
     Serial.println("");
     Serial.printf("Sector Dump: First %i Bytes\n", pByteCount);
     uint8_t lineCount = 0;
@@ -254,37 +306,84 @@ void dumpSector(Preferences* pDisk, char* pKey, uint32_t pByteCount) {
             Serial.println("");
         }
         
-        Serial.printf("0x%02X(%1c)", _sector[i], _sector[i]);
+        Serial.printf("0x%02X(%1c)", (pSector+i)[0], (pSector+i)[0]);
         if(i < (pByteCount - 1)) Serial.printf(",");
     }
+     
+    Serial.println("\n");
     
-    Serial.println("");
     Serial.printf("Sector Dump: Last %i Bytes\n", pByteCount);
     lineCount = 0;
-    for(int i=sectorSize-pByteCount; i<sectorSize; ++i) {
+    for(int i=(sectorSize - pByteCount); i<sectorSize; ++i) {
         ++lineCount;
         if(lineCount > 16) {
             lineCount = 0;
             Serial.println("");
         }
         
-        Serial.printf("0x%02X(%1c)", _sector[i], _sector[i]);
-        if(i < (sectorSize - 1)) Serial.printf(",");
+        Serial.printf("0x%02X(%1c)", (pSector+i)[0], (pSector+i)[0]);
+        if(i < (pByteCount - 1)) Serial.printf(",");
     }
-    
+        
     Serial.println("");
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////////
-void printSector(Preferences* pDisk, char* pKey) {
-  uint16_t sectorSize = pDisk->getBytesLength(pKey);
-  uint8_t _sector[sectorSize] = {0};
+void setup(){
+  static const esp_partition_t* msc_ota_partition = NULL;
 
-    if(pDisk->getBytes(pKey, (uint8_t*)&_sector, sectorSize) != sectorSize) {
-        SysTools::addLog("SysFlashTools::printSector, ABORT: Unable to read sector: %s", pKey);
+    Serial.begin(115200);
+    Serial.setDebugOutput(true);
+    delay(4000);
+    
+    uint8_t sector[512] = {0};
+    const esp_partition_t* ffat_partition = esp_partition_find_first(ESP_PARTITION_TYPE_ANY, ESP_PARTITION_SUBTYPE_ANY, "ffat");
+    
+    if(ffat_partition == nullptr) {
+        Serial.printf("esp_partition_find_first, ABORT: Partition Not Found \n");
         return;
     }
+
+    if (FORMAT_FFAT) FFat.format();
+    //Serial.printf("esp_partition_write: %lu \n", esp_partition_write(ffat_partition, 0, (uint8_t*)&bootSectors[0], sizeof(bootSectors[0])));
+    //Serial.printf("esp_partition_write: %lu \n", esp_partition_write(ffat_partition, 512, (uint8_t*)&bootSectors[1], sizeof(bootSectors[1])));
+    //Serial.printf("esp_partition_write: %lu \n", esp_partition_write(ffat_partition, 1024, (uint8_t*)&bootSectors[2], sizeof(bootSectors[2])));
+    //Serial.printf("esp_partition_write: %lu \n", esp_partition_write(ffat_partition, 1536, (uint8_t*)&bootSectors[3], sizeof(bootSectors[3])));
     
-    SysTools::addLog("SysFlashTools::printSector, Print Sector, sector: %s, val:\n\n'%s'", pKey, _sector);
+    if(!FFat.begin()){
+        Serial.println("FFat Mount Failed");
+        Serial.printf("esp_partition_read: %lu \n", esp_partition_read(ffat_partition, 0, (uint8_t*)&sector, sizeof(sector)));
+        dumpSector((uint8_t*)&sector, 256);
+        return;
+    }
+  
+    if(ffat_partition != nullptr) {
+        Serial.printf("esp_partition_find_first, address: 0x%04X, size: 0x%04X, label: %s \n", ffat_partition->address, ffat_partition->size, ffat_partition->label);
+        
+        Serial.printf("esp_partition_read: %lu \n", esp_partition_read(ffat_partition, 512, (uint8_t*)&sector, sizeof(sector)));
+        dumpSector((uint8_t*)&sector, 256);
+    }
+   
+    
+    
+    
+    
+    return;
+    
+    Serial.printf("Total space: %10u\n", FFat.totalBytes());
+    Serial.printf("Free space: %10u\n", FFat.freeBytes());
+    listDir(FFat, "/", 0);
+    writeFile(FFat, "/hello.txt", "Hello ");
+    appendFile(FFat, "/hello.txt", "World!\r\n");
+    readFile(FFat, "/hello.txt");
+    renameFile(FFat, "/hello.txt", "/foo.txt");
+    readFile(FFat, "/foo.txt");
+    deleteFile(FFat, "/foo.txt");
+    testFileIO(FFat, "/test.txt");
+    Serial.printf("Free space: %10u\n", FFat.freeBytes());
+    deleteFile(FFat, "/test.txt");
+    Serial.println( "Test complete" );
 }
-} //namespace
+
+void loop(){
+
+}
