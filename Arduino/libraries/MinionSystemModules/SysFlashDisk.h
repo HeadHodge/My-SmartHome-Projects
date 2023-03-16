@@ -15,7 +15,7 @@ namespace SysFlashDisk {
     uint16_t getSectorSize();
     uint16_t getSectorCount();
     
-    bool open(void (*pCallback)(bool status));
+    bool enable(void (*pCallback)(bool status));
     bool isConnected();
     
     //bool isReady();

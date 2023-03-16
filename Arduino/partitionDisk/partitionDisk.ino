@@ -10,8 +10,8 @@ void setup(){
     delay(4000);
     SysTools::addLog("%s", "Setup flashDisk");
     
-    SysPartitionDisk::open(nullptr);   
-    //SysFlashDisk::testFileIO("/test.txt");
+    SysPartitionDisk::enable(nullptr);   
+    //SysFlashDisk::testFileIO("test.txt");
     
     //SysTools::addLog( "%s \n", "Test complete" );
 }

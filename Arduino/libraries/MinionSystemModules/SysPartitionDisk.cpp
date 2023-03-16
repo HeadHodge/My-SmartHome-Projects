@@ -1,5 +1,13 @@
-#include "FS.h"
-#include "FFat.h"
+
+//#include "FS.h"
+//#include "FFat.h"
+# include <stdio.h>
+# include <string.h>
+#include "FF.h"
+
+//#include "esp_vfs.h"
+#include "esp_vfs_fat.h"
+#include "diskio_impl.h"
 #include "esp_partition.h"
 
 #include "SysFlashTools.h"
@@ -27,21 +35,24 @@ namespace SysPartitionDisk {
 
 // You only need to format FFat the first time you run a test
 #define FFAT_FORMATFLG false
-#define FFAT_SECTORSIZE 512
 #define FFAT_MSCFILE "/mscDrive.bin"
 
-const uint32_t DISK_SECTOR_COUNT = 2 * 8; // 8KB is the smallest size that windows allow to mount
+const uint16_t DISK_SECTOR_COUNT = 16; // 8KB is the smallest size that windows allow to mount
 const uint16_t DISK_SECTOR_SIZE = 512;    // Should be 512
 const uint16_t DISC_SECTORS_PER_TABLE = 1; //each table sector can fit 170KB (340 sectors)
-
-File _file;
 const esp_partition_t* _ffatPartition = esp_partition_find_first(ESP_PARTITION_TYPE_ANY, ESP_PARTITION_SUBTYPE_ANY, "ffat");
-bool _isReadMode = true;
-uint16_t _sectorCount = 0, _sectorSize = FFAT_SECTORSIZE;
-uint8_t _tempBuff[4096];
 
+FATFS* _fatFS = (FATFS*)malloc(sizeof (FATFS));
+//File   _file;
+bool   _isFormatted = false;
+bool   _isReadMode = true;
+uint16_t _sectorCount = DISK_SECTOR_COUNT;
+uint16_t _sectorSize = DISK_SECTOR_SIZE;
+//uint8_t _flashBuff[8192];
+uint8_t* _formatBuff;
+uint8_t* _flashBuff = (uint8_t*)malloc(4096);
 
-  uint8_t bootSectors[4][512] = {
+const  uint8_t bootSectors[4][512] = {
   //------------- Block0: Boot Sector -------------//
   {
     // Header (62 bytes)
@@ -146,7 +157,7 @@ uint8_t _tempBuff[4096];
     FAT_FILECONTENTS
   }
  };
- 
+/* 
 void readFile(const char * path){
     SysTools::addLog("Reading file: %s\r\n", path);
 
@@ -214,6 +225,7 @@ void deleteFile(const char * path){
         SysTools::addLog("%s", "- delete failed");
     }
 }
+*/
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 uint16_t getSectorSize() {
@@ -226,12 +238,13 @@ uint16_t getSectorCount() {
 }
  
 /////////////////////////////////////////////////////////////////////////////////////////////////
-void dumpBuffer(uint8_t* pBuffer, uint32_t pBufferSize, uint32_t pByteCount) {
-
-/////////////////////////////////////////////////////////////////////////////////////////////////  
-    SysTools::addLog("SysPartitionDisk::dumpBuffer, First %i Bytes\n", pByteCount);
+void dumpBuffer(const uint8_t* pBuffer, uint32_t pBufferSize, uint32_t pByteCount) {
+  SysTools::addLog("\nSysPartitionDisk::dumpBuffer, totalBytes: %u", pBufferSize);
     
+    //Print First Few Buffer Bytes
     uint8_t lineCount = 0;
+    
+    Serial.printf("%s", "First: ");
     for(int i=0; i<pByteCount; ++i) {
         ++lineCount;
         if(lineCount > 16) {
@@ -243,12 +256,14 @@ void dumpBuffer(uint8_t* pBuffer, uint32_t pBufferSize, uint32_t pByteCount) {
         if(i < (pByteCount - 1)) Serial.printf(",");
     }
      
-    Serial.println("\n");
+    Serial.println("\n===========================================================================================================================================");
     
-/////////////////////////////////////////////////////////////////////////////////////////////////    
-    SysTools::addLog("SysPartitionDisk::dumpBuffer, Last %i Bytes\n", pByteCount);
+    //Print Last Few Buffer Bytes
+    //SysTools::addLog("SysPartitionDisk::dumpBuffer, Last %i Bytes of %u Total", pByteCount, pBufferSize);
     
     lineCount = 0;
+    
+    Serial.printf("%s", " Last: ");
     for(int i=(pBufferSize - pByteCount); i<pBufferSize; ++i) {
         ++lineCount;
         if(lineCount > 16) {
@@ -262,105 +277,93 @@ void dumpBuffer(uint8_t* pBuffer, uint32_t pBufferSize, uint32_t pByteCount) {
         
     Serial.println("\n");
 }
+
 /////////////////////////////////////////////////////////////////////////////////////////////////
-uint32_t formatDisk(uint32_t pStartSector, uint8_t* pBuffer, uint32_t pBufferSize) {
-  SysTools::addLog("SysPartitionDisk::writeRAW, pStartSector: %lu, pBufferSize: %lu", pStartSector, pBufferSize);
-    
+DSTATUS diskInitialize (BYTE pdrv) {
+    SysTools::addLog("SysPartitionDisk::diskInitialize, pdrv: %u", pdrv);
+    return RES_OK;
+};
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
+DSTATUS diskStatus (BYTE pdrv) {
+    SysTools::addLog("SysPartitionDisk::diskStatus, pdrv: %u", pdrv);
+    return RES_OK;
+};
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
+uint32_t writeRAW(uint32_t pStartSector, const uint8_t* pBuffer, uint32_t pBufferSize) {
+  //SysTools::addLog("SysPartitionDisk::writeRAW, pStartSector: %lu, pBufferSize: %lu", pStartSector, pBufferSize);
   uint32_t hasFailed;
   const uint16_t startBlock = (pStartSector*512)/4096;
   const uint16_t byteOffset = (pStartSector*512) - (startBlock*4096);
   const uint16_t maxBufferSize = 4096 - byteOffset;
 
-   SysTools::addLog("SysPartitionDisk::writeRAW, replace memory, startBlock: %lu, byteOffset: %lu, bufferSize: %lu, maxBufferSize: %lu", startBlock, byteOffset, pBufferSize, maxBufferSize);
+   SysTools::addLog("SysPartitionDisk::writeRAW, replace flash memory, pStartSector: %lu, startBlock: %lu, byteOffset: %lu, bufferSize: %lu, maxBufferSize: %lu", pStartSector, startBlock, byteOffset, pBufferSize, maxBufferSize);
+   //dumpBuffer(pBuffer, 512, 32);
 
    if(pBufferSize > maxBufferSize) {
         SysTools::addLog("syspartitiondisk::writeRAW, ABORT: pBufferSize %lu greater than maxBufferSize: %lu", pBufferSize, maxBufferSize);
         return 0;       
     }
-    
-    
-    dumpBuffer(pBuffer, pBufferSize, 32);
-
-uint8_t tempBuff[4096];
-//uint8_t tempBuff1[4096];
-
-    hasFailed = esp_partition_read_raw(_ffatPartition, startBlock*4096, &tempBuff[0], 4096);    
-    
+    //dumpBuffer(pBuffer, pBufferSize, 32);
+  
+    hasFailed = esp_partition_read_raw(_ffatPartition, startBlock*4096, _flashBuff, 4096);       
     if(hasFailed) {
-        SysTools::addLog("SysPartitionDisk::writeRAW, ABORT: esp_partition_read_raw failed");
+        SysTools::addLog("SysPartitionDisk::writeRAW, ABORT: esp_partition_read_raw failed, pStartSector: %lu, pBufferSize: %lu", pStartSector, pBufferSize);
         return 0;
     }
     
-    memcpy(&tempBuff[byteOffset], &pBuffer[0], pBufferSize);
-  
-    hasFailed = esp_partition_erase_range(_ffatPartition, startBlock*4096, sizeof(tempBuff));   
+    //if(pStartSector == 0 || pStartSector == 0) dumpBuffer(pBuffer, 512, 16);
+    //if(pStartSector == 0 || pStartSector == 0) dumpBuffer(_flashBuff, 512, 16);
+    memcpy(_flashBuff+byteOffset, pBuffer, 512);
+    //if(pStartSector == 0 || pStartSector == 0) dumpBuffer(_flashBuff+byteOffset, 512, 16);
+
+    hasFailed = esp_partition_erase_range(_ffatPartition, startBlock*4096, 4096);   
     if(hasFailed) {
         SysTools::addLog("SysPartitionDisk::writeRAW, ABORT: esp_partition_erase_range failed: %lu", hasFailed);
+        SysTools::addLog("SysPartitionDisk::writeRAW, pStartSector: %lu, pBufferSize: %lu", pStartSector, pBufferSize);
         return 0;
     }
 
-    hasFailed = esp_partition_write_raw(_ffatPartition, startBlock*4096, &tempBuff[0], sizeof(tempBuff));    
+    hasFailed = esp_partition_write_raw(_ffatPartition, startBlock*4096, _flashBuff, 4096);    
     if(hasFailed) {
         SysTools::addLog("SysPartitionDisk::writeRAW, ABORT: esp_partition_read failed");
+        SysTools::addLog("SysPartitionDisk::writeRAW, pStartSector: %lu, pBufferSize: %lu", pStartSector, pBufferSize);
         return 0;
     }
-
-    SysTools::addLog("SysPartitionDisk::writeRAW, totalBytes written: %lu, starting at byte: %lu \n", pBufferSize, pStartSector);
-    dumpBuffer(tempBuff, sizeof(tempBuff), 32);
-
-    Serial.println("");
+/*    
+    if(pStartSector == 82 || pStartSector == 97) {
+        esp_partition_read_raw(_ffatPartition, 63*512, _flashBuff, 1024);       
+        dumpBuffer(_flashBuff, 512, 16);
+        dumpBuffer(_flashBuff+512, 512, 16);
+    }
+*/
+     //SysTools::addLog("SysPartitionDisk::writeRAW, totalBytes written: %lu, starting at byte: %lu \n", pBufferSize, pStartSector);
+    //dumpBuffer(_flashBuff, 512, 32);
+    //Serial.println("");
+    
     return pBufferSize;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
-uint32_t writeRAW(uint32_t pStartSector, uint8_t* pBuffer, uint32_t pBufferSize) {
-  SysTools::addLog("SysPartitionDisk::writeRAW, pStartSector: %lu, pBufferSize: %lu", pStartSector, pBufferSize);
+DRESULT diskWrite (BYTE pdrv, const BYTE* buff, DWORD sector, UINT count) {
+    SysTools::addLog("SysPartitionDisk::disk_write, pdrv: %u, sector: %lu, count: %u", pdrv, sector, count);
+    //dumpBuffer(buff, 512, 32);
     
-  uint32_t hasFailed;
-  const uint16_t startBlock = (pStartSector*512)/4096;
-  const uint16_t byteOffset = (pStartSector*512) - (startBlock*4096);
-  const uint16_t maxBufferSize = 4096 - byteOffset;
-
-   SysTools::addLog("SysPartitionDisk::writeRAW, replace memory, startBlock: %lu, byteOffset: %lu, bufferSize: %lu, maxBufferSize: %lu", startBlock, byteOffset, pBufferSize, maxBufferSize);
-
-   if(pBufferSize > maxBufferSize) {
-        SysTools::addLog("syspartitiondisk::writeRAW, ABORT: pBufferSize %lu greater than maxBufferSize: %lu", pBufferSize, maxBufferSize);
-        return 0;       
+    if(!_flashBuff) {
+        SysTools::addLog("SysPartitionDisk::diskWrite, ABORT: calloc '_flashBuff' failed");
+        return RES_ERROR;
     }
     
-    
-    dumpBuffer(pBuffer, pBufferSize, 32);
-    
-
-//uint8_t tempBuff1[4096];
-
-    hasFailed = esp_partition_read_raw(_ffatPartition, startBlock*4096, &_tempBuff[0], 4096);    
-    
-    if(hasFailed) {
-        SysTools::addLog("SysPartitionDisk::writeRAW, ABORT: esp_partition_read_raw failed");
-        return 0;
+    for(int i=0; i < count; ++i) {
+        if(writeRAW(sector+i, buff+(i*512), 512) != 512) {
+            SysTools::addLog("SysPartitionDisk::disk_write, ABORT: writeRAW failed");
+            return RES_ERROR;
+        };       
     }
-    
-    memcpy(&_tempBuff[byteOffset], &pBuffer[0], pBufferSize);
-  
-    hasFailed = esp_partition_erase_range(_ffatPartition, startBlock*4096, sizeof(_tempBuff));   
-    if(hasFailed) {
-        SysTools::addLog("SysPartitionDisk::writeRAW, ABORT: esp_partition_erase_range failed: %lu", hasFailed);
-        return 0;
-    }
-
-    hasFailed = esp_partition_write_raw(_ffatPartition, startBlock*4096, &_tempBuff[0], sizeof(_tempBuff));    
-    if(hasFailed) {
-        SysTools::addLog("SysPartitionDisk::writeRAW, ABORT: esp_partition_read failed");
-        return 0;
-    }
-
-    SysTools::addLog("SysPartitionDisk::writeRAW, totalBytes written: %lu, starting at byte: %lu \n", pBufferSize, pStartSector);
-    dumpBuffer(_tempBuff, sizeof(_tempBuff), 32);
-
-    Serial.println("");
-    return pBufferSize;
-}
+   
+    return RES_OK;
+};
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 uint32_t readRAW(uint32_t pStartSector, uint8_t* pBuffer, uint32_t pBufferSize) {
@@ -369,48 +372,249 @@ uint32_t readRAW(uint32_t pStartSector, uint8_t* pBuffer, uint32_t pBufferSize) 
     uint32_t hasFailed = esp_partition_read_raw(_ffatPartition, pStartSector*512, pBuffer, pBufferSize);    
     if(hasFailed) {
         SysTools::addLog("SysPartitionDisk::readRAW, ABORT: esp_partition_read failed");
+        SysTools::addLog("SysPartitionDisk::readRAW, pStartSector: %lu, pBufferSize: %lu", pStartSector, pBufferSize);
         return 0;
     }
 
     //SysTools::addLog("SysPartitionDisk::readRAW, totalBytes read: %lu, starting at sector: %lu \n", pBufferSize, pStartSector);
     //dumpBuffer(pBuffer, pBufferSize, 32);
     //Serial.println("");
+    
     return pBufferSize;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
-bool open(void (*pCallback)(bool)) {
-  SysTools::addLog("%s", "SysPartitionDisk::open");
+DRESULT diskRead (BYTE pdrv, BYTE* buff, DWORD sector, UINT count) {
+    SysTools::addLog("SysPartitionDisk::disk_read, pdrv: %u, sector: %lu, count: %u", pdrv, sector, count);
 
-    if(_ffatPartition == nullptr) {
-        SysTools::addLog("SysPartitionDisk::open, ABORT: Flash Partition 'ffat' Not Found \n");
-        return false;
+    readRAW(sector, buff, count*DISK_SECTOR_SIZE);
+    
+    for(int i=0; i < count; ++i) {
+        SysTools::addLog("SysPartitionDisk::disk_read, dump sector: %u", sector+i);
+        dumpBuffer(buff+(i*512), DISK_SECTOR_SIZE, 16);
     }
 
-    SysTools::addLog("SysPartitionDisk::open, esp_partition found, address: 0x%04X, size: 0x%04X, label: %s \n", _ffatPartition->address, _ffatPartition->size, _ffatPartition->label);
-    if(FORMAT_FFAT) FFat.format();
+    return RES_OK;
+};
 
-    if(!FFat.begin()){
-        SysTools::addLog("SysPartitionDisk::open, ABORT: FFat.begin Failed \n");
-        return false;
+/////////////////////////////////////////////////////////////////////////////////////////////////
+DRESULT diskIoctl (BYTE pdrv, BYTE cmd, void* buff) {
+    //SysTools::addLog("SysPartitionDisk::disk_ioctl, pdrv: %u, cmd: %u", pdrv, cmd);
+    
+    if(cmd == 0) {
+        SysTools::addLog("SysPartitionDisk::disk_ioctl, cmd: 0, CTRL_SYNC");
+        if(_isFormatted == true)return RES_OK;
+        
+        uint8_t sector[512];
+        
+        for(int i=0; i < 36; ++i) {
+            if(readRAW(63+i, &sector[0], 512) != 512) continue;
+            if(writeRAW(0+i, (const uint8_t*)&sector, 512) != 512) continue;
+
+            SysTools::addLog("SysPartitionDisk::disk_ioctl, Sector: %lu copied to Sector: %lu", 63+i, 0+i);
+        }
+        
+        _isFormatted = true;
+    } else if(cmd == 1) {
+        SysTools::addLog("SysPartitionDisk::disk_ioctl, cmd: 1, GET_SECTOR_COUNT: %i", 512);
+        ((uint32_t*)buff)[0] = (uint32_t)512;
+    } else if(cmd == 2) {
+        SysTools::addLog("SysPartitionDisk::disk_ioctl, cmd: 2, GET_SECTOR_SIZE: %i",512);
+        ((uint16_t*)buff)[0] = (uint16_t)512;
+    } else if(cmd == 3) {
+        SysTools::addLog("SysPartitionDisk::disk_ioctl, cmd: 3, GET_BLOCK_SIZE: %i", 1);
+        ((uint32_t*)buff)[0] = (uint32_t)1;
+    } else if(cmd == 4) {
+        SysTools::addLog("SysPartitionDisk::disk_ioctl, cmd: 4, CTRL_TRIM");
+    } else {
+        SysTools::addLog("SysPartitionDisk::disk_ioctl, ABORT: Unsupported cmd: %u", cmd);
+        return RES_PARERR;
+    };
+    
+    Serial.println("");
+    return RES_OK;
+};
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
+bool enable(void (*pCallback)(bool)) {
+  //SysTools::addLog("%s", "SysPartitionDisk::open");
+  SysTools::addLog("SysPartitionDisk::open, esp_partition found, address: 0x%04X, size: 0x%04X, label: %s \n", _ffatPartition->address, _ffatPartition->size, _ffatPartition->label);
+    
+/*    
+    //Format Disk
+    SysTools::addLog("SysPartitionDisk::open, Format Disk If Unformatted");
+
+    writeRAW(0, (const uint8_t*)&bootSectors[0][0], 512);
+    writeRAW(1, (const uint8_t*)&bootSectors[1][0], 512);
+    writeRAW(2, (const uint8_t*)&bootSectors[2][0], 512);
+    writeRAW(3, (const uint8_t*)&bootSectors[3][0], 512);
+
+    //Disk Formatted
+    SysTools::addLog("SysPartitionDisk::open, DISK FORMATTED\n");
+    _isFormatted = true;
+*/
+
+    //esp_vfs_fat_register
+    SysTools::addLog("SysPartitionDisk::open, esp_vfs_fat_register, FF_MIN_SS: %u, FF_MAX_SS: %u", FF_MIN_SS, FF_MAX_SS);
+    uint8_t hasFailed = esp_vfs_fat_register("/myfat", "", 5, &_fatFS);
+    if(hasFailed) {
+        SysTools::addLog("SysPartitionDisk::open, ABORT: esp_vfs_fat_register failed, errCode: %u", hasFailed);
+        return 0;
+    }
+
+    //ff_diskio_register
+    SysTools::addLog("SysPartitionDisk::open, ff_diskio_register, pdrv: %u", _fatFS->pdrv);
+    
+    ff_diskio_impl_t diskioSettings = {
+        diskInitialize,
+        diskStatus,
+        diskRead,
+        diskWrite,
+        diskIoctl
+    };
+
+    ff_diskio_register(_fatFS->pdrv, &diskioSettings);
+    
+    //Registered
+    SysTools::addLog("SysPartitionDisk::open, REGISTERED ff_diskio_register\n");
+
+    //Format Disk
+    _formatBuff = (uint8_t*)malloc(4096);	      
+    if(!_formatBuff) {
+        SysTools::addLog("SysPartitionDisk::open, ABORT: malloc '_formatBuff' failed");
+        return 0;
     }
     
+    hasFailed = f_mkfs("", 1, 512, _formatBuff, 4096); //drive, format, au size, workbuff, workbuffsize 
+    if(hasFailed != FR_OK) {
+        SysTools::addLog("SysPartitionDisk::open, ABORT: f_mount disk, errCode: %u", hasFailed);
+        return 0;
+    }
+
+    //Disk Formatted
+    SysTools::addLog("SysPartitionDisk::open, DISK FORMATTED\n");
+    
+    //f_mount disk
+    SysTools::addLog("SysPartitionDisk::open, f_mount disk, pdrv: %u\n", _fatFS->pdrv);
+    
+    hasFailed = f_mount(_fatFS, "", 0); //0-delay, 1-immediate
+    if(hasFailed != FR_OK) {
+        SysTools::addLog("SysPartitionDisk::open, ABORT: f_mount disk, errCode: %u", hasFailed);
+        return 0;
+    }
+
+    //Disk Mounted
+    SysTools::addLog("SysPartitionDisk::open, f_mount: DISK MOUNTED\n");
     uint8_t sector[512];
-    formatDisk(0, &bootSectors[0][0], sizeof(bootSectors));
     
-    /*
-    readRAW(0, &sector[0], sizeof(sector));
-    readRAW(1, &sector[0], sizeof(sector));
-    readRAW(2, &sector[0], sizeof(sector));
-    readRAW(3, &sector[0], sizeof(sector));
-    */
+    Serial.println("dump sector 2");
+    readRAW(2, &sector[0], 512);
+    dumpBuffer(&sector[0], 512, 256);
     
-    //memset(&sector, 'x', sizeof(sector));
-    //writeRAW(0, &bootSectors[0], sizeof(bootSectors));
+    Serial.println("dump sector 3");
+    readRAW(3, &sector[0], 512);
+    dumpBuffer(&sector[0], 512, 16);
     
-    //readRAW(0, &sector[0], sizeof(sector));
-   
-    return true;
+    //Create File
+    SysTools::addLog("SysPartitionDisk::open,  Create File: /myfat/README.TXT\n");
+    
+    FILE* fp = fopen("/myfat/README.TXT", "w"); // "w" defines "writing mode"
+    if ( fp == NULL )
+    {
+        Serial.printf( "Could not create file /myfat/README.TXT \n" ) ;
+        return 0;
+    }
+    
+    fputs("Hello World", fp);
+    fclose(fp);
+        
+    //Open File
+    SysTools::addLog("SysPartitionDisk::open, Open File: /myfat/README.TXT\n");
+    
+    fp = fopen("/myfat/README.TXT", "r") ;
+    if ( fp == NULL )
+    {
+        Serial.printf( "Could not open file /myfat/README.TXT \n" ) ;
+        return 0;
+    }
+    
+    //Read File
+    char str[128];
+    if(fgets(str, sizeof(str), fp) != NULL) Serial.printf("/myfat/README.TXT: %s \n", str) ;
+    fclose(fp);
+    
+    return 0;
+
+/*   
+    FF_DIR dj;         // Directory object /
+    FILINFO fno;    // File information /
+    FIL file;      // File objects /
+    uint size;
+
+    hasFailed = f_open(&file, "readme.txt", FA_READ);
+    if(hasFailed != FR_OK) {
+        SysTools::addLog("SysPartitionDisk::open, ABORT: f_open, errCode: %u", hasFailed);
+        return 0;
+    }
+
+    hasFailed = f_read (&file, &content, sizeof(content), &size);
+    if(hasFailed != FR_OK) {
+        SysTools::addLog("SysPartitionDisk::open, ABORT: f_read, errCode: %u", hasFailed);
+        return 0;
+    }
+    
+    f_close (&file);
+    SysTools::addLog("SysPartitionDisk::open, READ: %lu, content: %s", size, content);
+    
+
+return 0;
+*/
+   //Write File
+    
+    FIL fdisk;      /* File objects */
+    FRESULT fr;          /* FatFs function common result code */
+
+    /* Create destination file on the drive 0 */
+    hasFailed = f_open(&fdisk, "/world.txt", FA_WRITE | FA_CREATE_ALWAYS);
+    if(hasFailed != FR_OK) {
+        SysTools::addLog("SysPartitionDisk::open, ABORT: f_open, errCode: %u", hasFailed);
+        return 0;
+    }
+  
+    const uint8_t text[] = "Hello World";
+    uint sent, read;
+    
+    hasFailed = f_write (&fdisk, (uint8_t*)&text[0], sizeof(text), &sent);
+    if(hasFailed != FR_OK) {
+        SysTools::addLog("SysPartitionDisk::open, ABORT: f_write, errCode: %u", hasFailed);
+        return 0;
+    }
+    
+    f_close (&fdisk);
+
+    //File Written
+    SysTools::addLog("SysPartitionDisk::open, FILE WRITTEN\n");
+
+    //Read File
+    uint8_t content[128];
+    
+    hasFailed = f_open(&fdisk, "/world.txt", FA_READ);
+    hasFailed = f_read (&fdisk, &content, sizeof(content), &read);
+    if(hasFailed != FR_OK) {
+        SysTools::addLog("SysPartitionDisk::open, ABORT: f_read, errCode: %u", hasFailed);
+        return 0;
+    }
+    
+    f_close (&fdisk);
+    SysTools::addLog("SysPartitionDisk::open, READ: %lu, content: %s", read, content);
+
+    //File Read
+    SysTools::addLog("SysPartitionDisk::open, FILE READ\n");
+ 
+    //Open Complete
+    SysTools::addLog("SysPartitionDisk::open, COMPLETED\n");
+     
+    return 0;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////

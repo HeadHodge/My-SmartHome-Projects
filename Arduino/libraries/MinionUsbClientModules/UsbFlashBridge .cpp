@@ -98,8 +98,8 @@ bool open() {
     _MSC.onRead(onRead);
     _MSC.onWrite(onWrite);
     _MSC.mediaPresent(true);
-    //_MSC.begin(SysPartitionDisk::getSectorCount(), SysPartitionDisk::getSectorSize());
-    _MSC.begin(16, 512);
+    _MSC.begin(SysPartitionDisk::getSectorCount(), SysPartitionDisk::getSectorSize());
+    //_MSC.begin(16, 512);
     
     SysTools::addLog("%s", "UsbFlashBridge::open, Enable Usb Stack");
     USB.onEvent(onUsbEvent);

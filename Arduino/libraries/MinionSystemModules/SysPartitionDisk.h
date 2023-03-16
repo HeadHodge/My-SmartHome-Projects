@@ -8,11 +8,11 @@ namespace SysPartitionDisk {
     void writeFile(const char * path, const char * message);
     void readFile(const char * path);
     uint32_t readRAW(uint32_t pSector, uint8_t* pBuffer, uint32_t pBufferSize);
-    uint32_t writeRAW(uint32_t pSector, uint8_t* pBuffer, uint32_t pBufferSize);
-    uint16_t getSectorSize();
+    uint32_t writeRAW(uint32_t pSector, const uint8_t* pBuffer, uint32_t pBufferSize);
     uint16_t getSectorCount();
+    uint16_t getSectorSize();
     
-    bool open(void (*pCallback)(bool status));
+    bool enable(void (*pCallback)(bool status));
     bool isConnected();
     
     //bool isReady();
