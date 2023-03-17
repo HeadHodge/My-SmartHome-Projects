@@ -132,4 +132,45 @@ void receivedCommand(const char* pMessage) {
     memString = _memMap.getString(memKey);
     sendCommand("NOTIFY:{\"Command\":\"SETOPTIONS\", \"State\":\"Done\"}");
 }
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
+void dumpBuffer(const uint8_t* pBuffer, uint32_t pBufferSize, uint32_t pByteCount) {
+  SysTools::addLog("\nSysTools::dumpBuffer, totalBytes: %u", pBufferSize);
+    
+    //Print First Few Buffer Bytes
+    uint8_t lineCount = 0;
+    
+    Serial.printf("%s", "First: ");
+    for(int i=0; i<pByteCount; ++i) {
+        ++lineCount;
+        if(lineCount > 10) {
+            lineCount = 0;
+            Serial.println("");
+        }
+        
+        Serial.printf("0x%02X(%1c)", (pBuffer+i)[0], (pBuffer+i)[0]);
+        if(i < (pByteCount - 1)) Serial.printf(",");
+    }
+     
+    Serial.println("\n===========================================================================================================================================");
+    
+    //Print Last Few Buffer Bytes
+    //SysTools::addLog("SysPartitionDisk::dumpBuffer, Last %i Bytes of %u Total", pByteCount, pBufferSize);
+    
+    lineCount = 0;
+    
+    Serial.printf("%s", " Last: ");
+    for(int i=(pBufferSize - pByteCount); i<pBufferSize; ++i) {
+        ++lineCount;
+        if(lineCount > 16) {
+            lineCount = 0;
+            Serial.println("");
+        }
+        
+        Serial.printf("0x%02X(%1c)", (pBuffer+i)[0], (pBuffer+i)[0]);
+        if(i < (pBufferSize - 1)) Serial.printf(",");
+    }
+        
+    Serial.println("\n");
+}
 }

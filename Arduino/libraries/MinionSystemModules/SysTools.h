@@ -10,6 +10,7 @@ namespace SysTools
     void sendCommand(const char*);
     void receivedCommand(const char*);
     void getOptions(const char*, DynamicJsonDocument&);
+    void dumpBuffer(const uint8_t* pBuffer, uint32_t pBufferSize, uint32_t pByteCount);
 }
 
 #endif
