@@ -1,4 +1,4 @@
-//#include <ComSerialBridge.h>
+//located in my github repository
 #include <SysTools.h>
 #include <UsbFlashBridge.h>
 
@@ -7,14 +7,11 @@
 // set to '16M Fat' if you have a 16MB ESP32 dev module.
 
 void setup(){
-    //ComSerialBridge::open(115200);   
     Serial.begin(115200);
     delay(4000);
+    
     SysTools::addLog("%s", "usbFlashDrive::Setup");
-
     UsbFlashBridge::enable();   
-    //SysFlashDisk::testFileIO("/test.txt");   
-    //SysTools::addLog( "%s \n", "Test complete" );
 }
 
 void loop(){
