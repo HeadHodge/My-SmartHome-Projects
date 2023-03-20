@@ -135,7 +135,7 @@ void receivedCommand(const char* pMessage) {
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 void dumpBuffer(const uint8_t* pBuffer, uint32_t pBufferSize, uint32_t pByteCount) {
-  SysTools::addLog("\nSysTools::dumpBuffer, totalBytes: %u", pBufferSize);
+  SysTools::addLog("\nSysTools::dumpBuffer, pBufferSize: %u, pByteCount: %u", pBufferSize, pByteCount);
     
     //Print First Few Buffer Bytes
     uint8_t lineCount = 0;
@@ -162,7 +162,7 @@ void dumpBuffer(const uint8_t* pBuffer, uint32_t pBufferSize, uint32_t pByteCoun
     Serial.printf("%s", " Last: ");
     for(int i=(pBufferSize - pByteCount); i<pBufferSize; ++i) {
         ++lineCount;
-        if(lineCount > 16) {
+        if(lineCount > 10) {
             lineCount = 0;
             Serial.println("");
         }

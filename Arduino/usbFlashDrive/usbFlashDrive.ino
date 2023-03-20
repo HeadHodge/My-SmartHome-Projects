@@ -11,8 +11,8 @@ void setup(){
     Serial.begin(115200);
     delay(4000);
     SysTools::addLog("%s", "usbFlashDrive::Setup");
-    
-    UsbFlashBridge::open();   
+
+    UsbFlashBridge::enable();   
     //SysFlashDisk::testFileIO("/test.txt");   
     //SysTools::addLog( "%s \n", "Test complete" );
 }

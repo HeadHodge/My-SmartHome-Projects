@@ -5,7 +5,7 @@
 
 namespace UsbFlashBridge {
     bool isOpen();
-    bool open();
+    bool enable();
     //void controlDevice(DynamicJsonDocument&);
 }
 
