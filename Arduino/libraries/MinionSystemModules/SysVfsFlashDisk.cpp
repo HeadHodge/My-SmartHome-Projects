@@ -302,7 +302,7 @@ DSTATUS diskInitialize(uint8_t pDrv) {
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 DSTATUS diskStatus (BYTE pdrv) {
-    SysTools::addLog("***SysPartitionDisk::diskStatus, pdrv: %u", pdrv);
+    //SysTools::addLog("***SysPartitionDisk::diskStatus, pdrv: %u", pdrv);
     return 0;
     
     //STA_NOINIT    * Drive not initialized  *
@@ -350,7 +350,7 @@ bool enable() {
     
     //esp_vfs_fat_register
     SysTools::addLog("SysPartitionDisk::open, esp_vfs_fat_register, FF_MIN_SS: %u, FF_MAX_SS: %u", FF_MIN_SS, FF_MAX_SS);
-    uint8_t hasFailed = esp_vfs_fat_register("/myfat", "", 5, &_fatFS);
+    uint8_t hasFailed = esp_vfs_fat_register("/fatdisk", "", 5, &_fatFS);
     if(hasFailed) {
         SysTools::addLog("SysPartitionDisk::open, ABORT: esp_vfs_fat_register failed, errCode: %u", hasFailed);
         return 0;
@@ -388,7 +388,7 @@ bool enable() {
     SysTools::addLog("SysPartitionDisk::open, f_mount: DISK MOUNTED: %lu \n", disk_status(_fatFS->pdrv));
 
     //Open Directory
-    if(opendir("/myfat") == NULL) {
+    if(opendir("/fatdisk") == NULL) {
         SysTools::addLog("opendir failed");
         
         //FORMAT DISK
@@ -402,21 +402,23 @@ bool enable() {
         //SysTools::addLog("SysPartitionDisk::open, Change Volume Label: %lu", f_setlabel("FLASH DISK"));
 
         //CREATE FILE
-        SysTools::addLog("SysPartitionDisk::open, Create File: '/myfat/README.TXT'");
+        SysTools::addLog("SysPartitionDisk::open, Create File: '/fatdisk/README.TXT'");
     
-        FILE* fp = fopen("/myfat/README.TXT", "w"); // "w" defines "writing mode"
+        FILE* fp = fopen("/fatdisk/README.TXT", "w"); // "w" defines "writing mode"
         if(fp == NULL)
         {
-            SysTools::addLog("SysPartitionDisk::open, Could not create file '/myfat/README.TXT' \n");
+            SysTools::addLog("SysPartitionDisk::open, Could not create file '/fatdisk/README.TXT' \n");
             return false;
         }
     
         fputs("Hello World", fp);
-        fclose(fp); 
+        fclose(fp);
+        
+        f_mkdir("firmware");        
     }
     
     _isFormatted = true;
-    SysTools::addLog("SysPartitionDisk::open, '/myfat' is formatted");
+    SysTools::addLog("SysPartitionDisk::open, '/fatdisk' is formatted");
     
     //All Done
     SysTools::addLog("SysPartitionDisk::open, Open Flash Disk Completed \n");
