@@ -1,5 +1,5 @@
 #include <SysTools.h>
-#include <SysVfsFlashDisk.h>
+#include <SysVfsFatFs.h>
 
 // This file should be compiled with 'Partition Scheme' (in Tools menu)
 // set to 'Default with ffat' if you have a 4MB ESP32 dev module or
@@ -10,7 +10,7 @@ void setup(){
     delay(4000);
     SysTools::addLog("%s", "Setup flashDisk");
     
-    SysVfsFlashDisk::enable(nullptr);   
+    SysVfsFatFs::enable("/flashDisk", nullptr);   
     //SysFlashDisk::testFileIO("test.txt");
     
     //SysTools::addLog( "%s \n", "Test complete" );

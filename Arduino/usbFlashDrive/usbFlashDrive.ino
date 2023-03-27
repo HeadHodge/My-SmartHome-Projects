@@ -1,6 +1,6 @@
 //located in my github repository
 #include <SysTools.h>
-#include <UsbFlashBridge.h>
+#include <UsbFlashDiskBridge.h>
 
 // This file should be compiled with 'Partition Scheme' (in Tools menu)
 // set to 'Default with ffat' if you have a 4MB ESP32 dev module or
@@ -11,7 +11,7 @@ void setup(){
     delay(4000);
     
     SysTools::addLog("%s", "usbFlashDrive::Setup");
-    UsbFlashBridge::enable();   
+    UsbFlashDiskBridge::enable();   
 }
 
 void loop(){

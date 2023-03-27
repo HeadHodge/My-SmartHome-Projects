@@ -1,9 +1,9 @@
-#ifndef USBFLASHBRIDGE_H
-#define USBFLASHBRIDGE_H
+#ifndef USBFLASHDISKBRIDGE_H
+#define USBFLASHDISKBRIDGE_H
 
 #include <ArduinoJson.h>  // Install from IDE Library manager
 
-namespace UsbFlashBridge {
+namespace UsbFlashDiskBridge {
     bool isOpen();
     bool enable();
     //void controlDevice(DynamicJsonDocument&);
