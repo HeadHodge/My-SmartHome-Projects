@@ -160,32 +160,29 @@ DRESULT diskRead (BYTE pdrv, BYTE* buff, DWORD sector, UINT count) {
 };
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
-void setOptions(uint8_t pDiskNum, SysVfsFatFs::vfsDiskOptions_t* pDiskOptions) {
-  SysTools::addLog("SysFlashDisk::setOptions for pDiskNum: %u", pDiskNum);
+bool enable(SysVfsFatFs::vfsDiskOptions_t** pDiskOptions) {
+  SysTools::addLog("SysFlashDisk::enable Open Flash Disk");
     
     memset(&_vfsDiskOptions, 0, sizeof(_vfsDiskOptions));
-    _vfsDiskOptions.diskNum = pDiskNum;
+    //_vfsDiskOptions.diskNum = diskNum;
     _vfsDiskOptions.diskPath = "x:";
     _vfsDiskOptions.fileSystem = "/flashDisk";
     _vfsDiskOptions.testFile = "/flashDisk/README.TXT";
     _vfsDiskOptions.testDirectory = "x:/firmware";
-    _vfsDiskOptions.fatFS = nullptr;   
 
-    ((uint8_t*)_vfsDiskOptions.diskPath)[0]      = pDiskNum+'0';
-    ((uint8_t*)_vfsDiskOptions.testDirectory)[0] = pDiskNum+'0';
-
-    _vfsDiskOptions.diskioEvents.init = diskInitialize;
-    _vfsDiskOptions.diskioEvents.status = diskStatus;
-    _vfsDiskOptions.diskioEvents.read = diskRead;
-    _vfsDiskOptions.diskioEvents.write = diskWrite;
-    _vfsDiskOptions.diskioEvents.ioctl = diskIoctl;
+    ((uint8_t*)_vfsDiskOptions.diskPath)[0]      = '0';
+    ((uint8_t*)_vfsDiskOptions.testDirectory)[0] = '0';
     
     _vfsDiskOptions.diskTableSectors = 1;
     _vfsDiskOptions.diskSectorSize = 512;
     _vfsDiskOptions.diskSectorCount = (_ffatPartition->size / 512) - 1;
 
-    if(pDiskOptions == nullptr) return;
-    memcpy(pDiskOptions, &_vfsDiskOptions, sizeof(_vfsDiskOptions));
+    if(pDiskOptions == nullptr) return false;
+    //memcpy(pDiskOptions, &_vfsDiskOptions, sizeof(_vfsDiskOptions));
+    pDiskOptions[0] = &_vfsDiskOptions;
+    
+    SysTools::addLog("SysFlashDisk::enable, Flash Disk Opened, address: 0x%04X, size: 0x%04X, label: %s \n", _ffatPartition->address, _ffatPartition->size, _ffatPartition->label);
+    return true;
 };
 } //namespace SysFlashDisk
 

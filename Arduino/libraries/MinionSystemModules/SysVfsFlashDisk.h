@@ -7,7 +7,7 @@
 namespace SysFlashDisk {
     uint32_t readRAW(uint32_t pSector, uint8_t* pBuffer, uint32_t pBufferSize);
     uint32_t writeRAW(uint32_t pSector, const uint8_t* pBuffer, uint32_t pBufferSize);    
-    void setOptions(uint8_t pDiskNum, SysVfsFatFs::vfsDiskOptions_t* pDiskOptions);
+    bool enable(SysVfsFatFs::vfsDiskOptions_t** pDiskOptions);
 }
 
 #endif
