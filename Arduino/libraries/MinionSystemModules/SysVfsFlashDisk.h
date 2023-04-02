@@ -1,13 +1,14 @@
-#ifndef SYSFLASHDISK_H
-#define SYSFLASHDISK_H
-#include <FF.h>
-#include <esp_vfs_fat.h>
-#include <diskio_impl.h>
+#ifndef SYSVFSFLASHDISK_H
+#define SYSVFSFLASHDISK_H
 
 namespace SysFlashDisk {
-    uint32_t readRAW(uint32_t pSector, uint8_t* pBuffer, uint32_t pBufferSize);
-    uint32_t writeRAW(uint32_t pSector, const uint8_t* pBuffer, uint32_t pBufferSize);    
-    bool enable(SysVfsFatFs::vfsDiskOptions_t** pDiskOptions);
-}
+    bool readRAW(uint8_t pdrv, uint8_t* buffer, uint32_t sector);
+    bool writeRAW(uint8_t pdrv, uint8_t* buffer, uint32_t sector);
+    uint8_t enable(SysVfsFatFs::vfsDiskOptions_t** pDiskOptions);
+    
+    const char* mediaType();
+    uint32_t sectorCount();
+    uint16_t sectorSize();
+} //namespace SysFlashDisk
 
 #endif

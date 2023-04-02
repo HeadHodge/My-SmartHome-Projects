@@ -18,8 +18,8 @@ SysVfsFatFs::vfsDiskOptions_t _vfsDiskOptions;
 uint8_t* _diskBuff = (uint8_t*)malloc(4096);
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
-char* cardType(uint8_t pdrv) {
-    sdcard_type_t cardType = sdcard_type(pdrv);
+const char* mediaType() {
+    sdcard_type_t cardType = sdcard_type(_vfsDiskOptions.diskNum);
 
     if(cardType == CARD_MMC){
        return "MMC";
@@ -35,13 +35,13 @@ char* cardType(uint8_t pdrv) {
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
-uint32_t sectorCount(uint8_t pdrv) {
-    return sdcard_num_sectors(pdrv);
+uint32_t sectorCount() {
+    return sdcard_num_sectors(_vfsDiskOptions.diskNum);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
-uint32_t sectorSize(uint8_t pdrv) {
-    return sdcard_sector_size(pdrv);
+uint16_t sectorSize() {
+    return sdcard_sector_size(_vfsDiskOptions.diskNum);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -219,8 +219,12 @@ uint8_t enable(SysVfsFatFs::vfsDiskOptions_t** pDiskOptions) {
     _vfsDiskOptions.fileSystem = "/cardDisk";
     _vfsDiskOptions.testFile = "/cardDisk/README.TXT";
     _vfsDiskOptions.testDirectory = "x:/firmware";
-    _vfsDiskOptions.readRaw = &sd_read_raw;
-    _vfsDiskOptions.writeRaw = &sd_write_raw;
+    _vfsDiskOptions.diskTableSectors = 1;
+    _vfsDiskOptions.mediaType   = &mediaType;
+    _vfsDiskOptions.sectorSize  = &sectorSize;
+    _vfsDiskOptions.sectorCount = &sectorCount;
+    _vfsDiskOptions.readRaw     = &sd_read_raw;
+    _vfsDiskOptions.writeRaw    = &sd_write_raw;
 
     ((uint8_t*)_vfsDiskOptions.diskPath)[0]      = diskNum+'0';
     ((uint8_t*)_vfsDiskOptions.testDirectory)[0] = diskNum+'0';

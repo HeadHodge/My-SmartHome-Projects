@@ -111,22 +111,25 @@ bool enable() {
   SysTools::addLog("%s", "UsbDiskBridge::begin");
   
     //Open Flash Disk
-    SysTools::addLog("%s", "UsbDiskBridge::begin, Open Flash Disk");
+    SysTools::addLog("%s", "UsbDiskBridge::begin, Open /flashDisk");
  
-    //if(!SysVfsFatFs::enableDisk("/flashDisk", &diskOptions)) {
-    //    SysTools::addLog("%s", "UsbDiskBridge::enable, ABORT: Open /flashDisk Disk Failed");
-    //    return false;       
-    //};
- 
-    if(!SysVfsFatFs::enableDisk("/cardDisk", &_diskOptions)) {
-        SysTools::addLog("%s", "UsbDiskBridge::enable, ABORT: Open /cardDisk Disk Failed");
+    if(!SysVfsFatFs::enableDisk("/flashDisk", &_diskOptions)) {
+        SysTools::addLog("%s", "UsbDiskBridge::enable, ABORT: Open /flashDisk Failed");
         return false;       
     };
+ 
+    //if(!SysVfsFatFs::enableDisk("/cardDisk", &_diskOptions)) {
+    //    SysTools::addLog("%s", "UsbDiskBridge::enable, ABORT: Open /cardDisk Disk Failed");
+    //    return false;       
+    //};
     
     //return true;       
     delay(5000);
+    //return false;       
+    
+    
     //Open USB-MSC Interface
-    SysTools::addLog("UsbDiskBridge::open, Open Usb-MSC interface with sectorCount: %i, sectorSize: %i", _diskOptions->diskSectorCount, _diskOptions->diskSectorSize);        
+    SysTools::addLog("UsbDiskBridge::open, Open Usb-MSC interface with sectorCount: %i, sectorSize: %i", _diskOptions->sectorCount(), _diskOptions->sectorSize());        
     _MSC.vendorID("ESP32-S3");//max 8 chars
     _MSC.productID("USB_FLASHDRIVE");//max 16 chars
     _MSC.productRevision("1.0");//max 4 chars
@@ -134,7 +137,7 @@ bool enable() {
     _MSC.onRead(onRead);
     _MSC.onWrite(onWrite);
     _MSC.mediaPresent(true);
-    _MSC.begin(_diskOptions->diskSectorCount, _diskOptions->diskSectorSize);
+    _MSC.begin(_diskOptions->sectorCount(), _diskOptions->sectorSize());
     //_MSC.begin(7614, _diskOptions->diskSectorSize);
     
     SysTools::addLog("%s", "UsbDiskBridge::enable, Enable Usb Stack");

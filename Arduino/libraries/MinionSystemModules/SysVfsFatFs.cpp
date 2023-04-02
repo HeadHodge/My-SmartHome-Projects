@@ -5,8 +5,9 @@
 
 //My Required Libraries
 #include <SysTools.h>
-#include <SysVfsFatFs.h>
 #include <SysVfsCardDisk.h>
+#include <SysVfsFlashDisk.h>
+#include <SysVfsFatFs.h>
 
 // This file should be compiled with 'Partition Scheme' (in Tools menu)
 // set to 'Default with ffat' if you have a 4MB ESP32 dev module or
@@ -86,7 +87,7 @@ bool testDisk(char* pDirectory, char* pFile)
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 bool formatDisk(uint8_t pDiskNum, const char* pDisk = "0:") {
-    SysTools::addLog("SysVfsFatFs::formatDisk, diskNum: %u, diskSectorSize: %lu, diskSectorCount: %lu", pDiskNum, _vfsDiskOptions[pDiskNum]->diskSectorSize, _vfsDiskOptions[pDiskNum]->diskSectorCount);
+    SysTools::addLog("SysVfsFatFs::formatDisk, diskNum: %u, diskSectorSize: %lu, diskSectorCount: %lu", pDiskNum, _vfsDiskOptions[pDiskNum]->sectorSize(), _vfsDiskOptions[pDiskNum]->sectorCount());
     
     //Format Disk
     uint8_t* workBuff = nullptr;
@@ -126,19 +127,17 @@ bool enableDisk(const char* pFileSystem, vfsDiskOptions_t** pDiskOptions) {
         return false;
     }
     
-    ///////////////////
-    //ff_diskio_register
-    ///////////////////
+    /////////////////////////
+    //  REGISTER DISKIO
+    /////////////////////////
     vfsDiskOptions_t* diskOptions = nullptr;
 
     if(pFileSystem == "/flashDisk") {
-        //diskNum = _disksEnabled++;// ++_disksEnabled;       
-        //diskNum = SysFlashDisk::enable(&diskOptions);
-        SysTools::addLog("SysVfsFatFs::enable, FF_MIN_SS: %u, FF_MAX_SS: %u, FF_VOLUMES: %u, FF_STR_VOLUME_ID: %u", FF_MIN_SS, FF_MAX_SS, FF_VOLUMES, FF_STR_VOLUME_ID);
+        diskNum = SysFlashDisk::enable(&diskOptions);       
+        //SysTools::addLog("SysVfsFatFs::enable, FF_MIN_SS: %u, FF_MAX_SS: %u, FF_VOLUMES: %u, FF_STR_VOLUME_ID: %u", FF_MIN_SS, FF_MAX_SS, FF_VOLUMES, FF_STR_VOLUME_ID);
     } else if(pFileSystem == "/cardDisk") {
-        //diskNum = _disksEnabled++;// ++_disksEnabled;       
         diskNum = SysCardDisk::enable(&diskOptions);       
-        SysTools::addLog("SysVfsFatFs::enable, Enabled fs: %s, diskNum: %u ", pFileSystem, diskNum);
+        //SysTools::addLog("SysVfsFatFs::enable, Enabled fs: %s, diskNum: %u ", pFileSystem, diskNum);
     } else {
         SysTools::addLog("SysVfsFatFs::enable, ABORT: Invalid Disk Type '%s'", pFileSystem);
         return false;
@@ -155,7 +154,7 @@ bool enableDisk(const char* pFileSystem, vfsDiskOptions_t** pDiskOptions) {
     SysTools::addLog("SysVfsFatFs::enableDisk, Disk I/O Registered, diskNum: %u, fs: %s\n", diskNum, _vfsDiskOptions[diskNum]->fileSystem);
     
     /////////////////////////
-    // esp_vfs_fat_register
+    // REGISTER VFS
     /////////////////////////
     SysTools::addLog("SysVfsFatFs::enable, esp_vfs_fat_register, diskNum: %lu, fs: '%s', path: '%s'", diskNum, _vfsDiskOptions[diskNum]->fileSystem, _vfsDiskOptions[diskNum]->diskPath);
     //SysTools::addLog("SysVfsFatFs::enable, esp_vfs_fat_register, diskNum: %lu", diskNum);
@@ -168,6 +167,13 @@ bool enableDisk(const char* pFileSystem, vfsDiskOptions_t** pDiskOptions) {
     
     //esp_vfs_fat Registered
     SysTools::addLog("SysVfsFatFs::enable, REGISTERED esp_vfs_fat_register, diskNum: %lu\n", diskNum);
+
+        //FORMAT DISK
+        if(formatDisk(diskNum, _vfsDiskOptions[diskNum]->diskPath) != true) {
+            SysTools::addLog("SysVfsFatFs::enableDisk, ABORT: formatFat16FlashDisk failed");
+            return false;
+        }
+        SysTools::addLog("SysVfsFatFs::enableDisk, Format Done");
  
     /////////////////////////
     //   Mount Disk
@@ -182,11 +188,11 @@ bool enableDisk(const char* pFileSystem, vfsDiskOptions_t** pDiskOptions) {
 
     //Disk Mounted
     _isMounted = true;
-    _vfsDiskOptions[diskNum]->diskType         = SysCardDisk::cardType(diskNum);
-    _vfsDiskOptions[diskNum]->diskSectorCount  = SysCardDisk::sectorCount(diskNum);
-    _vfsDiskOptions[diskNum]->diskSectorSize   = SysCardDisk::sectorSize(diskNum);
-    _vfsDiskOptions[diskNum]->diskTableSectors = 1;
-    SysTools::addLog("SysVfsFatFs::enable, f_mount: DISK MOUNTED, cardType: %s, sectorSize: %lu, sectorCont %lu \n", _vfsDiskOptions[diskNum]->diskType, _vfsDiskOptions[diskNum]->diskSectorSize, _vfsDiskOptions[diskNum]->diskSectorCount);
+    //_vfsDiskOptions[diskNum]->diskType         = SysCardDisk::cardType(diskNum);
+    //_vfsDiskOptions[diskNum]->diskSectorCount  = SysCardDisk::sectorCount(diskNum);
+    //_vfsDiskOptions[diskNum]->diskSectorSize   = SysCardDisk::sectorSize(diskNum);
+    //_vfsDiskOptions[diskNum]->diskTableSectors = 1;
+    SysTools::addLog("SysVfsFatFs::enable, f_mount: DISK MOUNTED, mediaType: %s, sectorSize: %lu, sectorCont %lu \n", _vfsDiskOptions[diskNum]->mediaType(), _vfsDiskOptions[diskNum]->sectorSize(), _vfsDiskOptions[diskNum]->sectorCount());
 
     ///////////////////
     //  Test Disk
