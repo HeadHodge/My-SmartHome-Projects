@@ -5,9 +5,9 @@
 namespace SysCardDisk {
     uint32_t readRAW(uint32_t pSector, uint8_t* pBuffer, uint32_t pBufferSize);
     uint32_t writeRAW(uint32_t pSector, const uint8_t* pBuffer, uint32_t pBufferSize);    
-    uint8_t enable(SysVfsFatFs::vfsDiskOptions_t** pDiskOptions);
+    uint8_t enable(SysFatFs::vfsDiskOptions_t** pDiskOptions);
 
-    const char* mediaType();
+    const char* diskType();
     uint32_t sectorCount();
     uint16_t sectorSize();
 } //SysCardDisk

@@ -1,5 +1,5 @@
 // ArduinoJson - https://arduinojson.org
-// Copyright © 2014-2022, Benoit BLANCHON
+// Copyright © 2014-2023, Benoit BLANCHON
 // MIT License
 
 #pragma once
@@ -11,31 +11,14 @@
 #include <ArduinoJson/Strings/StringAdapters.hpp>
 #include <ArduinoJson/Variant/VariantContent.hpp>
 
-// VariantData can't have a constructor (to be a POD), so we have no way to fix
-// this warning
-#if defined(__GNUC__)
-#  if __GNUC__ >= 7
-#    pragma GCC diagnostic push
-#    pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
-#    pragma GCC diagnostic ignored "-Wuninitialized"
-#  endif
-#endif
-
-namespace ARDUINOJSON_NAMESPACE {
+ARDUINOJSON_BEGIN_PRIVATE_NAMESPACE
 
 class VariantData {
   VariantContent _content;  // must be first to allow cast from array to variant
   uint8_t _flags;
 
  public:
-  // Must be a POD!
-  // - no constructor
-  // - no destructor
-  // - no virtual
-  // - no inheritance
-  void init() {
-    _flags = VALUE_IS_NULL;
-  }
+  VariantData() : _flags(VALUE_IS_NULL) {}
 
   void operator=(const VariantData& src) {
     _content = src._content;
@@ -336,10 +319,4 @@ class VariantData {
   };
 };
 
-}  // namespace ARDUINOJSON_NAMESPACE
-
-#if defined(__GNUC__)
-#  if __GNUC__ >= 8
-#    pragma GCC diagnostic pop
-#  endif
-#endif
+ARDUINOJSON_END_PRIVATE_NAMESPACE

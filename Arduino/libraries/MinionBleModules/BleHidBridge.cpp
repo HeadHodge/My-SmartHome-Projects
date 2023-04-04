@@ -2,22 +2,21 @@
 #include <Arduino.h>
 
 #include <SysTools.h>
-#include <BleHub.h>
+#include <BleHidOut.h>
 #include <BleHidBridge.h>
 
-namespace BleHubBridge
-{
+namespace BleHidBridge {
 bool isOpen = false;
 
 bool isBridgeConnected() {
-    return BleHub::isHubConnected();
+    return BleHidOut::isConnected();
 }
 
 void controlDevice(DynamicJsonDocument& pKeyObj) {    
 SysTools::addLog("BleHidBridge::controlDevice with keyWord %s", (const char *)pKeyObj["required"]["keyWord"]);
 DynamicJsonDocument optionsObj(1024);
 
-    if (BleHub::isHubConnected() == false) {
+    if (BleHidOut::isConnected() == false) {
         SysTools::addLog("%s", "BleHidBridge::controlDevice Aborted: BleHub not Connected");
         return;
     }
@@ -31,12 +30,12 @@ DynamicJsonDocument optionsObj(1024);
         return;
     }
 
-    BleHub::controlDevice(optionsObj);
+    BleHidOut::controlDevice(optionsObj);
 }
 
 void openBridge(const char *pDeviceName) {
-    BleHub::openHub(pDeviceName);
+    BleHidOut::open(pDeviceName);
     isOpen = true;
     SysTools::addLog("%s", "BleHidBridge::openBridge, Bridge is Open");
 }
-}
+} //namespace BleHidBridge

@@ -2,22 +2,21 @@
 #include <Arduino.h>
 
 #include <SysTools.h>
-#include <UsbHub.h>
+#include <UsbHidOut.h>
 #include <UsbHidBridge.h>
 
-namespace UsbHubBridge
-{
+namespace UsbHidBridge {
 bool isOpen = false;
 
 bool isBridgeConnected() {
-    return UsbHub::isHubConnected();
+    return UsbHidOut::isConnected();
 }
 
 void controlDevice(DynamicJsonDocument& pKeyObj) {    
 SysTools::addLog("UsbHidBridge::controlDevice with keyWord %s", (const char *)pKeyObj["required"]["keyWord"]);
 DynamicJsonDocument optionsObj(1024);
 
-    if (UsbHub::isHubConnected() == false) {
+    if (UsbHidOut::isConnected() == false) {
         SysTools::addLog("%s", "UsbHidBridge::controlDevice Abrted: UsbHub not Connected");
         return;
     }
@@ -31,11 +30,11 @@ DynamicJsonDocument optionsObj(1024);
         return;
     }
 
-    UsbHub::controlDevice(optionsObj);
+    UsbHidOut::controlDevice(optionsObj);
 }
 void openBridge() {
-    UsbHub::openHub();
+    UsbHidOut::open();
     isOpen = true;
     SysTools::addLog("%s", "UsbHidBridge::openBridge, Bridge now Open");
 }
-}
+} //namespace UsbHidBridge

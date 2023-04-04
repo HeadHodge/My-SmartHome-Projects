@@ -3,11 +3,11 @@
 
 #include <ArduinoJson.h>  // Install from IDE Library manager
 
-namespace UsbHubBridge
+namespace UsbHidBridge
 {
     bool isBridgeOpen();
     void openBridge();
     void controlDevice(DynamicJsonDocument&);
-}
+} //namespace UsbHidBridge
 
 #endif

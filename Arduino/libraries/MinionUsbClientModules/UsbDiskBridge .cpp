@@ -3,13 +3,11 @@
 
 #include <SysTools.h>
 #include <SysVfsFatFs.h>
-//#include <SysVfsFlashDisk.h>
-//#include <SysVfsCardDisk.h>
 #include <UsbDiskBridge.h>
 
 namespace UsbDiskBridge {
 USBMSC _MSC;
-SysVfsFatFs::vfsDiskOptions_t* _diskOptions = nullptr;
+SysFatFs::vfsDiskOptions_t* _diskOptions = nullptr;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 static int32_t onWrite(uint32_t pSector, uint32_t pOffset, uint8_t* pBuffer, uint32_t pBuffSize){
@@ -107,28 +105,22 @@ void onUsbEvent(void* arg, esp_event_base_t event_base, int32_t event_id, void* 
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
-bool enable() {
+bool enable(char* pfileSystem) {
   SysTools::addLog("%s", "UsbDiskBridge::begin");
   
-    //Open Flash Disk
+    //////////////////////////////////////
+    //        Open VFS Disk
+    //////////////////////////////////////
     SysTools::addLog("%s", "UsbDiskBridge::begin, Open /flashDisk");
  
-    if(!SysVfsFatFs::enableDisk("/flashDisk", &_diskOptions)) {
-        SysTools::addLog("%s", "UsbDiskBridge::enable, ABORT: Open /flashDisk Failed");
+    if(!SysFatFs::enableDisk(pfileSystem, &_diskOptions)) {
+        SysTools::addLog("%s", "UsbDiskBridge::enable, ABORT: Open '%s' Failed", pfileSystem);
         return false;       
     };
- 
-    //if(!SysVfsFatFs::enableDisk("/cardDisk", &_diskOptions)) {
-    //    SysTools::addLog("%s", "UsbDiskBridge::enable, ABORT: Open /cardDisk Disk Failed");
-    //    return false;       
-    //};
-    
-    //return true;       
-    delay(5000);
-    //return false;       
-    
-    
-    //Open USB-MSC Interface
+
+    //////////////////////////////////////
+    //Open USB-MSC Interface (USB Drive)
+    //////////////////////////////////////
     SysTools::addLog("UsbDiskBridge::open, Open Usb-MSC interface with sectorCount: %i, sectorSize: %i", _diskOptions->sectorCount(), _diskOptions->sectorSize());        
     _MSC.vendorID("ESP32-S3");//max 8 chars
     _MSC.productID("USB_FLASHDRIVE");//max 16 chars

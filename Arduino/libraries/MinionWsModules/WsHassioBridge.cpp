@@ -11,18 +11,19 @@
 #include <ArduinoJson.h>  // Install from IDE Library manager
 
 #include <SysTools.h>
-#include <WsDevice.h>
+#include <WsJsonOut.h>
 #include <WsHassioBridge.h>
 
-namespace WsDeviceBridge
-{
+/////////////////////////////////////////////////////////////
+namespace WsHassioBridge {
 callBack receivedKey;
-bool isOpen = false;
+bool isBridgeOpen = false;
 const char* ssid     = "WAP-IOT";
 const char* password = "Pin#92109";
 const char* accessToken = "{\"type\": \"auth\", \"access_token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiI1MDI4OWI1NjJlMTU0Mzc4YTU3ZDBiOTkwZTc0NWMyOSIsImlhdCI6MTY3MjQyNDE0MCwiZXhwIjoxOTg3Nzg0MTQwfQ.A5CqydtUIjuhr4Yf9KliXqaxMhzmduaG779ICZSZ6eU\"}";            
 int refNum = 1;
 
+/////////////////////////////////////////////////////////////
 char *receivedMessage(unsigned char *pMessage) {    
 const char* messageType;
 DynamicJsonDocument doc(1024);
@@ -34,12 +35,12 @@ DynamicJsonDocument doc(1024);
  
       if(strcmp(messageType, "auth_required") == 0) {
         SysTools::addLog("WsHassioBridge::receivedMessage Send accessToken: %s", accessToken);
-        WsDevice::controlDevice(accessToken);
+        WsJsonOut::controlDevice(accessToken);
         return "";
       }     
 
       if(strcmp(messageType, "auth_ok") == 0) {
-        isOpen = false;
+        isBridgeOpen = false;
         SysTools::addLog("%s", "WsHassioBridge::receivedMessage Bridge is Open");  
         return "";
       }
@@ -52,12 +53,14 @@ DynamicJsonDocument doc(1024);
       return "";
 }
 
-bool isBridgeOpen() {
-    return isOpen;
+/////////////////////////////////////////////////////////////
+bool isOpen() {
+    return isBridgeOpen;
 }
 
-void refreshBridge() {
-    WsDevice::refreshDevice();
+/////////////////////////////////////////////////////////////
+void refresh() {
+    WsJsonOut::refresh();
 }
 
 void controlDevice(DynamicJsonDocument& pKeyObj) {
@@ -72,15 +75,16 @@ void controlDevice(DynamicJsonDocument& pKeyObj) {
     sprintf(controlString, "{\"id\": %i, \"type\": \"fire_event\", \"event_type\": \"keyPressed\", \"event_data\": %s}", refNum, keyString);
     
     refNum = refNum + 1;
-    WsDevice::controlDevice(controlString);
+    WsJsonOut::controlDevice(controlString);
     
     SysTools::addLog("WsHassioBridge::controlDevice sent controlString %s", controlString);
 }
 
-void openBridge(callBack pCallBack)
+/////////////////////////////////////////////////////////////
+void open(callBack pCallBack)
 {
     receivedKey = pCallBack;
-    WsDevice::openDevice(receivedMessage);
+    WsJsonOut::open(receivedMessage);
     return;
 }
-}
+} //namespace WsHassioBridge

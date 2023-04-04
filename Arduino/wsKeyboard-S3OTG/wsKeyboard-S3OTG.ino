@@ -9,14 +9,12 @@
 #define US_KEYBOARD 1
 #include <Arduino.h>
 #include <ArduinoJson.h>  // Install from IDE Library manager
-#include "USB.h"
+#include <USB.h>
 
-#include <UsbSD.h>
 #include <BleHidBridge.h>
 #include <UsbHidBridge.h>
-#include <WsJsonBridge.h>
+#include <WsKeyHub.h>
 #include <WsHassioBridge.h>
-#include <ComSerialBridge.h>
 #include <UsbhostCDC.hpp>
 #include <SysTools.h>
 
@@ -49,30 +47,28 @@ char* receivedKey(DynamicJsonDocument& pKeyObj){
 //bit4 4 WsHubBridge
 //bit8 8 WsDeviceBridge
   
-    if(targetDevices == 0) BleHubBridge::controlDevice(pKeyObj); //default bridge
-    if((targetDevices & 1) != 0) BleHubBridge::controlDevice(pKeyObj);
-    if((targetDevices & 2) != 0) UsbHubBridge::controlDevice(pKeyObj);
+    if(targetDevices == 0) BleHidBridge::controlDevice(pKeyObj); //default bridge
+    if((targetDevices & 1) != 0) BleHidBridge::controlDevice(pKeyObj);
+    if((targetDevices & 2) != 0) UsbHidBridge::controlDevice(pKeyObj);
     //if((targetDevices & 4) != 0) WsHubBridge::controlDevice(pKeyObj);
-    if((targetDevices & 8) != 0) WsDeviceBridge::controlDevice(pKeyObj);
+    if((targetDevices & 8) != 0) WsHassioBridge::controlDevice(pKeyObj);
     
     return "";
 }
 
 void setup()
 {
-    ComSerialBridge::open(115200);
-    //USBSerial.begin(115200);
-    
-    //UsbSD::open();
+    Serial.begin(115200);
+    delay(4000);
      
-    SysTools::addLog("%s", "Open BleHubBridge");
-    BleHubBridge::openBridge("wsKeyboard-S3OTG");
+    SysTools::addLog("%s", "Open BleHidBridge");
+    BleHidBridge::openBridge("wsKeyboard-S3OTG");
 
     SysTools::addLog("%s", "Open WsHubBridge");
-    WsHubBridge::openBridge(receivedKey);
+    WsKeyHub::open(receivedKey);
 
     SysTools::addLog("%s", "Open WsDeviceBridge");
-    WsDeviceBridge::openBridge(receivedKey);
+    WsHassioBridge::open(receivedKey);
 
     //SysTools::addLog("%s", "Open UsbHubBridge");
     //UsbHubBridge::openBridge();
@@ -87,7 +83,7 @@ void setup()
 
 void loop()
 {
-    WsHubBridge::refreshBridge();
-    WsDeviceBridge::refreshBridge();
+    WsKeyHub::refresh();
+    WsHassioBridge::refresh();
     UsbhostCDC::refresh();
 }

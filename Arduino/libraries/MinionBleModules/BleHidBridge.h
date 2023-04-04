@@ -3,11 +3,11 @@
 
 #include <ArduinoJson.h>  // Install from IDE Library manager
 
-namespace BleHubBridge
+namespace BleHidBridge
 {
     bool isBridgeConnected();
     void openBridge(const char *);
     void controlDevice(DynamicJsonDocument&);
-}
+} //namespace BleHidBridge
 
 #endif

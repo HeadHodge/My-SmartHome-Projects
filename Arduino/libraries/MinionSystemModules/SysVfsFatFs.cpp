@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <dirent.h>
 #include <esp_vfs_fat.h>
+#include <Update.h>
 
 //My Required Libraries
 #include <SysTools.h>
@@ -14,14 +15,13 @@
 // set to '16M Fat' if you have a 16MB ESP32 dev module.
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
-namespace SysVfsFatFs {
+namespace SysFatFs {
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
-FATFS* fatFS[FF_VOLUMES] = {nullptr};
-
 vfsDiskOptions_t* _vfsDiskOptions[FF_VOLUMES];
+FATFS* fatFS[FF_VOLUMES] = {nullptr};
+const char* _firmwareFile = "/flashDisk/firmware/flashfirmware.bin";
 uint8_t* _formatBuff = nullptr;
-
 uint8_t _disksEnabled = 0;
 bool    _isFormatted = false;
 bool    _isMounted = false;
@@ -83,6 +83,72 @@ bool testDisk(char* pDirectory, char* pFile)
           
     (void) closedir (dp);
     return true;
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
+bool flashProgram() {
+  SysTools::addLog("SysVfsFatFs::flashProgram: '%s'", _firmwareFile);
+
+    FILE* fp = fopen(_firmwareFile, "rb");
+    if(fp == NULL)
+    {
+        SysTools::addLog("SysVfsFatFs::flashProgram, ABORT: _firmwareFile '%s' missing \n", _firmwareFile);
+        return false;
+    }
+    
+    /////////////////////////////
+    //Start Firmware Upgrade
+    /////////////////////////////
+    SysTools::addLog("SysVfsFatFs::flashProgram, *** Program Board ***");
+
+    fseek(fp, 0, SEEK_END); // seek to end of file
+    uint32_t fsize = ftell(fp); // get current file pointer
+    fseek(fp, 0, SEEK_SET); // seek back to beginning of file
+ 
+    uint8_t buff[4096];
+    memset(buff, 0, sizeof(buff));
+  
+    if(!Update.begin(fsize)) {
+        SysTools::addLog("SysVfsFatFs::flashProgram ABORT: Update.begin() failed");
+        return false;
+    }
+
+    uint32_t bytesRead = 0;
+    uint32_t bytesTotal = 0;
+    
+    while(true) {
+        if(bytesTotal >= fsize) break;
+        
+        if(fsize - bytesTotal >= sizeof(buff))
+            bytesRead = fread(buff, 1, sizeof(buff), fp);
+        else
+            bytesRead = fread(buff, 1, fsize - bytesTotal, fp);
+
+        bytesTotal += bytesRead;
+        
+        Update.write(buff, bytesRead);
+    }
+    
+    //Remove firmwareFile
+    
+    fclose(fp);    
+    int8_t ret = remove(_firmwareFile);
+    
+    if(ret == 0)
+        printf("SysVfsFatFs::flashProgram, _firmwareFile deleted successfully");
+    else
+        printf("SysVfsFatFs::flashProgram, ERROR: Unable to remove _firmwareFile: '%s'", _firmwareFile);
+    
+    //Complete Firmware Upgrade
+      
+    if(Update.isFinished() != false)
+        SysTools::addLog("SysVfsFatFs::flashProgram, Update successfully completed. Reset Board.");
+    else
+        SysTools::addLog("SysVfsFatFs::flashProgram, Update not finished? Something went wrong!");
+    
+    Update.end();
+
+    printf("SysVfsFatFs::flashProgram, Completed!");
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -157,7 +223,6 @@ bool enableDisk(const char* pFileSystem, vfsDiskOptions_t** pDiskOptions) {
     // REGISTER VFS
     /////////////////////////
     SysTools::addLog("SysVfsFatFs::enable, esp_vfs_fat_register, diskNum: %lu, fs: '%s', path: '%s'", diskNum, _vfsDiskOptions[diskNum]->fileSystem, _vfsDiskOptions[diskNum]->diskPath);
-    //SysTools::addLog("SysVfsFatFs::enable, esp_vfs_fat_register, diskNum: %lu", diskNum);
 
     hasFailed = esp_vfs_fat_register(_vfsDiskOptions[diskNum]->fileSystem, _vfsDiskOptions[diskNum]->diskPath, 5, &fatFS[diskNum]);
     if(hasFailed) {
@@ -168,13 +233,6 @@ bool enableDisk(const char* pFileSystem, vfsDiskOptions_t** pDiskOptions) {
     //esp_vfs_fat Registered
     SysTools::addLog("SysVfsFatFs::enable, REGISTERED esp_vfs_fat_register, diskNum: %lu\n", diskNum);
 
-        //FORMAT DISK
-        if(formatDisk(diskNum, _vfsDiskOptions[diskNum]->diskPath) != true) {
-            SysTools::addLog("SysVfsFatFs::enableDisk, ABORT: formatFat16FlashDisk failed");
-            return false;
-        }
-        SysTools::addLog("SysVfsFatFs::enableDisk, Format Done");
- 
     /////////////////////////
     //   Mount Disk
     /////////////////////////
@@ -183,17 +241,34 @@ bool enableDisk(const char* pFileSystem, vfsDiskOptions_t** pDiskOptions) {
     hasFailed = f_mount(fatFS[diskNum], _vfsDiskOptions[diskNum]->diskPath, 1); //0-delay, 1-immediate
     if(hasFailed != FR_OK) {
         SysTools::addLog("SysVfsFatFs::enable, ABORT: f_mount disk, errCode: %u", hasFailed);
-        return 0;
+
+        //FORMAT DISK
+        SysTools::addLog("SysVfsFatFs::enable, Trying to Format Disk: %lu", diskNum);
+        if(formatDisk(diskNum, _vfsDiskOptions[diskNum]->diskPath) != true) {
+            SysTools::addLog("SysVfsFatFs::enableDisk, ABORT: formatFat16FlashDisk failed");
+            return false;
+        }
+        SysTools::addLog("SysVfsFatFs::enableDisk, Format Done");
+    
+        //RETRY MOUNT DISK
+        SysTools::addLog("SysVfsFatFs::enable, f_mount disk, diskNum: %u", diskNum);
+        fatFS[diskNum]->pdrv = diskNum;
+        hasFailed = f_mount(fatFS[diskNum], _vfsDiskOptions[diskNum]->diskPath, 1); //0-delay, 1-immediate
+        if(hasFailed != FR_OK) {
+            SysTools::addLog("SysVfsFatFs::enable, ABORT: f_mount disk, errCode: %u", hasFailed);
+            return false;
+        }
     }
 
     //Disk Mounted
     _isMounted = true;
-    //_vfsDiskOptions[diskNum]->diskType         = SysCardDisk::cardType(diskNum);
-    //_vfsDiskOptions[diskNum]->diskSectorCount  = SysCardDisk::sectorCount(diskNum);
-    //_vfsDiskOptions[diskNum]->diskSectorSize   = SysCardDisk::sectorSize(diskNum);
-    //_vfsDiskOptions[diskNum]->diskTableSectors = 1;
-    SysTools::addLog("SysVfsFatFs::enable, f_mount: DISK MOUNTED, mediaType: %s, sectorSize: %lu, sectorCont %lu \n", _vfsDiskOptions[diskNum]->mediaType(), _vfsDiskOptions[diskNum]->sectorSize(), _vfsDiskOptions[diskNum]->sectorCount());
+    SysTools::addLog("SysVfsFatFs::enable, f_mount: DISK MOUNTED, diskType: %s, sectorSize: %lu, sectorCont %lu \n", _vfsDiskOptions[diskNum]->diskType(), _vfsDiskOptions[diskNum]->sectorSize(), _vfsDiskOptions[diskNum]->sectorCount());
 
+    ///////////////////
+    //  Flash Program
+    ///////////////////  
+    flashProgram();
+    
     ///////////////////
     //  Test Disk
     ///////////////////  
@@ -225,4 +300,4 @@ bool enableDisk(const char* pFileSystem, vfsDiskOptions_t** pDiskOptions) {
     SysTools::addLog("SysVfsFatFs::enableDisk, Enable Vfs Disk '%s' Completed \n", _vfsDiskOptions[diskNum]->fileSystem);
     return true;
 }
-} //namespace SysVfsFatFs
+} //namespace SysFatFs

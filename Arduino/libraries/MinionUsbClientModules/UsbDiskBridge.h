@@ -5,7 +5,7 @@
 
 namespace UsbDiskBridge {
     bool isOpen();
-    bool enable();
+    bool enable(char* pfileSystem = "/flashDisk");
     //void controlDevice(DynamicJsonDocument&);
 } //namespace UsbDiskBridge
 

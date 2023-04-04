@@ -3,13 +3,13 @@
 
 #include <ArduinoJson.h>  // Install from IDE Library manager
 
-namespace WsDeviceBridge
+namespace WsHassioBridge
 {
     typedef char* (*callBack)(DynamicJsonDocument&); // type for conciseness
-    bool isBridgeOpen();
-    void openBridge(callBack);
-    void refreshBridge();
+    bool isOpen();
+    void open(callBack);
+    void refresh();
     void controlDevice(DynamicJsonDocument&);
-}
+} //namespace WsHassioBridge
 
 #endif

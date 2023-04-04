@@ -18,13 +18,13 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////
 namespace SysFlashDisk {
 /////////////////////////////////////////////////////////////////////////////////////////////////
-SysVfsFatFs::vfsDiskOptions_t _vfsDiskOptions;
+SysFatFs::vfsDiskOptions_t _vfsDiskOptions;
 uint8_t* _diskBuff = (uint8_t*)malloc(4096);
 const esp_partition_t* _ffatPartition = esp_partition_find_first(ESP_PARTITION_TYPE_ANY, ESP_PARTITION_SUBTYPE_ANY, "ffat");
 //_ffatPartition->address, _ffatPartition->size, _ffatPartition->label
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
-const char* mediaType() {
+const char* diskType() {
  
     return _ffatPartition->label;
 }
@@ -142,7 +142,7 @@ uint32_t writeSector(uint32_t pStartSector, const uint8_t* pBuffer, uint32_t pBu
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 DRESULT diskWrite(uint8_t pDiskNum, const uint8_t* pBuff, DWORD pSector, UINT pCount) {
-  SysTools::addLog("***SysVfsFlashDisk::diskWrite, pDiskNum: %u, pSector: %lu, pCount: %u", pDiskNum, pSector, pCount);
+  //SysTools::addLog("***SysVfsFlashDisk::diskWrite, pDiskNum: %u, pSector: %lu, pCount: %u", pDiskNum, pSector, pCount);
   //dumpBuffer(pBuff, 512, 32);
 
     for(int index=0; index < pCount; ++index) {
@@ -180,7 +180,7 @@ bool readRaw(uint8_t pdrv, uint8_t* buffer, uint32_t sector) {
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
-uint8_t enable(SysVfsFatFs::vfsDiskOptions_t** pDiskOptions) {
+uint8_t enable(SysFatFs::vfsDiskOptions_t** pDiskOptions) {
   SysTools::addLog("SysVfsFlashDisk::enable Open Flash Disk");
   if(pDiskOptions != nullptr) pDiskOptions[0] = nullptr;
   uint8_t diskNum = 0xFF;
@@ -209,7 +209,7 @@ uint8_t enable(SysVfsFatFs::vfsDiskOptions_t** pDiskOptions) {
     _vfsDiskOptions.testFile = "/flashDisk/README.TXT";
     _vfsDiskOptions.testDirectory = "x:/firmware";
     _vfsDiskOptions.diskTableSectors = 1;
-    _vfsDiskOptions.mediaType   = &mediaType;
+    _vfsDiskOptions.diskType    = &diskType;
     _vfsDiskOptions.sectorSize  = &sectorSize;
     _vfsDiskOptions.sectorCount = &sectorCount;
     _vfsDiskOptions.readRaw     = &readRaw;
