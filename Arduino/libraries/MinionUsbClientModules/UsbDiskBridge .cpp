@@ -106,12 +106,12 @@ void onUsbEvent(void* arg, esp_event_base_t event_base, int32_t event_id, void* 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 bool enable(char* pfileSystem) {
-  SysTools::addLog("%s", "UsbDiskBridge::begin");
+  SysTools::addLog("%s", "UsbDiskBridge::enable");
   
     //////////////////////////////////////
     //        Open VFS Disk
     //////////////////////////////////////
-    SysTools::addLog("%s", "UsbDiskBridge::begin, Open /flashDisk");
+    SysTools::addLog("UsbDiskBridge::enable, Open: '%s'", pfileSystem);
  
     if(!SysFatFs::enableDisk(pfileSystem, &_diskOptions)) {
         SysTools::addLog("%s", "UsbDiskBridge::enable, ABORT: Open '%s' Failed", pfileSystem);

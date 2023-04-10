@@ -8,6 +8,7 @@
 #include <SysTools.h>
 #include <SysVfsCardDisk.h>
 #include <SysVfsFlashDisk.h>
+#include <SysVfsRamDisk.h>
 #include <SysVfsFatFs.h>
 
 // This file should be compiled with 'Partition Scheme' (in Tools menu)
@@ -168,7 +169,7 @@ bool formatDisk(uint8_t pDiskNum, const char* pDisk = "0:") {
 
     free(workBuff);    
     if(hasFailed != FR_OK) {
-        SysTools::addLog("SysVfsFatFs::formatDisk, ABORT: f_mount disk, errCode: %u", hasFailed);
+        SysTools::addLog("SysVfsFatFs::formatDisk, ABORT: f_mkfs, errCode: %u", hasFailed);
         return false;
     }
 
@@ -203,6 +204,9 @@ bool enableDisk(const char* pFileSystem, vfsDiskOptions_t** pDiskOptions) {
         //SysTools::addLog("SysVfsFatFs::enable, FF_MIN_SS: %u, FF_MAX_SS: %u, FF_VOLUMES: %u, FF_STR_VOLUME_ID: %u", FF_MIN_SS, FF_MAX_SS, FF_VOLUMES, FF_STR_VOLUME_ID);
     } else if(pFileSystem == "/cardDisk") {
         diskNum = SysCardDisk::enable(&diskOptions);       
+        //SysTools::addLog("SysVfsFatFs::enable, Enabled fs: %s, diskNum: %u ", pFileSystem, diskNum);
+    } else if(pFileSystem == "/ramDisk") {
+        diskNum = SysRamDisk::enable(&diskOptions);       
         //SysTools::addLog("SysVfsFatFs::enable, Enabled fs: %s, diskNum: %u ", pFileSystem, diskNum);
     } else {
         SysTools::addLog("SysVfsFatFs::enable, ABORT: Invalid Disk Type '%s'", pFileSystem);
@@ -245,7 +249,7 @@ bool enableDisk(const char* pFileSystem, vfsDiskOptions_t** pDiskOptions) {
         //FORMAT DISK
         SysTools::addLog("SysVfsFatFs::enable, Trying to Format Disk: %lu", diskNum);
         if(formatDisk(diskNum, _vfsDiskOptions[diskNum]->diskPath) != true) {
-            SysTools::addLog("SysVfsFatFs::enableDisk, ABORT: formatFat16FlashDisk failed");
+            SysTools::addLog("SysVfsFatFs::enableDisk, ABORT: formatDisk failed");
             return false;
         }
         SysTools::addLog("SysVfsFatFs::enableDisk, Format Done");

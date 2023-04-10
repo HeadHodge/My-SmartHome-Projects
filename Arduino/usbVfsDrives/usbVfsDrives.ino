@@ -10,7 +10,7 @@ void setup(){
     Serial.begin(115200);
     delay(4000);
     
-    SysTools::addLog("%s", "usbFlashDrive::Setup");
+    SysTools::addLog("%s", "usbVfsDrives::Setup");
     UsbDiskBridge::enable("/flashDisk");   
 }
 
