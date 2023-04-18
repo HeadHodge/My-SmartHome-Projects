@@ -21,7 +21,7 @@ namespace SysFatFs {
 
 vfsDiskOptions_t* _vfsDiskOptions[FF_VOLUMES];
 FATFS* fatFS[FF_VOLUMES] = {nullptr};
-const char* _firmwareFile = "/flashDisk/firmware/flashfirmware.bin";
+const char* _firmwareFile = "/cardDisk/firmware/flashfirmware.bin";
 uint8_t* _formatBuff = nullptr;
 uint8_t _disksEnabled = 0;
 bool    _isFormatted = false;
@@ -32,28 +32,28 @@ bool testDisk(char* pDirectory, char* pFile)
 {
   DIR *dp;
   struct dirent *ep;     
-  SysTools::addLog("opendir: %s, testFile: %s", pDirectory, pFile);
+  SysTools::addLog("SysVfsFatFs::testDisk, opendir: %s, testFile: %s", pDirectory, pFile);
 
     //LIST DIR
-    SysTools::addLog("List Directory");
+    SysTools::addLog("SysVfsFatFs::testDisk, List Directory");
     dp = opendir(pDirectory);
 
     if(dp == NULL) {
-        SysTools::addLog("Couldn't open the directory");
+        SysTools::addLog("SysVfsFatFs::testDisk, Couldn't open the directory");
         return -1;
     }
     
-    while ((ep = readdir (dp)) != NULL) SysTools::addLog("fileName: %s", ep->d_name);
+    while ((ep = readdir (dp)) != NULL) SysTools::addLog("SysVfsFatFs::testDisk, fileName: %s", ep->d_name);
 
     (void) closedir (dp);
 
     //ADD TEST FILE
-    SysTools::addLog("SysVfsFatFs::enableDisk, Create Test File: '%s'", pFile);
+    SysTools::addLog("SysVfsFatFs::testDisk, Create Test File: '%s'", pFile);
     
     FILE* fp = fopen(pFile, "w"); // "w" defines "writing mode"
         
     if(fp == NULL){
-        SysTools::addLog("SysVfsFatFs::enableDisk, Could not create file '%s' \n", pFile);
+        SysTools::addLog("SysVfsFatFs::testDisk, Could not create file '%s' \n", pFile);
         return false;
     }
     
@@ -61,7 +61,7 @@ bool testDisk(char* pDirectory, char* pFile)
     fclose(fp);
     
     //DUMP TEST FILE
-    SysTools::addLog("SysVfsFatFs::enableDisk, Dump Test File: '%s'", pFile);
+    SysTools::addLog("SysVfsFatFs::testDisk, Dump Test File: '%s'", pFile);
     fp = fopen(pFile,"r");
     int c;
 
@@ -76,11 +76,11 @@ bool testDisk(char* pDirectory, char* pFile)
     fclose(fp);
     
     //LIST DIR
-    SysTools::addLog("List Directory");
+    SysTools::addLog("SysVfsFatFs::testDisk, List Directory");
     dp = opendir(pDirectory);
     
     //list directory
-    while ((ep = readdir (dp)) != NULL) SysTools::addLog("fileName: %s", ep->d_name);
+    while ((ep = readdir (dp)) != NULL) SysTools::addLog("SysVfsFatFs::testDisk, fileName: %s", ep->d_name);
           
     (void) closedir (dp);
     return true;
@@ -88,6 +88,7 @@ bool testDisk(char* pDirectory, char* pFile)
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 bool flashProgram() {
+  _firmwareFile = "/cardDisk/firmware.bin";
   SysTools::addLog("SysVfsFatFs::flashProgram: '%s'", _firmwareFile);
 
     FILE* fp = fopen(_firmwareFile, "rb");
@@ -110,7 +111,7 @@ bool flashProgram() {
     memset(buff, 0, sizeof(buff));
   
     if(!Update.begin(fsize)) {
-        SysTools::addLog("SysVfsFatFs::flashProgram ABORT: Update.begin() failed");
+        SysTools::addLog("SysVfsFatFs::flashProgram, ABORT: Update.begin() Failed with fsize: %lu\n", fsize);
         return false;
     }
 
@@ -136,9 +137,9 @@ bool flashProgram() {
     int8_t ret = remove(_firmwareFile);
     
     if(ret == 0)
-        printf("SysVfsFatFs::flashProgram, _firmwareFile deleted successfully");
+        SysTools::addLog("SysVfsFatFs::flashProgram, _firmwareFile deleted successfully");
     else
-        printf("SysVfsFatFs::flashProgram, ERROR: Unable to remove _firmwareFile: '%s'", _firmwareFile);
+        SysTools::addLog("SysVfsFatFs::flashProgram, ABORT: Unable to remove _firmwareFile: '%s'", _firmwareFile);
     
     //Complete Firmware Upgrade
       
@@ -149,7 +150,7 @@ bool flashProgram() {
     
     Update.end();
 
-    printf("SysVfsFatFs::flashProgram, Completed!");
+    SysTools::addLog("SysVfsFatFs::flashProgram, Completed!\n");
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////

@@ -13,10 +13,14 @@
 
 #include <BleHidBridge.h>
 #include <UsbHidBridge.h>
+#include <UsbhostCDC.hpp>
+
 #include <WsKeyHub.h>
 #include <WsHassioBridge.h>
-#include <UsbhostCDC.hpp>
+#include <WsJsonIn.h>
+
 #include <SysTools.h>
+#include <SysSpiDisplay.h>
 
 const char* ssid     = "WAP-IOT";
 const char* password = "Pin#92109";
@@ -67,6 +71,9 @@ void setup()
     SysTools::addLog("%s", "Open WsHubBridge");
     WsKeyHub::open(receivedKey);
 
+    SysTools::addLog("%s", "Enable SysSpiDisplay");
+    SysSpiDisplay::enable(WsJsonIn::getConnectInfo());
+
     SysTools::addLog("%s", "Open WsDeviceBridge");
     WsHassioBridge::open(receivedKey);
 
@@ -86,4 +93,5 @@ void loop()
     WsKeyHub::refresh();
     WsHassioBridge::refresh();
     UsbhostCDC::refresh();
+    SysSpiDisplay::refresh();
 }

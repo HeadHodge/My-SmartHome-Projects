@@ -10,7 +10,7 @@
 #include <Arduino.h>
 
 #include <SysTools.h>
-#include <WsJsonIn.h>
+#include <WsEndpoint.h>
 #include <WsKeyHub.h>
 
 namespace WsKeyHub {
@@ -20,6 +20,13 @@ const char* password = "Pin#92109";
 receivedKeyCallback receivedKey;
 bool isBridgeConnected = false;
 DynamicJsonDocument messageObj(512);
+
+char* _localEndpointInfo[] = {
+    "WAP2G-MASTERBEDROOM",
+    "Pin#95833",
+    "000.000.000.000",
+    "80"
+};
 
 char *messageReceived(unsigned char *pMessageJson){
     deserializeJson(messageObj, pMessageJson);
@@ -62,13 +69,15 @@ bool isConnected() {
 }
 
 void refresh() {
-    WsJsonIn::refresh();
+    WsEndpoint::refresh();
 }
 
 void open(receivedKeyCallback pReceivedKey)
 {
     receivedKey = pReceivedKey;
-    WsJsonIn::open(messageReceived);
+    WsEndpoint::awaitEndpoint(_localEndpointInfo);
+    //(messageReceived);
+    
     SysTools::addLog("%s", "WsKeyHub::open Hub is Open");  
     return;
 }
