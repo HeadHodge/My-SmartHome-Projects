@@ -52,11 +52,11 @@ DynamicJsonDocument doc(1024);
  
     if(strcmp(messageType, "auth_required") == 0) {
       SysTools::addLog("WsHassioBridge::receivedMessage Send accessToken: %s", _remoteEndpointInfo[WsEndpoint::CONNECT_PASSWORD]);
-      char message[128];
+      char pkg[128];
         
-        memset(message, 0, sizeof(message));
-        sprintf(message, "{\"type\": \"auth\", \"access_token\": \"%s\"}", _remoteEndpointInfo[WsEndpoint::CONNECT_PASSWORD]);            
-        WsEndpoint::sendEndpoint(message);
+        memset(pkg, 0, sizeof(pkg));
+        sprintf(pkg, "{\"type\": \"auth\", \"access_token\": \"%s\"}", _remoteEndpointInfo[WsEndpoint::CONNECT_PASSWORD]);            
+        WsEndpoint::sendControlPkg(pkg);
         return "";
     }     
 
@@ -86,19 +86,19 @@ void refresh() {
 
 void controlDevice(DynamicJsonDocument& pKeyObj) {
   SysTools::addLog("WsHassioBridge::controlDevice with keyWord: %s", (const char *)pKeyObj["required"]["keyWord"]);
-  char controlString[512];
+  char controlPkg[512];
   char keyString[512];
 
-    memset (controlString, 0, 512);
+    memset (controlPkg, 0, 512);
     memset (keyString, 0, 512);
     
     serializeJson(pKeyObj, keyString);
-    sprintf(controlString, "{\"id\": %i, \"type\": \"fire_event\", \"event_type\": \"keyPressed\", \"event_data\": %s}", refNum, keyString);
+    sprintf(controlPkg, "{\"id\": %i, \"type\": \"fire_event\", \"event_type\": \"keyPressed\", \"event_data\": %s}", refNum, keyString);
     
     refNum = refNum + 1;
-    WsEndpoint::sendEndpoint(controlString);
+    WsEndpoint::sendControlPkg(controlPkg);
     
-    SysTools::addLog("WsHassioBridge::controlDevice sent controlString %s", controlString);
+    SysTools::addLog("WsHassioBridge::controlDevice sent controlPkg %s", controlPkg);
 }
 
 /////////////////////////////////////////////////////////////

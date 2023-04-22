@@ -48,15 +48,15 @@
 
 */
 //Required System Libraries
-#include <SPI.h>
-#include <TFT_eSPI.h>       // Hardware-specific library
+//#include <SPI.h>
+//#include <TFT_eSPI.h>       // Hardware-specific library
 
 //My Required Libraries
 #include <SysTools.h>
 #include <SysSpiDisplay.h>
 
 ///////////////////////////////////////////////////////////
-TFT_eSPI tft = TFT_eSPI();  // Invoke custom library
+//TFT_eSPI tft = TFT_eSPI();  // Invoke custom library
 void setup(void) {
 ///////////////////////////////////////////////////////////
     SysSpiDisplay::enable();

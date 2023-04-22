@@ -26,7 +26,7 @@ void refresh() {
     
     memset (message, 0, maxMessage);
     Serial.readBytesUntil('\0', message, maxMessage - 1); //leave one safety null char in message buffer
-    SysTools::receivedCommand((const char*)&message[0]);
+    //SysTools::receivedCommand((const char*)&message[0]);
 }
  
 void open(int pBaud = 115200) {
@@ -38,4 +38,4 @@ void open(int pBaud = 115200) {
     SysTools::addLog("%s", "ComSerial::open ComSerial Now Open");
     delay(1000);
 }
-} //namespace
+} //namespace SysSerialPort

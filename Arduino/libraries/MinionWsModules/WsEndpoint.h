@@ -17,21 +17,22 @@ namespace WsEndpoint {
         "NOPATH"
     };
   
-    void replyEndpoint(const char *pMessage);
-    void sendEndpoint(const char *pMessage);    
+    bool sendReplyPkg(const char *pPkg);
+    bool sendControlPkg(const char *pPkg);    
+    bool sendControlPkg(DynamicJsonDocument& pPkg);
     char** getConnectInfo();
     void refresh();
     bool isWifiConnected();
     
     bool awaitEndpoint(
         char* pConnectInfo[] = _defaultConnectInfo,
-        void (*pOnEndpointObject)(DynamicJsonDocument *pObject) = nullptr
+        void (*pOnPkgInput)(DynamicJsonDocument& pPkgObj) = nullptr
     );
     
     bool connectEndpoint(
         char* pConnectInfo[] = _defaultConnectInfo,
         char* pEndpointInfo[] = _defaultConnectInfo,
-        void (*pOnEndpointObject)(DynamicJsonDocument *pObject) = nullptr
+        void (*pOnPkgInput)(DynamicJsonDocument& pPkgObj) = nullptr
     );
 } //namespace WsEndpoint
 

@@ -21,7 +21,7 @@ DynamicJsonDocument optionsObj(1024);
         return;
     }
     
-    SysTools::lookupKeyWord(pKeyObj, optionsObj);
+    //SysTools::lookupKeyWord(pKeyObj, optionsObj);
     SysTools::addLog("BleHidBridge::controlDevice: %s %i %i, %i, %i", (const char*)optionsObj["keyWord"], (int)optionsObj["keyCode"], (int)optionsObj["keyModifier"], (int)optionsObj["keyDuration"], (int)optionsObj["keyDelay"]);
     
     if((int)optionsObj["keyCode"] == 0)

@@ -207,7 +207,7 @@
 #define TFT_RST  8              // Reset pin, toggles on startup
 #define TFT_BL   9              // LED back-light control pin
 #define TFT_BACKLIGHT_ON HIGH   // Level to turn ON back-light (HIGH or LOW)
-#define SPI_FREQUENCY  20000000 //
+#define SPI_FREQUENCY  40000000 //
 #define TFT_WIDTH  240          // ST7789 240 x 240 and 240 x 320
 #define TFT_HEIGHT 240          // ST7789 240 x 240
 #define TFT_INVERSION_ON       //

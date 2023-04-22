@@ -1,34 +1,29 @@
 #define US_KEYBOARD 1
-#include <Arduino.h>
-#include <ArduinoJson.h>
-#include <Preferences.h>
+//#include <stdio.h>
+//#include <stdlib.h>
+//#include <iosrtream>
+//#include <Arduino.h>
+//#include <Preferences.h>
+//#include <dirent.h>
 
 #include <SysTools.h>
 
 namespace SysTools {
  
-char* _defaultMap = "settings";
-char  _currentMap[32] = "";
-Preferences _memMap;
+//char* _defaultMap = "settings";
+//char  _currentMap[32] = "";
+//Preferences _memMap;
 
+/*
 void sendCommand(const char* pCommand) {
   if(Serial.availableForWrite() == 0) return;
 
     Serial.printf("\r\n%s\r\n\n", pCommand);
 }
+*/
 
-void addLog(const char* format, ...) {
-    
-    va_list argptr;
-    va_start(argptr, format);
-    printf("%s", "LOG: ");
-    //vsprintf(logBuffer, format, argptr);
-    vprintf(format, argptr);
-    printf("%s", "\r\n");
-    va_end(argptr);
-    
-};
 
+/*
 void getOptions(const char* pMemKey, DynamicJsonDocument& pOptions) {
   const char* memKey;
   const char* memValue;
@@ -50,7 +45,10 @@ void setMemMap(const char* pMapName) {
     strcpy(_currentMap, pMapName);
 }
 
+
+///////////////////////////////////////////////////////////////////
 void lookupKeyWord(DynamicJsonDocument& pMessageObj, DynamicJsonDocument& pDeviceObj) { 
+///////////////////////////////////////////////////////////////////
   SysTools::addLog("SysTools::lookupKeyWord: '%s'", (const char*)pMessageObj["required"]["keyWord"]);
 
   JsonObject keyOptions = pMessageObj["optional"].as<JsonObject>();
@@ -90,7 +88,8 @@ void lookupKeyWord(DynamicJsonDocument& pMessageObj, DynamicJsonDocument& pDevic
     
     SysTools::addLog("SysTools::lookupKeyWord: deviceOptions: %s %i %i, %i, %i", (const char*)pDeviceObj["keyWord"], (int)pDeviceObj["keyCode"], (int)pDeviceObj["keyModifier"], (int)pDeviceObj["keyDuration"], (int)pDeviceObj["keyDelay"]);
 };
-
+*/
+/*
 void receivedCommand(const char* pMessage) {
   addLog("SysTools::receivedCommand Message: %s", pMessage);
   DynamicJsonDocument messageObj(512);
@@ -132,9 +131,84 @@ void receivedCommand(const char* pMessage) {
     memString = _memMap.getString(memKey);
     sendCommand("NOTIFY:{\"Command\":\"SETOPTIONS\", \"State\":\"Done\"}");
 }
+*/
+
+///////////////////////////////////////////////////////////////////
+DynamicJsonDocument* getOptionsObj(char* pFileName, char* pDirectory) {
+///////////////////////////////////////////////////////////////////
+    FILE *fp = NULL;
+    char filePath[128];
+    DynamicJsonDocument* optionsObj = nullptr;
+
+    sprintf(filePath, "%s/%s", pDirectory, pFileName);
+    fp = fopen(filePath,"r");
+    
+    if(fp == NULL) {
+        SysTools::addLog("SysTools::getOptionsObj, ABORT: fopen failed: %s", filePath);
+        return nullptr;
+    };
+    
+    fseek(fp, 0, SEEK_END);     // seek to end of file
+    uint32_t fsize = ftell(fp); // get current file pointer
+    fseek(fp, 0, SEEK_SET);     // seek back to beginning of file
+    char* optionsStr = (char*)malloc(fsize+1);
+    memset(optionsStr, 0, fsize+1);
+    uint16_t bytesRead = fread(optionsStr, 1, fsize, fp);
+    fclose(fp);
+    
+    if(bytesRead != fsize) {
+        SysTools::addLog("SysTools::getOptionsObj, ABORT: Incorrect fread Bytes Read: %lu", bytesRead);
+        return nullptr;
+    };
+    
+    SysTools::addLog("SysTools::getOptionsObj, optionsObj optionsStr: %s", optionsStr);
+    optionsObj = new DynamicJsonDocument(fsize*2);
+    DeserializationError deserializeErr = deserializeJson(*optionsObj, (const char*)optionsStr);
+    free(optionsStr);
+   
+    if(deserializeErr) {
+        SysTools::addLog("SysTools::getOptionsObj, ABORT: Deserialize File Failed, Reason: %s", deserializeErr.c_str());
+        return nullptr;
+    };
+     
+    optionsObj->shrinkToFit();
+    SysTools::addLog("SysTools::getOptionsObj, optionsStr: %s, \nmemoryUsage: '%lu', capacity: '%lu'", optionsStr, optionsObj->memoryUsage(), optionsObj->capacity());
+
+    return optionsObj;
+}
+    
+///////////////////////////////////////////////////////////////////
+bool saveOptionsObj(DynamicJsonDocument* pOptionsObject, char* pFileName, char* pDirectory) {
+///////////////////////////////////////////////////////////////////
+  SysTools::addLog("SysTools::saveOptionsObj, pDirectory: %s, pFileName: %s", pDirectory, pFileName);
+  char optionsStr[1024];
+  char filePath[128];
+  
+    if(serializeJson(*pOptionsObject, optionsStr) == 0){
+        SysTools::addLog("saveOptionsObj::saveOptionsObj, ABORT: Serialize OptionsObj Failed");
+        return false;
+    };
+
+    mkdir(pDirectory, 0777);
+
+    FILE *fp = NULL;
+    sprintf(filePath, "%s/%s", pDirectory, pFileName);
+    fp = fopen(filePath,"w");
+    
+    if(fp == NULL) {
+        SysTools::addLog("SysTools::saveOptionsObj, ABORT: fopen failed");
+        return false;
+    };
+    
+    fprintf(fp, "%s", optionsStr);
+    fclose(fp);
+  
+    return true;
+}
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 void dumpBuffer(const uint8_t* pBuffer, uint32_t pBufferSize, uint32_t pByteCount) {
+///////////////////////////////////////////////////////////////////
   SysTools::addLog("\nSysTools::dumpBuffer, pBufferSize: %u, pByteCount: %u", pBufferSize, pByteCount);
     
     //Print First Few Buffer Bytes
@@ -173,4 +247,15 @@ void dumpBuffer(const uint8_t* pBuffer, uint32_t pBufferSize, uint32_t pByteCoun
         
     Serial.println("\n");
 }
+
+///////////////////////////////////////////////////////////////////
+void addLog(const char* format, ...) {
+///////////////////////////////////////////////////////////////////
+    va_list argptr;
+    va_start(argptr, format);
+    printf("%s", "LOG: ");
+    vprintf(format, argptr);
+    printf("%s", "\r\n");
+    va_end(argptr);
 }
+} //namespace SysTools

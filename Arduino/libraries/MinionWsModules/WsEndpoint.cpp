@@ -18,22 +18,18 @@
 
 namespace WsEndpoint {
 
-char* _connectInfo[] = {
-    "WAP2G-MASTERBEDROOM",
-    "Pin#95833",
-    "000.000.000.000",
-    "80"
-};
+char** _connectInfo = nullptr;
+char** _endpointInfo = nullptr;
 
 WebSocketsServer* _webSocketServer;
 WebSocketsClient* _webSocketClient;
-bool _isWifiConnected = false;
+bool _isAPConnected = false;
 bool _isServerEnabled = false;
 bool _isClientEnabled = false;
 bool _isServerConnected = false;
 bool _isClientConnected = false;
-void (*_onServerObject)(DynamicJsonDocument *pObject) = nullptr;
-void (*_onClientObject)(DynamicJsonDocument *pObject) = nullptr;
+void (*_onServerPkg)(DynamicJsonDocument& pPkg) = nullptr;
+void (*_onClientPkg)(DynamicJsonDocument& pPkg) = nullptr;
 
 /////////////////////////////////////////////////////////////
 char** getConnectInfo() {
@@ -44,128 +40,31 @@ char** getConnectInfo() {
 };
 
 /////////////////////////////////////////////////////////////
-bool onEndpointInput(uint8_t* pInput, size_t pLength, void (*pOnEndpointObject)(DynamicJsonDocument *pObject) = nullptr) {
+bool sendReplyPkg(const char *pPkg) {
 /////////////////////////////////////////////////////////////
-  SysTools::addLog("wsEndpoint::onEndpointInput, pLength: %lu, pInput: %s", pLength, pInput);
-  if(pOnEndpointObject == nullptr) return false;
-  DynamicJsonDocument doc(pLength*2);
+ SysTools::addLog("wsEndpoint::sendJasonReplyStr: %s", pPkg);
+     return _webSocketServer->sendTXT(0, pPkg);
+}
 
-    DeserializationError err = deserializeJson(doc, (const char*)pInput);
-    
-    if (err) {
-        SysTools::addLog("wsEndpoint::onEndpointInput, ABORT: Invalid Jason, Reason: %s", err.c_str());
+/////////////////////////////////////////////////////////////
+bool sendControlPkg(const char *pPkg) {
+/////////////////////////////////////////////////////////////
+  SysTools::addLog("wsEndpoint::sendJasonControlStr: %s", pPkg);
+    return _webSocketClient->sendTXT(pPkg);
+}
+
+/////////////////////////////////////////////////////////////
+bool sendControlPkg(DynamicJsonDocument& pPkg) {
+/////////////////////////////////////////////////////////////
+  SysTools::addLog("wsEndpoint::sendControlPkg");
+  char pkg[1024];
+  
+    if(serializeJson(pPkg, pkg) == 0){
+        SysTools::addLog("wsEndpoint::sendControlPkg, ABORT: Serialize Pkg Failed");
         return false;
     };
-    
-    SysTools::addLog("wsEndpoint::onEndpointInput, Before Doc Shrink, memoryUsage: '%lu', capacity: '%lu'", doc.memoryUsage(), doc.capacity());
-    doc.shrinkToFit();
-    SysTools::addLog("wsEndpoint::onEndpointInput, After Doc Shrink,  memoryUsage: '%lu', capacity: '%lu'", doc.memoryUsage(), doc.capacity());
-
-    pOnEndpointObject(&doc);
-    return true;
-}
-
-/////////////////////////////////////////////////////////////
-void webClientEvent(WStype_t type, uint8_t* input, size_t length) {
-/////////////////////////////////////////////////////////////
-  SysTools::addLog("wsEndpoint::webClientEvent(type: %d)", type);
-
-	switch(type) {
-		case WStype_DISCONNECTED:
-			SysTools::addLog("%s", "wsEndpoint::webClientEvent Disconnected!");
-            _isServerConnected = false;
-			break;
-		case WStype_CONNECTED:
-			SysTools::addLog("wsEndpoint::webClientEvent Connected to url: %s", input);
-            _isServerConnected = true;
-			break;
-		case WStype_TEXT:
-            onEndpointInput(input, length, _onClientObject);
-			break;
-		case WStype_BIN:
-			SysTools::addLog("wsEndpoint::webClientEvent get binary length: %u", length);
-			break;
-		case WStype_ERROR:			
-		case WStype_FRAGMENT_TEXT_START:
-		case WStype_FRAGMENT_BIN_START:
-		case WStype_FRAGMENT:
-		case WStype_FRAGMENT_FIN:
-			break;
-	}
-}
-
-//////////////////////////////////////////////////////////////
-void webServerEvent(uint8_t num, WStype_t type, uint8_t *input, size_t length) {
-//////////////////////////////////////////////////////////////
-  SysTools::addLog("wsEndpoint::webServerEvent(num: %d, type: %d)", num, type);
-    
-    switch(type) {
-    case WStype_DISCONNECTED:
-        SysTools::addLog("wsEndpoint::webServerEvent[%u] Disconnected!", type);
-        _isServerConnected = false;
-        break;
-    case WStype_CONNECTED:
-    {
-      //IPAddress ip = webSocket.remoteIP(num);
-      SysTools::addLog("wsEndpoint::webServerEvent[%u] Connected from %s url: %s", type, _connectInfo[CONNECT_ADDRESS], input);
-      _isServerConnected = true;
-    }
-      break;
-    case WStype_TEXT:
-    {
-        SysTools::addLog("wsEndpoint::webServerEvent[%u] Received Input: [%d] %s", type, length, input);
-    }
-        break;
-    case WStype_BIN:
-      SysTools::addLog("wsEndpoint::webServerEvent[%u] Binary!", type);
-      break;
-    case WStype_FRAGMENT_TEXT_START:
-      SysTools::addLog("wsEndpoint::webServerEvent[%u] Fragment Text Start!", type);
-      break;
-    case WStype_FRAGMENT_BIN_START:
-      SysTools::addLog("wsEndpoint::webServerEvent[%u] Fragment Binary Start!", type);
-      break;
-    case WStype_FRAGMENT:
-      SysTools::addLog("wsEndpoint::webServerEvent[%u] Fragment!", type);
-      break;
-    case WStype_FRAGMENT_FIN:
-      SysTools::addLog("wsEndpoint::webServerEvent[%u] Fragment Finish!", type);
-      break;
-    case WStype_PING:
-      SysTools::addLog("wsEndpoint::webServerEvent[%u] Ping!", type);
-      break;
-    case WStype_PONG:
-      SysTools::addLog("wsEndpoint::webServerEvent[%u] Pong!", type);
-      break;
-    case WStype_ERROR:
-      SysTools::addLog("wsEndpoint::webServerEvent[%u] Error!", type);
-      break;
-    default:
-      SysTools::addLog("wsEndpoint::webServerEvent Unknown WStype [%d]", type);
-      break;
-  }
-  
-  SysTools::addLog("wsEndpoint::webServerEvent, %s", "");
-}
-
-//////////////////////////////////////////////////////////////
-bool isWifiConnected() {
-//////////////////////////////////////////////////////////////
-  SysTools::addLog("wsEndpoint::isWifiConnected");
-
-    return _isWifiConnected;
-}
-
-/////////////////////////////////////////////////////////////
-void replyEndpoint(const char *pJson) {
-/////////////////////////////////////////////////////////////
-    _webSocketServer->sendTXT(0, pJson);
-}
-
-/////////////////////////////////////////////////////////////
-void sendEndpoint(const char *pJson) {
-/////////////////////////////////////////////////////////////
-    _webSocketClient->sendTXT(pJson);
+        
+    return sendControlPkg(pkg);
 }
 
 //////////////////////////////////////////////////////////////
@@ -175,13 +74,121 @@ void refresh() {
     if(_isClientEnabled == true) _webSocketClient->loop();
 }
 
+/////////////////////////////////////////////////////////////
+bool onPkgInput(uint8_t* pPkgStr, size_t pLength, void (*pOnPkgInput)(DynamicJsonDocument& pPkgObj) = nullptr) {
+/////////////////////////////////////////////////////////////
+  //SysTools::addLog("wsEndpoint::onPkgInput, pLength: %lu, pPkgStr: %s", pLength, pPkgStr);
+  if(pOnPkgInput == nullptr) return false;
+  DynamicJsonDocument pkgObj(pLength*2);
+
+    DeserializationError err = deserializeJson(pkgObj, (const char*)pPkgStr);
+    
+    if (err) {
+        SysTools::addLog("wsEndpoint::onPkgInput, ABORT: Invalid Pkg, Reason: %s", err.c_str());
+        return false;
+    };
+    
+    //SysTools::addLog("wsEndpoint::onPkgInput, Before pkgObj Shrink, memoryUsage: '%lu', capacity: '%lu'", pkgObj.memoryUsage(), pkgObj.capacity());
+    pkgObj.shrinkToFit();
+    SysTools::addLog("wsEndpoint::onPkgInput, pPkgStr: %s, \nmemoryUsage: '%lu', capacity: '%lu'", pPkgStr, pkgObj.memoryUsage(), pkgObj.capacity());
+
+    pOnPkgInput(pkgObj);
+    return true;
+}
+
+/////////////////////////////////////////////////////////////
+void webClientEvent(WStype_t type, uint8_t* input, size_t length) {
+/////////////////////////////////////////////////////////////
+
+	switch(type) {
+		case WStype_DISCONNECTED:
+			SysTools::addLog("%s", "wsEndpoint::webClientEvent Disconnected!");
+            _isClientConnected = false;
+			break;
+		case WStype_CONNECTED:
+			SysTools::addLog("wsEndpoint::webClientEvent Connected to url: %s", input);
+            _isClientConnected = true;
+			break;
+		case WStype_TEXT:
+            onPkgInput(input, length, _onClientPkg);
+			break;
+		case WStype_BIN:
+			SysTools::addLog("wsEndpoint::webClientEvent get binary length: %u", length);
+			break;
+		case WStype_ERROR:			
+		case WStype_FRAGMENT_TEXT_START:
+		case WStype_FRAGMENT_BIN_START:
+		case WStype_FRAGMENT:
+		case WStype_FRAGMENT_FIN:
+            SysTools::addLog("wsEndpoint::webClientEvent, Received Unknown Event Type(type: %d)", type);
+			break;
+	}
+}
+
 //////////////////////////////////////////////////////////////
-bool connectWifi(char* pConnectInfo[]) {
+void webServerEvent(uint8_t num, WStype_t type, uint8_t *input, size_t length) {
 //////////////////////////////////////////////////////////////
-  if(_isWifiConnected) return true;
+    
+    switch(type) {
+        case WStype_DISCONNECTED:
+            SysTools::addLog("wsEndpoint::webServerEvent[%u] Disconnected!", type);
+            _isServerConnected = false;
+            break;
+        case WStype_CONNECTED:
+            SysTools::addLog("wsEndpoint::webServerEvent[%u] Connected from %s url: %s", type, _connectInfo[CONNECT_ADDRESS], input);
+            _isServerConnected = true;
+            break;
+        case WStype_TEXT:
+            //SysTools::addLog("wsEndpoint::webServerEvent[%u] Received Input: [%d] %s", type, length, input);
+            onPkgInput(input, length, _onServerPkg);
+            break;
+        case WStype_BIN:
+            SysTools::addLog("wsEndpoint::webServerEvent[%u] Binary!", type);
+            break;
+        case WStype_FRAGMENT_TEXT_START:
+            SysTools::addLog("wsEndpoint::webServerEvent[%u] Fragment Text Start!", type);
+            break;
+        case WStype_FRAGMENT_BIN_START:
+            SysTools::addLog("wsEndpoint::webServerEvent[%u] Fragment Binary Start!", type);
+            break;
+        case WStype_FRAGMENT:
+            SysTools::addLog("wsEndpoint::webServerEvent[%u] Fragment!", type);
+            break;
+        case WStype_FRAGMENT_FIN:
+            SysTools::addLog("wsEndpoint::webServerEvent[%u] Fragment Finish!", type);
+            break;
+        case WStype_PING:
+            SysTools::addLog("wsEndpoint::webServerEvent[%u] Ping!", type);
+            break;
+        case WStype_PONG:
+            SysTools::addLog("wsEndpoint::webServerEvent[%u] Pong!", type);
+            break;
+        case WStype_ERROR:
+            SysTools::addLog("wsEndpoint::webServerEvent[%u] Error!", type);
+            break;
+        default:
+            SysTools::addLog("wsEndpoint::webServerEvent Unknown WStype [%d]", type);
+            break;
+    }
+  
+}
+
+//////////////////////////////////////////////////////////////
+bool isWifiConnected() {
+//////////////////////////////////////////////////////////////
+  SysTools::addLog("wsEndpoint::isWifiConnected");
+
+    return _isAPConnected;
+}
+
+//////////////////////////////////////////////////////////////
+bool connectAP(char* pConnectInfo[]) {
+//////////////////////////////////////////////////////////////
+  if(_isAPConnected) return true;
   
   SysTools::addLog("wsEndpoint::connectWifi");
   uint32_t startTime = CURRENT_TIME;
+  _connectInfo = pConnectInfo;
     
     // We start by connecting to a WiFi network
     SysTools::addLog("wsEndpoint::connectWifi Connect to Wifi AP: '%s', Wifi PSW: '%s'", pConnectInfo[CONNECT_SSID], pConnectInfo[CONNECT_PASSWORD]);
@@ -199,17 +206,20 @@ bool connectWifi(char* pConnectInfo[]) {
     sprintf(pConnectInfo[CONNECT_ADDRESS], "%s", WiFi.localIP().toString());
 
     SysTools::addLog("wsEndpoint::connectWifi Connected to SSID: '%s', Password: %s, Address: %s", pConnectInfo[CONNECT_SSID], pConnectInfo[CONNECT_PASSWORD], pConnectInfo[CONNECT_ADDRESS]);
-    _isWifiConnected = true;
+    _isAPConnected = true;
     return true;
 }
   
 //////////////////////////////////////////////////////////////
-bool connectEndpoint(char* pConnectInfo[], char* pEndpointInfo[], void (*pOnEndpointObject)(DynamicJsonDocument *pObject)) {
+bool connectEndpoint(char* pConnectInfo[], char* pEndpointInfo[], void (*pOnClientPkg)(DynamicJsonDocument& pPkg)) {
 //////////////////////////////////////////////////////////////
   SysTools::addLog("wsEndpoint::connectEndpoint");
 
-    _onClientObject = pOnEndpointObject;
-    connectWifi(pConnectInfo);
+    _endpointInfo = pEndpointInfo;
+    connectAP(pConnectInfo);
+
+    //Connection to Endpoint
+    _onClientPkg = pOnClientPkg;
     _webSocketClient = new WebSocketsClient();
 
     // try every 5000 again if connection has failed
@@ -221,9 +231,6 @@ bool connectEndpoint(char* pConnectInfo[], char* pEndpointInfo[], void (*pOnEndp
     // event handler
     _webSocketClient->onEvent(webClientEvent);
     
-    // server address, port and URL
-    //pEndpointInfo[CONNECT_ADDRESS] = "192.168.0.224";
-    //pEndpointInfo[CONNECT_PORT] = "8123";
     _webSocketClient->begin(pEndpointInfo[CONNECT_ADDRESS], atoi(pEndpointInfo[CONNECT_PORT]), pEndpointInfo[CONNECT_PATH]);
 
     SysTools::addLog("wsEndpoint::connectEndpoint %s", "wsClientDevice is Open");
@@ -233,19 +240,20 @@ bool connectEndpoint(char* pConnectInfo[], char* pEndpointInfo[], void (*pOnEndp
 }
 
 //////////////////////////////////////////////////////////////
-bool awaitEndpoint(char* pConnectInfo[], void (*pOnEndpointObject)(DynamicJsonDocument *pObject)) {
+bool awaitEndpoint(char* pConnectInfo[], void (*pOnPkgInput)(DynamicJsonDocument& pObject)) {
 //////////////////////////////////////////////////////////////
   SysTools::addLog("wsEndpoint::awaitEndpoint");
    
-    _onServerObject = pOnEndpointObject;
-    connectWifi(pConnectInfo);
+    _onServerPkg = pOnPkgInput;
+    _connectInfo = pConnectInfo;
+    connectAP(pConnectInfo);
     
     //Listen for Connections
     _webSocketServer = new WebSocketsServer(atoi(pConnectInfo[CONNECT_PORT]));
     _webSocketServer->onEvent(webServerEvent);
     _webSocketServer->begin();
 
-    SysTools::addLog("wsEndpoint::awaitEndpoint, Waiting for Device Connection on Port: %u...", pConnectInfo[CONNECT_PORT]);
+    SysTools::addLog("wsEndpoint::awaitEndpoint, Waiting for Device Connection on Port: %s...", pConnectInfo[CONNECT_PORT]);
 
     _isServerEnabled = true;
     return true;
