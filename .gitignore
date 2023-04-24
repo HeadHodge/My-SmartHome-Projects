@@ -1,7 +1,7 @@
 backups/
 minionLogic/LLC
-Arduino/gitLibraries
-Arduino/gitProjects
+Arduino/gitLibraries/
+Arduino/gitProjects/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
