@@ -89,11 +89,13 @@ void enable(char* pConnectInfo[]) {
     _tft.setTextPadding(1);
   
     _tft.setTextSize(3);
-    _tft.drawCentreString("Ultra Proxy", 120, 0, 2);  //_tft.println("Total Wifi Remote Control");
-    _tft.drawCentreString("Wifi Remote", 120, 47, 2);  //_tft.println("Total Wifi Remote Control");
+    _tft.drawCentreString("smartRemotes", 120, 0, 2);  //_tft.println("Total Wifi Remote Control");
 
     _tft.setTextSize(2);
-    _tft.drawCentreString("v23.04", 120, 95, 2);  //_tft.println("Total Wifi Remote Control");
+    _tft.drawCentreString("v23.04 By:", 120, 47, 2);  //_tft.println("Total Wifi Remote Control");
+
+    _tft.setTextSize(3);
+    _tft.drawCentreString("minionLogic", 120, 74, 2);  //_tft.println("Total Wifi Remote Control");
 
     _tft.setTextSize(2);
     _tft.drawString("SSID:", 10, 134, 1);  //_tft.println("Total Wifi Remote Control");

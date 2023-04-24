@@ -5,7 +5,7 @@
 
 //My Required Libraries
 #include <SysTools.h>
-#include <SysVfsFatFs.h>
+//#include <SysVfsBridge.h>
 #include <SysVfsRamDisk.h>
 
 // This file should be compiled with 'Partition Scheme' (in Tools menu)
@@ -15,7 +15,7 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////
 namespace SysRamDisk {
 /////////////////////////////////////////////////////////////////////////////////////////////////
-SysFatFs::vfsDiskOptions_t _vfsDiskOptions;
+SysVfsBridge::vfsDiskOptions_t _vfsDiskOptions;
 uint8_t* _ramDisk;
 const esp_partition_t* _ffatPartition = esp_partition_find_first(ESP_PARTITION_TYPE_ANY, ESP_PARTITION_SUBTYPE_ANY, "ffat");
 
@@ -123,7 +123,7 @@ bool readRaw(uint8_t pdrv, uint8_t* buffer, uint32_t sector) {
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
-uint8_t enable(SysFatFs::vfsDiskOptions_t** pDiskOptions) {
+uint8_t enable(SysVfsBridge::vfsDiskOptions_t** pDiskOptions) {
   SysTools::addLog("SysVfsFlashDisk::enable Open Flash Disk");
   if(pDiskOptions != nullptr) pDiskOptions[0] = nullptr;
   uint8_t diskNum = 0xFF;

@@ -3,22 +3,23 @@
 #include <dirent.h>
 #include <esp_vfs_fat.h>
 #include <Update.h>
+#include <filesystem>
 
 //My Required Libraries
 #include <SysTools.h>
-#include <SysVfsCardDisk.h>
 #include <SysVfsFlashDisk.h>
+#include <SysVfsMmcDisk.h>
+#include <SysVfsSpiDisk.h>
 #include <SysVfsRamDisk.h>
-#include <SysVfsFatFs.h>
+#include <SysVfsBridge.h>
 
 // This file should be compiled with 'Partition Scheme' (in Tools menu)
 // set to 'Default with ffat' if you have a 4MB ESP32 dev module or
 // set to '16M Fat' if you have a 16MB ESP32 dev module.
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
-namespace SysFatFs {
+namespace SysVfsBridge {
 /////////////////////////////////////////////////////////////////////////////////////////////////
-
 vfsDiskOptions_t* _vfsDiskOptions[FF_VOLUMES];
 FATFS* fatFS[FF_VOLUMES] = {nullptr};
 const char* _firmwareFile = "/cardDisk/firmware/flashfirmware.bin";
@@ -28,67 +29,8 @@ bool    _isFormatted = false;
 bool    _isMounted = false;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
-bool testDisk(char* pDirectory, char* pFile)
-{
-  DIR *dp;
-  struct dirent *ep;     
-  SysTools::addLog("SysVfsFatFs::testDisk, opendir: %s, testFile: %s", pDirectory, pFile);
-
-    //LIST DIR
-    SysTools::addLog("SysVfsFatFs::testDisk, List Directory");
-    dp = opendir(pDirectory);
-
-    if(dp == NULL) {
-        SysTools::addLog("SysVfsFatFs::testDisk, Couldn't open the directory");
-        return -1;
-    }
-    
-    while ((ep = readdir (dp)) != NULL) SysTools::addLog("SysVfsFatFs::testDisk, fileName: %s", ep->d_name);
-
-    (void) closedir (dp);
-
-    //ADD TEST FILE
-    SysTools::addLog("SysVfsFatFs::testDisk, Create Test File: '%s'", pFile);
-    
-    FILE* fp = fopen(pFile, "w"); // "w" defines "writing mode"
-        
-    if(fp == NULL){
-        SysTools::addLog("SysVfsFatFs::testDisk, Could not create file '%s' \n", pFile);
-        return false;
-    }
-    
-    fputs("Hello World!", fp);
-    fclose(fp);
-    
-    //DUMP TEST FILE
-    SysTools::addLog("SysVfsFatFs::testDisk, Dump Test File: '%s'", pFile);
-    fp = fopen(pFile,"r");
-    int c;
-
-    Serial.printf("%c", '\n');
-    while(1) {
-      c = fgetc(fp);
-      if(feof(fp)) break ;
-      Serial.printf("%c", c);
-    }
-    Serial.printf("%c%c", '\n', '\n');
-   
-    fclose(fp);
-    
-    //LIST DIR
-    SysTools::addLog("SysVfsFatFs::testDisk, List Directory");
-    dp = opendir(pDirectory);
-    
-    //list directory
-    while ((ep = readdir (dp)) != NULL) SysTools::addLog("SysVfsFatFs::testDisk, fileName: %s", ep->d_name);
-          
-    (void) closedir (dp);
-    return true;
-}
-
-/////////////////////////////////////////////////////////////////////////////////////////////////
 bool flashProgram() {
-  _firmwareFile = "/cardDisk/firmware.bin";
+  _firmwareFile = "/firmware/update.bin";
   SysTools::addLog("SysVfsFatFs::flashProgram: '%s'", _firmwareFile);
 
     FILE* fp = fopen(_firmwareFile, "rb");
@@ -154,8 +96,9 @@ bool flashProgram() {
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
-bool formatDisk(uint8_t pDiskNum, const char* pDisk = "0:") {
-    SysTools::addLog("SysVfsFatFs::formatDisk, diskNum: %u, diskSectorSize: %lu, diskSectorCount: %lu", pDiskNum, _vfsDiskOptions[pDiskNum]->sectorSize(), _vfsDiskOptions[pDiskNum]->sectorCount());
+bool formatDisk(vfsDiskOptions_t* pDiskOptions, uint8_t pDiskNum, const char* pDisk = "0:") {
+/////////////////////////////////////////////////////////////////////////////////////////////////
+  SysTools::addLog("SysVfsFatFs::formatDisk, diskNum: %u, diskSectorSize: %lu, diskSectorCount: %lu", pDiskNum, _vfsDiskOptions[pDiskNum]->sectorSize(), _vfsDiskOptions[pDiskNum]->sectorCount());
     
     //Format Disk
     uint8_t* workBuff = nullptr;
@@ -175,14 +118,24 @@ bool formatDisk(uint8_t pDiskNum, const char* pDisk = "0:") {
     }
 
     //Formatted
-    SysTools::addLog("SysVfsFatFs::formatDisk, DISK FORMATTED\n");   
+    SysTools::addLog("SysVfsFatFs::formatDisk, DISK: %u FORMATTED\n", pDiskNum);   
+    if(pDiskOptions->onFormatted != nullptr) (pDiskOptions->onFormatted)();
+/*
+    //Test Disk
+    SysTools::addLog("SysVfsFatFs::formatDisk, Test Disk: %u", pDiskNum);
+    if(!testDisk(_vfsDiskOptions[pDiskNum]->fileSystem, _vfsDiskOptions[pDiskNum]->testFile)) {
+        SysTools::addLog("SysVfsFatFs::formatDisk, ABORT: Test Disk Failed");
+        return false;
+    }
+*/
+
     return true;
 }    
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
-bool enableDisk(const char* pFileSystem, vfsDiskOptions_t** pDiskOptions) {
+bool enableDisk(const char* pFileSystem, bool pFormatDisk, vfsDiskOptions_t** pDiskOptions) {
   SysTools::addLog("SysVfsFatFs::enable \n");
-  uint8_t diskNum = -1;
+  uint8_t diskNum = 255;
   uint8_t hasFailed;
 
     if(pDiskOptions != nullptr) pDiskOptions[0] = nullptr;
@@ -202,20 +155,19 @@ bool enableDisk(const char* pFileSystem, vfsDiskOptions_t** pDiskOptions) {
 
     if(pFileSystem == "/flashDisk") {
         diskNum = SysFlashDisk::enable(&diskOptions);       
-        //SysTools::addLog("SysVfsFatFs::enable, FF_MIN_SS: %u, FF_MAX_SS: %u, FF_VOLUMES: %u, FF_STR_VOLUME_ID: %u", FF_MIN_SS, FF_MAX_SS, FF_VOLUMES, FF_STR_VOLUME_ID);
-    } else if(pFileSystem == "/cardDisk") {
-        diskNum = SysCardDisk::enable(&diskOptions);       
-        //SysTools::addLog("SysVfsFatFs::enable, Enabled fs: %s, diskNum: %u ", pFileSystem, diskNum);
+    } else if(pFileSystem == "/mmcDisk") {
+        diskNum = SysMmcDisk::enable(&diskOptions);       
+    } else if(pFileSystem == "/spiDisk") {
+        diskNum = SysSpiDisk::enable(&diskOptions);       
     } else if(pFileSystem == "/ramDisk") {
         diskNum = SysRamDisk::enable(&diskOptions);       
-        //SysTools::addLog("SysVfsFatFs::enable, Enabled fs: %s, diskNum: %u ", pFileSystem, diskNum);
     } else {
         SysTools::addLog("SysVfsFatFs::enable, ABORT: Invalid Disk Type '%s'", pFileSystem);
         return false;
     }
     
-    if(diskNum == -1) {
-        SysTools::addLog("SysVfsFatFs::enable, ABORT: Invalid diskNum: %u", diskNum);
+    if(diskNum == 255) {
+        SysTools::addLog("SysVfsFatFs::enable, ABORT: Invalid diskNum: %i", diskNum);
         return false;
     }
     
@@ -235,7 +187,6 @@ bool enableDisk(const char* pFileSystem, vfsDiskOptions_t** pDiskOptions) {
         return 0;
     }
     
-    //esp_vfs_fat Registered
     SysTools::addLog("SysVfsFatFs::enable, REGISTERED esp_vfs_fat_register, diskNum: %lu\n", diskNum);
 
     /////////////////////////
@@ -244,20 +195,20 @@ bool enableDisk(const char* pFileSystem, vfsDiskOptions_t** pDiskOptions) {
     SysTools::addLog("SysVfsFatFs::enable, f_mount disk, diskNum: %u", diskNum);
     fatFS[diskNum]->pdrv = diskNum;
     hasFailed = f_mount(fatFS[diskNum], _vfsDiskOptions[diskNum]->diskPath, 1); //0-delay, 1-immediate
-    if(hasFailed != FR_OK) {
-        SysTools::addLog("SysVfsFatFs::enable, ABORT: f_mount disk, errCode: %u", hasFailed);
 
+    if(hasFailed != FR_OK) {
+        SysTools::addLog("SysVfsFatFs::enable, FAILED: f_mount disk, errCode: %u", hasFailed);
+     
         //FORMAT DISK
         SysTools::addLog("SysVfsFatFs::enable, Trying to Format Disk: %lu", diskNum);
-        if(formatDisk(diskNum, _vfsDiskOptions[diskNum]->diskPath) != true) {
+        pFormatDisk = false;
+        if(formatDisk(diskOptions, diskNum, _vfsDiskOptions[diskNum]->diskPath) != true) {
             SysTools::addLog("SysVfsFatFs::enableDisk, ABORT: formatDisk failed");
             return false;
         }
-        SysTools::addLog("SysVfsFatFs::enableDisk, Format Done");
     
         //RETRY MOUNT DISK
-        SysTools::addLog("SysVfsFatFs::enable, f_mount disk, diskNum: %u", diskNum);
-        fatFS[diskNum]->pdrv = diskNum;
+        SysTools::addLog("SysVfsFatFs::enable, REMOUNT: f_mount disk, diskNum: %u", diskNum);
         hasFailed = f_mount(fatFS[diskNum], _vfsDiskOptions[diskNum]->diskPath, 1); //0-delay, 1-immediate
         if(hasFailed != FR_OK) {
             SysTools::addLog("SysVfsFatFs::enable, ABORT: f_mount disk, errCode: %u", hasFailed);
@@ -266,43 +217,30 @@ bool enableDisk(const char* pFileSystem, vfsDiskOptions_t** pDiskOptions) {
     }
 
     //Disk Mounted
-    _isMounted = true;
     SysTools::addLog("SysVfsFatFs::enable, f_mount: DISK MOUNTED, diskType: %s, sectorSize: %lu, sectorCont %lu \n", _vfsDiskOptions[diskNum]->diskType(), _vfsDiskOptions[diskNum]->sectorSize(), _vfsDiskOptions[diskNum]->sectorCount());
+    _isMounted = true;
+    
+    ///////////////////
+    //  Format Disk
+    ///////////////////     
+    if(pFormatDisk) {
+        //FORMAT DISK
+        SysTools::addLog("SysVfsFatFs::enableDisk, Format Disk");
 
+        if(formatDisk(diskOptions, diskNum, _vfsDiskOptions[diskNum]->diskPath) != true) {
+            SysTools::addLog("SysVfsFatFs::enableDisk, ABORT: formatFat16FlashDisk failed");
+            return false;
+        }
+    }
+    
     ///////////////////
     //  Flash Program
     ///////////////////  
     flashProgram();
-    
-    ///////////////////
-    //  Test Disk
-    ///////////////////  
-    SysTools::addLog("SysVfsFatFs::enable, Test Disk, diskNum: %u", diskNum);
-
-    //RUN TEST
-    if(!testDisk(_vfsDiskOptions[diskNum]->fileSystem, _vfsDiskOptions[diskNum]->testFile)) {
-        SysTools::addLog("SysVfsFatFs::enableDisk, ABORT: Test Mounted Disk Failed, Formatting Disk");
-
-        //FORMAT DISK
-        if(formatDisk(diskNum, _vfsDiskOptions[diskNum]->diskPath) != true) {
-            SysTools::addLog("SysVfsFatFs::enableDisk, ABORT: formatFat16FlashDisk failed");
-            return false;
-        }
-        SysTools::addLog("SysVfsFatFs::enableDisk, Format Done");
-    
-        //RUN TEST AGAIN
-        if(!testDisk(_vfsDiskOptions[diskNum]->fileSystem, _vfsDiskOptions[diskNum]->testFile)) {
-            SysTools::addLog("SysVfsFatFs::enableDisk, ABORT: Test Mounted Disk Failed");
-            return false;
-        };
-        SysTools::addLog("SysVfsFatFs::enableDisk, Disk Test Done");
-    } else {
-        SysTools::addLog("SysVfsFatFs::enableDisk, Disk Test Done");
-    }
 
     //All Done
     if(pDiskOptions != nullptr) pDiskOptions[0] = _vfsDiskOptions[diskNum];
     SysTools::addLog("SysVfsFatFs::enableDisk, Enable Vfs Disk '%s' Completed \n", _vfsDiskOptions[diskNum]->fileSystem);
     return true;
 }
-} //namespace SysFatFs
+} //namespace SysVfsBridge

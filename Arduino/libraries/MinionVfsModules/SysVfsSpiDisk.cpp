@@ -4,17 +4,17 @@
 
 //My Required Libraries
 #include <SysTools.h>
-#include <SysVfsFatFs.h>
-#include <SysVfsCardDisk.h>
+//#include <SysVfsBridge.h>
+#include <SysVfsSpiDisk.h>
 
 // This file should be compiled with 'Partition Scheme' (in Tools menu)
 // set to 'Default with ffat' if you have a 4MB ESP32 dev module or
 // set to '16M Fat' if you have a 16MB ESP32 dev module.
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
-namespace SysCardDisk {
+namespace SysSpiDisk {
 /////////////////////////////////////////////////////////////////////////////////////////////////
-SysFatFs::vfsDiskOptions_t _vfsDiskOptions;
+SysVfsBridge::vfsDiskOptions_t _vfsDiskOptions;
 uint8_t* _diskBuff = (uint8_t*)malloc(4096);
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -64,7 +64,7 @@ void dumpSector(uint16_t pSector, uint16_t pDumpBytes) {
 };
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
-uint8_t enable(SysFatFs::vfsDiskOptions_t** pDiskOptions) {
+uint8_t enable(SysVfsBridge::vfsDiskOptions_t** pDiskOptions) {
   SysTools::addLog("SysCardDisk::enable, Open Card Disk");
   if(pDiskOptions != nullptr) pDiskOptions[0] = nullptr;
 
@@ -105,5 +105,5 @@ uint8_t enable(SysFatFs::vfsDiskOptions_t** pDiskOptions) {
     if(pDiskOptions != nullptr) pDiskOptions[0] = &_vfsDiskOptions;    
     return diskNum;    
  };
-} //namespace SysCardDisk
+} //namespace SysSpiDisk
 

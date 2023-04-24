@@ -1,14 +1,15 @@
-#ifndef SYSVFSFLASHDISK_H
-#define SYSVFSFLASHDISK_H
+#ifndef SYSVFSMMCDISK_H
+#define SYSVFSMMCDISK_H
+#include <SysVfsBridge.h>
 
-namespace SysFlashDisk {
+namespace SysMmcDisk {
     bool readRAW(uint8_t pdrv, uint8_t* buffer, uint32_t sector);
     bool writeRAW(uint8_t pdrv, uint8_t* buffer, uint32_t sector);
-    uint8_t enable(SysFatFs::vfsDiskOptions_t** pDiskOptions);
+    uint8_t enable(SysVfsBridge::vfsDiskOptions_t** pDiskOptions);
     
     const char* diskType();
     uint32_t sectorCount();
     uint16_t sectorSize();
-} //namespace SysFlashDisk
+} //namespace SysMmcDisk
 
 #endif

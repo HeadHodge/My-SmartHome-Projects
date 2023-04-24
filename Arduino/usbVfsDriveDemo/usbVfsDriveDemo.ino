@@ -1,6 +1,7 @@
 //located in my github repository
 #include <SysTools.h>
 #include <UsbDiskBridge.h>
+#include <SysSpiDisplay.h>
 
 // This file should be compiled with 'Partition Scheme' (in Tools menu)
 // set to 'Default with ffat' if you have a 4MB ESP32 dev module or
@@ -10,11 +11,14 @@ void setup(){
     Serial.begin(115200);
     delay(4000);
     
+    //Turn Display On
+    SysSpiDisplay::enable();
+    
     SysTools::addLog("%s", "usbVfsDrives::Setup");
-    // flashDisk, cardDisk, ramDisk
-    UsbDiskBridge::enable("/cardDisk");   
+    UsbDiskBridge::enable("/mmcDisk", true);   
 }
 
 void loop(){
+    SysSpiDisplay::refresh();
 
 }
