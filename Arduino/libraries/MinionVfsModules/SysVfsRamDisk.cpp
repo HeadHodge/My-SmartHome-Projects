@@ -1,6 +1,6 @@
 //Sytem Required Libraries
 #include <stdio.h>
-//#include <dirent.h>
+#include <dirent.h>
 #include <diskio_impl.h>
 
 //My Required Libraries
@@ -123,6 +123,68 @@ bool readRaw(uint8_t pdrv, uint8_t* buffer, uint32_t sector) {
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
+void onRemove() {
+/////////////////////////////////////////////////////////////////////////////////////////////////
+  SysTools::addLog("SysVfsFlashDisk::onRemove");
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
+void onInsert() {
+/////////////////////////////////////////////////////////////////////////////////////////////////
+  SysTools::addLog("SysVfsFlashDisk::onInsert");
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
+bool onFormatted() {
+/////////////////////////////////////////////////////////////////////////////////////////////////
+  SysTools::addLog("SysVfsRamDisk::onFormatted");
+  DIR *dp;
+  struct dirent *ep;     
+
+    //ADD DEFAULT DIRECTORIES
+    mkdir("/ramDisk/firmware", 0777);
+    mkdir("/ramDisk/system", 0777);
+
+    //ADD FILE
+    SysTools::addLog("SysVfsRamDisk::testDisk, Create Test File: '%s'", "/ramDisk/ReadMe.txt");
+    
+    FILE* fp = fopen("/ramDisk/ReadMe.txt", "w"); // "w" defines "writing mode"
+        
+    if(fp == NULL){
+        SysTools::addLog("SysVfsRamDisk::testDisk, Could not create file '%s' \n", "/ramDisk/ReadMe.txt");
+        return false;
+    }
+    
+    fputs("Welome!\nThanks for Using 'smartRemotes'\nBy: http://minionLogic.com", fp);
+    fclose(fp);
+    
+    //DUMP FILE
+    SysTools::addLog("SysVfsRamDisk::testDisk, Dump Test File: '%s'", "/ramDisk/ReadMe.txt");
+    fp = fopen("/ramDisk/ReadMe.txt","r");
+    int c;
+
+    Serial.printf("%c", '\n');
+    while(1) {
+      c = fgetc(fp);
+      if(feof(fp)) break ;
+      Serial.printf("%c", c);
+    }
+    Serial.printf("%c%c", '\n', '\n');
+   
+    fclose(fp);
+        
+    //LIST DIR
+    SysTools::addLog("SysVfsRamDisk::testDisk, List Directory");
+    dp = opendir("/ramDisk/");
+    
+    //list directory
+    while ((ep = readdir (dp)) != NULL) SysTools::addLog("SysVfsRamDisk::testDisk, fileName: %s", ep->d_name);
+          
+    (void) closedir (dp);
+    return true;
+}
+   
+/////////////////////////////////////////////////////////////////////////////////////////////////
 uint8_t enable(SysVfsBridge::vfsDiskOptions_t** pDiskOptions) {
   SysTools::addLog("SysVfsFlashDisk::enable Open Flash Disk");
   if(pDiskOptions != nullptr) pDiskOptions[0] = nullptr;
@@ -159,6 +221,9 @@ uint8_t enable(SysVfsBridge::vfsDiskOptions_t** pDiskOptions) {
     _vfsDiskOptions.sectorCount = &sectorCount;
     _vfsDiskOptions.readRaw     = &readRaw;
     _vfsDiskOptions.writeRaw    = &writeRaw;
+    _vfsDiskOptions.onInsert    = &onInsert;
+    _vfsDiskOptions.onRemove    = &onRemove;
+    _vfsDiskOptions.onFormatted = &onFormatted;
 
     ((uint8_t*)_vfsDiskOptions.diskPath)[0]      = diskNum+'0';
     ((uint8_t*)_vfsDiskOptions.testDirectory)[0] = diskNum+'0';

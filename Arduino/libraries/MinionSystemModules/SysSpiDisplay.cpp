@@ -73,7 +73,7 @@ void refresh(void) {
 }
 
 ///////////////////////////////////////////////////////////
-void enable(char* pConnectInfo[]) {
+bool enable(char* pConnectInfo[]) {
 ///////////////////////////////////////////////////////////
   SysTools::addLog("SysSpiDisplay::enable, Turn On Display, time: %lu", millis());
   SysTools::addLog("SysSpiDisplay::enable, ConnectInfo, ssid: %s, password: %s, address: %s", pConnectInfo[0], pConnectInfo[1], pConnectInfo[2]);
@@ -92,10 +92,10 @@ void enable(char* pConnectInfo[]) {
     _tft.drawCentreString("smartRemotes", 120, 0, 2);  //_tft.println("Total Wifi Remote Control");
 
     _tft.setTextSize(2);
-    _tft.drawCentreString("v23.04 By:", 120, 47, 2);  //_tft.println("Total Wifi Remote Control");
+    _tft.drawCentreString("v23.04 By:", 120, 49, 2);  //_tft.println("Total Wifi Remote Control");
 
     _tft.setTextSize(3);
-    _tft.drawCentreString("minionLogic", 120, 74, 2);  //_tft.println("Total Wifi Remote Control");
+    _tft.drawCentreString("minionLogic", 120, 78, 2);  //_tft.println("Total Wifi Remote Control");
 
     _tft.setTextSize(2);
     _tft.drawString("SSID:", 10, 134, 1);  //_tft.println("Total Wifi Remote Control");
@@ -106,5 +106,7 @@ void enable(char* pConnectInfo[]) {
     _tft.drawCentreString(pConnectInfo[2], 120, 220, 1);  //_tft.println("Total Wifi Remote Control");
 
     _displayOffTime = _currentTime + 30000;
+    
+    return true;
 }
 } //namespace SysSpiDisplay

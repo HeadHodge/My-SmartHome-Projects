@@ -154,20 +154,20 @@ bool onFormatted() {
     mkdir("/system", 0777);
 
     //ADD FILE
-    SysTools::addLog("SysVfsFatFs::testDisk, Create Test File: '%s'", "/ReadMe.txt");
+    SysTools::addLog("SysVfsMmcDisk::onFormatted, Create Test File: '%s'", "/ReadMe.txt");
     
     FILE* fp = fopen("/ReadMe.txt", "w"); // "w" defines "writing mode"
         
     if(fp == NULL){
-        SysTools::addLog("SysVfsFatFs::testDisk, Could not create file '%s' \n", "/ReadMe.txt");
+        SysTools::addLog("SysVfsMmcDisk::onFormatted, Could not create file '%s' \n", "/ReadMe.txt");
         return false;
     }
     
-    fputs("Welome!\nThanks for Using 'smartRemotes'\nBy: http://minionLogic.com", fp);
+    fputs("Welcome!\nThanks for Using 'smartRemotes'\nBy: http://minionLogic.com", fp);
     fclose(fp);
     
     //DUMP FILE
-    SysTools::addLog("SysVfsFatFs::testDisk, Dump Test File: '%s'", "/ReadMe.txt");
+    SysTools::addLog("SysVfsMmcDisk::onFormatted, Dump Test File: '%s'", "/ReadMe.txt");
     fp = fopen("/ReadMe.txt","r");
     int c;
 
@@ -182,13 +182,14 @@ bool onFormatted() {
     fclose(fp);
         
     //LIST DIR
-    SysTools::addLog("SysVfsFatFs::testDisk, List Directory");
+    SysTools::addLog("SysVfsMmcDisk::onFormatted, List Directory");
     dp = opendir("/");
     
     //list directory
-    while ((ep = readdir (dp)) != NULL) SysTools::addLog("SysVfsFatFs::testDisk, fileName: %s", ep->d_name);
-          
+    while ((ep = readdir (dp)) != NULL) SysTools::addLog("SysVfsMmcDisk::onFormatted, fileName: %s", ep->d_name);          
     (void) closedir (dp);
+
+    Serial.println("");
     return true;
 }
    
@@ -283,8 +284,8 @@ uint8_t enable(SysVfsBridge::vfsDiskOptions_t** pDiskOptions) {
 
     _vfsDiskOptions.diskNum = diskNum;
     _vfsDiskOptions.diskPath = "x:";
-    //_vfsDiskOptions.fileSystem = "/mmcDisk";
-    _vfsDiskOptions.fileSystem = "";
+    _vfsDiskOptions.fileSystem = "/mmcDisk";
+    _vfsDiskOptions.mountDirectory = "";
     _vfsDiskOptions.testFile = "/mmcDisk/ReadMe.txt";
     _vfsDiskOptions.testDirectory = "x:/firmware";
     _vfsDiskOptions.diskTableSectors = 1;

@@ -2,12 +2,10 @@
 #include <USBMSC.h>
 
 #include <SysTools.h>
-#include <SysVfsBridge.h>
 #include <UsbDiskBridge.h>
 
 namespace UsbDiskBridge {
 USBMSC _MSC;
-SysVfsBridge::vfsDiskOptions_t* _flashDiskOptions = nullptr;
 SysVfsBridge::vfsDiskOptions_t* _diskOptions = nullptr;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -98,14 +96,17 @@ void onUsbEvent(void* arg, esp_event_base_t event_base, int32_t event_id, void* 
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
-bool enable(char* pfileSystem, bool pFormatDisk) {
+bool enable(SysVfsBridge::vfsDiskOptions_t* pDiskOptions) {
   SysTools::addLog("%s", "UsbDiskBridge::enable");
-  
+
+    _diskOptions = pDiskOptions;
+    
+/* 
+    
     //////////////////////////////////////
     //        Open VFS Disk
     //////////////////////////////////////
-    SysTools::addLog("UsbDiskBridge::enable, Open: '%s'", pfileSystem);
- 
+    SysTools::addLog("UsbDiskBridge::enable, Open: '%s'", pDiskOptions->fileSystem);
     if(!SysVfsBridge::enableDisk("/flashDisk", false, &_flashDiskOptions)) {
         SysTools::addLog("UsbDiskBridge::enable, ABORT: Open '%s' Failed", pfileSystem);
         return false;       
@@ -117,13 +118,13 @@ bool enable(char* pfileSystem, bool pFormatDisk) {
         SysTools::addLog("UsbDiskBridge::enable, ABORT: Open '%s' Failed", pfileSystem);
         return false;       
     };
-
+*/
     //////////////////////////////////////
     //Open USB-MSC Interface (USB Drive)
     //////////////////////////////////////
     SysTools::addLog("UsbDiskBridge::open, Open Usb-MSC interface with sectorCount: %i, sectorSize: %i", _diskOptions->sectorCount(), _diskOptions->sectorSize());        
     _MSC.vendorID("ESP32-S3");//max 8 chars
-    _MSC.productID("USB_MMCDRIVE");//max 16 chars
+    _MSC.productID("USB_MSCDRIVE");//max 16 chars
     _MSC.productRevision("1.0");//max 4 chars
     _MSC.onStartStop(onStartStop);
     _MSC.onRead(onRead);

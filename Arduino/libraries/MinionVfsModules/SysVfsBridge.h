@@ -5,10 +5,11 @@ namespace SysVfsBridge {
     
     typedef struct {
         uint8_t diskNum;
-        char*   diskPath;
-        char*   fileSystem;
-        char*   testFile;
-        char*   testDirectory;
+        char*    diskPath;
+        char*    fileSystem;
+        char*    mountDirectory;
+        char*    testFile;
+        char*    testDirectory;
         uint16_t diskTableSectors; //each table sector can fit 170KB (340 sectors)
 
         const char* (*diskType)();

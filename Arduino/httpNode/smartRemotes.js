@@ -31,12 +31,14 @@ console.log("Enter openConnection");
 	if(_isConnected) return;
 	
 	//### new WebSocket ###
-	_socket = new WebSocket(_server);
+	_socket = new WebSocket("ws://192.168.0.210:8000");
 	
 	//### onopen ###
 	_socket.onopen = function(event) {
-		console.log(`**** smartRemotes Server Connected to: ${_server} ****`);
+		console.log(`**** smartRemotes Server Connected  ****`);
 		_isConnected = true;
+        _socket.send("{hello}");
+
 		if(callBack) callBack();
 	};
 	
@@ -312,7 +314,10 @@ console.log(`Enter loadCase, filePath: ${filePath}`);
 	console.log(`**** webRemote Object Loaded ****`);
 	
 	window.addEventListener("load", function(){
-		loadCase();
+        openConnection();
+        //_socket.send("{hello}");
+
+		//loadCase();
 	});
 
 /////////////////////////// END PRIVATE NAMESPACE //////////////////////	

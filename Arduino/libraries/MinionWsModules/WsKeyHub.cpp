@@ -10,7 +10,7 @@
 #include <Arduino.h>
 
 #include <SysTools.h>
-#include <WsEndpoint.h>
+#include <WsEndpoints.h>
 #include <WsKeyHub.h>
 
 namespace WsKeyHub {
@@ -69,13 +69,13 @@ bool isConnected() {
 }
 
 void refresh() {
-    WsEndpoint::refresh();
+    WsEndpoints::refresh();
 }
 
 void open(receivedKeyCallback pReceivedKey)
 {
     receivedKey = pReceivedKey;
-    WsEndpoint::awaitEndpoint(_localEndpointInfo);
+    WsEndpoints::awaitEndpoint(_localEndpointInfo);
     //(messageReceived);
     
     SysTools::addLog("%s", "WsKeyHub::open Hub is Open");  

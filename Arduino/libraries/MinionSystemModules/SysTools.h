@@ -7,6 +7,9 @@ namespace SysTools
 {
     //void lookupKeyWord(DynamicJsonDocument&, DynamicJsonDocument&);
     void addLog(const char*, ...);
+    void displayHome();
+    void displayAPConnection();
+    void displayStationConnection();
     //void sendCommand(const char*);
     //void receivedCommand(const char*);
     //void getOptions(const char*, DynamicJsonDocument&);

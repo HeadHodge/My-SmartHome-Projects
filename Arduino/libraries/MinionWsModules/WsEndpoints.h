@@ -1,7 +1,8 @@
-#ifndef WSENPOINT_H
-#define WSENPOINT_H
+#ifndef WSENPOINTS_H
+#define WSENPOINTS_H
+#include <ArduinoJson.h>  // Install from IDE Library manager
 
-namespace WsEndpoint {
+namespace WsEndpoints {
     //typedef char* (*callBack)(unsigned char*);
     #define CURRENT_TIME millis()
     
@@ -17,12 +18,14 @@ namespace WsEndpoint {
         "NOPATH"
     };
   
+    bool enable();
+    bool createWifiAP();
     bool sendReplyPkg(const char *pPkg);
     bool sendControlPkg(const char *pPkg);    
     bool sendControlPkg(DynamicJsonDocument& pPkg);
     char** getConnectInfo();
     void refresh();
-    bool isWifiConnected();
+    bool isNetworkConnected();
     
     bool awaitEndpoint(
         char* pConnectInfo[] = _defaultConnectInfo,
@@ -34,6 +37,6 @@ namespace WsEndpoint {
         char* pEndpointInfo[] = _defaultConnectInfo,
         void (*pOnPkgInput)(DynamicJsonDocument& pPkgObj) = nullptr
     );
-} //namespace WsEndpoint
+} //namespace WsEndpoints
 
 #endif

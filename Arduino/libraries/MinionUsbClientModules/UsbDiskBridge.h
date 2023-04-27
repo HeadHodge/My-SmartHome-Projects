@@ -1,12 +1,10 @@
 #ifndef USBDISKBRIDGE_H
 #define USBDISKBRIDGE_H
-
-//#include <ArduinoJson.h>  // Install from IDE Library manager
+#include <SysVfsBridge.h>
 
 namespace UsbDiskBridge {
     bool isOpen();
-    bool enable(char* pfileSystem = "/flashDisk", bool pFormatDisk = false);
-    //void controlDevice(DynamicJsonDocument&);
+    bool enable(SysVfsBridge::vfsDiskOptions_t* pDiskOptions = nullptr);
 } //namespace UsbDiskBridge
 
 #endif

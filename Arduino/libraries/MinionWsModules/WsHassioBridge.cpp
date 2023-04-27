@@ -11,7 +11,7 @@
 #include <ArduinoJson.h>  // Install from IDE Library manager
 
 #include <SysTools.h>
-#include <WsEndpoint.h>
+#include <WsEndpoints.h>
 #include <WsHassioBridge.h>
 
 /////////////////////////////////////////////////////////////
@@ -51,12 +51,12 @@ DynamicJsonDocument doc(1024);
     SysTools::addLog("WsHassioBridge::receivedMessage messageType: %s", messageType);
  
     if(strcmp(messageType, "auth_required") == 0) {
-      SysTools::addLog("WsHassioBridge::receivedMessage Send accessToken: %s", _remoteEndpointInfo[WsEndpoint::CONNECT_PASSWORD]);
+      SysTools::addLog("WsHassioBridge::receivedMessage Send accessToken: %s", _remoteEndpointInfo[WsEndpoints::CONNECT_PASSWORD]);
       char pkg[128];
         
         memset(pkg, 0, sizeof(pkg));
-        sprintf(pkg, "{\"type\": \"auth\", \"access_token\": \"%s\"}", _remoteEndpointInfo[WsEndpoint::CONNECT_PASSWORD]);            
-        WsEndpoint::sendControlPkg(pkg);
+        sprintf(pkg, "{\"type\": \"auth\", \"access_token\": \"%s\"}", _remoteEndpointInfo[WsEndpoints::CONNECT_PASSWORD]);            
+        WsEndpoints::sendControlPkg(pkg);
         return "";
     }     
 
@@ -81,7 +81,7 @@ bool isOpen() {
 
 /////////////////////////////////////////////////////////////
 void refresh() {
-    WsEndpoint::refresh();
+    WsEndpoints::refresh();
 }
 
 void controlDevice(DynamicJsonDocument& pKeyObj) {
@@ -96,7 +96,7 @@ void controlDevice(DynamicJsonDocument& pKeyObj) {
     sprintf(controlPkg, "{\"id\": %i, \"type\": \"fire_event\", \"event_type\": \"keyPressed\", \"event_data\": %s}", refNum, keyString);
     
     refNum = refNum + 1;
-    WsEndpoint::sendControlPkg(controlPkg);
+    WsEndpoints::sendControlPkg(controlPkg);
     
     SysTools::addLog("WsHassioBridge::controlDevice sent controlPkg %s", controlPkg);
 }
@@ -106,7 +106,7 @@ void open(callBack pCallBack)
 {
     receivedKey = pCallBack;
     //WsEndpoint::open(receivedMessage);
-    WsEndpoint::connectEndpoint(_localEndpointInfo, _remoteEndpointInfo);
+    WsEndpoints::connectEndpoint(_localEndpointInfo, _remoteEndpointInfo);
     return;
 }
 } //namespace WsHassioBridge

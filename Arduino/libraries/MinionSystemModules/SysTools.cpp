@@ -1,15 +1,14 @@
 #define US_KEYBOARD 1
-//#include <stdio.h>
-//#include <stdlib.h>
-//#include <iosrtream>
-//#include <Arduino.h>
-//#include <Preferences.h>
-//#include <dirent.h>
+#include <SPI.h>
+#include <TFT_eSPI.h>       // Hardware-specific library
 
 #include <SysTools.h>
 
 namespace SysTools {
- 
+#define _currentTime millis()
+TFT_eSPI _tft = TFT_eSPI();  // Invoke custom library
+uint32_t _displayOffTime = 0; //millisecs
+bool displayEnabled = false;
 //char* _defaultMap = "settings";
 //char  _currentMap[32] = "";
 //Preferences _memMap;
@@ -246,6 +245,113 @@ void dumpBuffer(const uint8_t* pBuffer, uint32_t pBufferSize, uint32_t pByteCoun
     }
         
     Serial.println("\n");
+}
+
+///////////////////////////////////////////////////////////
+void enableDisplay() {
+///////////////////////////////////////////////////////////
+  SysTools::addLog("SysSpiDisplay::enableDisplay");
+
+    //Init Display
+    if(displayEnabled) return;
+    
+    _tft.init();
+    displayEnabled = true;
+}
+///////////////////////////////////////////////////////////
+void displayStationConnection() {
+///////////////////////////////////////////////////////////
+  SysTools::addLog("SysSpiDisplay::displayStationConnection, time: %lu", millis());
+
+    enableDisplay();
+
+    //Set the font colour
+    _tft.fillScreen(TFT_GREEN);
+    _tft.setTextColor(TFT_BLACK, TFT_GREEN);
+    _tft.setTextPadding(1);
+  
+    _tft.setTextSize(3);
+    _tft.drawCentreString("smartRemotes", 120, 0, 2);  //_tft.println("Total Wifi Remote Control");
+
+    _tft.setTextSize(2);
+    _tft.drawCentreString("v23.04 By:", 120, 49, 2);  //_tft.println("Total Wifi Remote Control");
+
+    _tft.setTextSize(3);
+    _tft.drawCentreString("minionLogic", 120, 78, 2);  //_tft.println("Total Wifi Remote Control");
+
+    _tft.setTextSize(2);
+    _tft.drawString("SSID:", 10, 134, 1);  //_tft.println("Total Wifi Remote Control");
+    _tft.drawCentreString("pConnectInfo", 120, 156, 1);  //_tft.println("Total Wifi Remote Control");
+    _tft.drawString("PSW:", 10, 182, 1);  //_tft.println("Total Wifi Remote Control");
+    _tft.drawCentreString("pConnectInfo[1]", 120, 192, 1);  //_tft.println("Total Wifi Remote Control");
+    _tft.drawString("IP:", 10, 210, 1);  //_tft.println("Total Wifi Remote Control");
+    _tft.drawCentreString("pConnectInfo[2]", 120, 220, 1);  //_tft.println("Total Wifi Remote Control");
+
+    _displayOffTime = _currentTime + 30000;
+}
+
+///////////////////////////////////////////////////////////
+void displayAPConnection() {
+///////////////////////////////////////////////////////////
+  SysTools::addLog("SysSpiDisplay::displayAPConnection, time: %lu", millis());
+
+    enableDisplay();
+
+    //Set the font colour
+    _tft.fillScreen(TFT_RED);
+    _tft.setTextColor(TFT_BLACK, TFT_GREEN);
+    _tft.setTextPadding(1);
+  
+    _tft.setTextSize(3);
+    _tft.drawCentreString("smartRemotes", 120, 0, 2);  //_tft.println("Total Wifi Remote Control");
+
+    _tft.setTextSize(2);
+    _tft.drawCentreString("v23.04 By:", 120, 49, 2);  //_tft.println("Total Wifi Remote Control");
+
+    _tft.setTextSize(3);
+    _tft.drawCentreString("minionLogic", 120, 78, 2);  //_tft.println("Total Wifi Remote Control");
+
+    _tft.setTextSize(2);
+    _tft.drawString("SSID:", 10, 134, 1);  //_tft.println("Total Wifi Remote Control");
+    _tft.drawCentreString("pConnectInfo", 120, 156, 1);  //_tft.println("Total Wifi Remote Control");
+    _tft.drawString("PSW:", 10, 182, 1);  //_tft.println("Total Wifi Remote Control");
+    _tft.drawCentreString("pConnectInfo[1]", 120, 192, 1);  //_tft.println("Total Wifi Remote Control");
+    _tft.drawString("IP:", 10, 210, 1);  //_tft.println("Total Wifi Remote Control");
+    _tft.drawCentreString("pConnectInfo[2]", 120, 220, 1);  //_tft.println("Total Wifi Remote Control");
+
+    _displayOffTime = _currentTime + 30000;
+}
+
+///////////////////////////////////////////////////////////
+void displayHome() {
+///////////////////////////////////////////////////////////
+  SysTools::addLog("SysSpiDisplay::displayHome, time: %lu", millis());
+
+    enableDisplay();
+
+    //Set the font colour
+    _tft.fillScreen(TFT_WHITE);
+    _tft.setTextColor(TFT_BLACK, TFT_GREEN);
+    _tft.setTextPadding(1);
+  
+    _tft.setTextSize(3);
+    _tft.drawCentreString("smartRemotes", 120, 0, 2);  //_tft.println("Total Wifi Remote Control");
+
+    _tft.setTextSize(2);
+    _tft.drawCentreString("v23.04 By:", 120, 49, 2);  //_tft.println("Total Wifi Remote Control");
+
+    _tft.setTextSize(3);
+    _tft.drawCentreString("minionLogic", 120, 78, 2);  //_tft.println("Total Wifi Remote Control");
+
+    _tft.setTextSize(2);
+    _tft.drawString("SSID:", 10, 134, 1);  //_tft.println("Total Wifi Remote Control");
+    _tft.drawCentreString("pConnectInfo", 120, 156, 1);  //_tft.println("Total Wifi Remote Control");
+    _tft.drawString("PSW:", 10, 182, 1);  //_tft.println("Total Wifi Remote Control");
+    _tft.drawCentreString("pConnectInfo[1]", 120, 192, 1);  //_tft.println("Total Wifi Remote Control");
+    _tft.drawString("IP:", 10, 210, 1);  //_tft.println("Total Wifi Remote Control");
+    _tft.drawCentreString("pConnectInfo[2]", 120, 220, 1);  //_tft.println("Total Wifi Remote Control");
+
+    _displayOffTime = _currentTime + 30000;
 }
 
 ///////////////////////////////////////////////////////////////////
