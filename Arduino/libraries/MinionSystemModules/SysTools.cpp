@@ -133,6 +133,25 @@ void receivedCommand(const char* pMessage) {
 */
 
 ///////////////////////////////////////////////////////////////////
+DynamicJsonDocument* createPkg(char* pJsonString) {
+///////////////////////////////////////////////////////////////////
+  SysTools::addLog("SysTools::createPkg");
+  DynamicJsonDocument* pkg = new DynamicJsonDocument(strlen(pJsonString) * 2);
+
+    DeserializationError err = deserializeJson(*pkg, (const char*)pJsonString);
+    
+    if (err) {
+        SysTools::addLog("SysTools::createPkg, ABORT: Invalid Pkg, Reason: %s", err.c_str());
+        free(pkg);
+        return nullptr;
+    };
+    
+    pkg->shrinkToFit();
+    SysTools::addLog("wsEndpoints::onPkgInput, pJsonString: %s, \nmemoryUsage: '%lu', capacity: '%lu'", pJsonString, pkg->memoryUsage(), pkg->capacity());
+    return pkg;
+}
+
+///////////////////////////////////////////////////////////////////
 DynamicJsonDocument* getOptionsObj(char* pFileName, char* pDirectory) {
 ///////////////////////////////////////////////////////////////////
     FILE *fp = NULL;

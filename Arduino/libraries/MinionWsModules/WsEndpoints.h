@@ -3,7 +3,8 @@
 #include <ArduinoJson.h>  // Install from IDE Library manager
 
 namespace WsEndpoints {
-    //typedef char* (*callBack)(unsigned char*);
+    //typedef void (*sendEndpointPkg)(DynamicJsonDocument* pEndpointPkg);
+    typedef void (*onEndpointPkg)(char* pSource, DynamicJsonDocument* pPkgIn, void (*sendEndpointPkg)(DynamicJsonDocument* pEndpointPkg));
     #define CURRENT_TIME millis()
     
     enum connectOptions {
@@ -18,12 +19,12 @@ namespace WsEndpoints {
         "NOPATH"
     };
   
-    bool enable();
+    bool enable(onEndpointPkg pOnPkgInput);
     bool createWifiAP();
+    void sendEndpointPkg(DynamicJsonDocument* pEndpointPkg);
     bool sendReplyPkg(const char *pPkg);
     bool sendControlPkg(const char *pPkg);    
     bool sendControlPkg(DynamicJsonDocument& pPkg);
-    char** getConnectInfo();
     void refresh();
     bool isNetworkConnected();
     
@@ -33,7 +34,6 @@ namespace WsEndpoints {
     );
     
     bool connectEndpoint(
-        char* pConnectInfo[] = _defaultConnectInfo,
         char* pEndpointInfo[] = _defaultConnectInfo,
         void (*pOnPkgInput)(DynamicJsonDocument& pPkgObj) = nullptr
     );

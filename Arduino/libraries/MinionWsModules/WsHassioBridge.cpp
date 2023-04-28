@@ -106,7 +106,7 @@ void open(callBack pCallBack)
 {
     receivedKey = pCallBack;
     //WsEndpoint::open(receivedMessage);
-    WsEndpoints::connectEndpoint(_localEndpointInfo, _remoteEndpointInfo);
+    WsEndpoints::connectEndpoint(_remoteEndpointInfo);
     return;
 }
 } //namespace WsHassioBridge

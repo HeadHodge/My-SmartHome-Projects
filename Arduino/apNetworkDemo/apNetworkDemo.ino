@@ -13,6 +13,23 @@
 
 #include <SysTools.h>
 #include <WsEndpoints.h>
+#include <ArduinoJson.h>
+
+void onEndpointPkg(char* pSource, DynamicJsonDocument* pPkgIn, void (*sendEndpointPkg)(DynamicJsonDocument* pEndpointPkg)) {
+  Serial.printf("onEndpointPkg Called from: %s\n", pSource);
+  char* htmlReply = "{\"homePage\": \"<b>Hello, world</b><script>alert('Hello World!');</script>\"}";
+  DynamicJsonDocument* optionsObj; // = new DynamicJsonDocument(128);
+
+    optionsObj = SysTools::createPkg(htmlReply);
+    
+    if(optionsObj == nullptr) {
+        SysTools::addLog("ABORT: createPkg failed");
+        return;
+    };
+ 
+     sendEndpointPkg(optionsObj);
+     free(optionsObj);
+};
 
 void setup() {
   Serial.begin(115200);
@@ -21,7 +38,7 @@ void setup() {
   Serial.println("Configuring access point...");
 
   SysTools::displayHome();
-  WsEndpoints::enable();
+  WsEndpoints::enable(&onEndpointPkg);
   //SysTools::displayConnection();
   return;
 }

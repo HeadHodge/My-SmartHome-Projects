@@ -18,9 +18,12 @@
 namespace WsEndpoints {
 AsyncWebServer   _httpServer(80);
 WebSocketsServer _wsServer = WebSocketsServer(8000);
+WebSocketsClient _wsClient = WebSocketsClient();
+AsyncWebServerRequest* _httpRequest = nullptr;
+IPAddress _wsClientAddress;
 
-char** _connectInfo = nullptr;
-char** _endpointInfo = nullptr;
+//char** _connectInfo = nullptr;
+//char** _endpointInfo = nullptr;
 
 bool _isServerEnabled = false;
 bool _isClientEnabled = false;
@@ -31,14 +34,7 @@ bool _isNetworkConnected = false;
 
 void (*_onServerPkg)(DynamicJsonDocument& pPkg) = nullptr;
 void (*_onClientPkg)(DynamicJsonDocument& pPkg) = nullptr;
-
-/////////////////////////////////////////////////////////////
-char** getConnectInfo() {
-/////////////////////////////////////////////////////////////
-  SysTools::addLog("wsEndpoints::getConnectInfo");
-
-    return _connectInfo;
-};
+onEndpointPkg _onPkgInput = nullptr;
 
 /////////////////////////////////////////////////////////////
 bool sendReplyPkg(const char *pPkg) {
@@ -90,8 +86,32 @@ bool onPkgInput(uint8_t* pPkgStr, size_t pLength, void (*pOnPkgInput)(DynamicJso
     return true;
 }
 
+//////////////////////////////////////////////////////////////
+bool isNetworkConnected() {
+//////////////////////////////////////////////////////////////
+  SysTools::addLog("wsEndpoints::isNetworkConnected");
+
+    return _isNetworkConnected;
+}
+
+//////////////////////////////////////////////////////////////
+void sendHttpEndpointPkg(DynamicJsonDocument* pEndpointPkg) {
+//////////////////////////////////////////////////////////////
+  if(_httpRequest == nullptr) return;
+  SysTools::addLog("wsEndpoints::sendHttpEndpointPkg, HomePage: %s", (const char*)(*pEndpointPkg)["homePage"]);
+
+    _httpRequest->send(200, "text/html", (const char*)(*pEndpointPkg)["homePage"]);
+    _httpRequest = nullptr;
+}
+
+//////////////////////////////////////////////////////////////
+void refresh() {
+//////////////////////////////////////////////////////////////
+    _wsServer.loop();
+}
+
 /////////////////////////////////////////////////////////////
-void webClientEvent(WStype_t type, uint8_t* input, size_t length) {
+void onWsClientEvent(WStype_t type, uint8_t* input, size_t length) {
 /////////////////////////////////////////////////////////////
 
 	switch(type) {
@@ -120,245 +140,77 @@ void webClientEvent(WStype_t type, uint8_t* input, size_t length) {
 }
 
 //////////////////////////////////////////////////////////////
-void webServerEvent(uint8_t num, WStype_t type, uint8_t *input, size_t length) {
-//////////////////////////////////////////////////////////////
-    
-    switch(type) {
-        case WStype_DISCONNECTED:
-            SysTools::addLog("wsEndpoints::webServerEvent[%u] Disconnected!", type);
-            _isServerConnected = false;
-            break;
-        case WStype_CONNECTED:
-            SysTools::addLog("wsEndpoints::webServerEvent[%u] Connected from %s url: %s", type, _connectInfo[CONNECT_ADDRESS], input);
-            _isServerConnected = true;
-            break;
-        case WStype_TEXT:
-            //SysTools::addLog("wsEndpoints::webServerEvent[%u] Received Input: [%d] %s", type, length, input);
-            onPkgInput(input, length, _onServerPkg);
-            break;
-        case WStype_BIN:
-            SysTools::addLog("wsEndpoints::webServerEvent[%u] Binary!", type);
-            break;
-        case WStype_FRAGMENT_TEXT_START:
-            SysTools::addLog("wsEndpoints::webServerEvent[%u] Fragment Text Start!", type);
-            break;
-        case WStype_FRAGMENT_BIN_START:
-            SysTools::addLog("wsEndpoints::webServerEvent[%u] Fragment Binary Start!", type);
-            break;
-        case WStype_FRAGMENT:
-            SysTools::addLog("wsEndpoints::webServerEvent[%u] Fragment!", type);
-            break;
-        case WStype_FRAGMENT_FIN:
-            SysTools::addLog("wsEndpoints::webServerEvent[%u] Fragment Finish!", type);
-            break;
-        case WStype_PING:
-            SysTools::addLog("wsEndpoints::webServerEvent[%u] Ping!", type);
-            break;
-        case WStype_PONG:
-            SysTools::addLog("wsEndpoints::webServerEvent[%u] Pong!", type);
-            break;
-        case WStype_ERROR:
-            SysTools::addLog("wsEndpoints::webServerEvent[%u] Error!", type);
-            break;
-        default:
-            SysTools::addLog("wsEndpoints::webServerEvent Unknown WStype [%d]", type);
-            break;
-    }
-  
-}
-
-// Callback: receiving any WebSocket message
-void onWebSocketEvent(uint8_t client_num,
-                      WStype_t type,
-                      uint8_t * payload,
-                      size_t length) {
-
-  // Figure out the type of WebSocket event
-  switch(type) {
-
-    // Client has disconnected
-    case WStype_DISCONNECTED:
-      Serial.printf("[%u] Disconnected!\n", client_num);
-      break;
-
-    // New client has connected
-    case WStype_CONNECTED:
-      {
-        IPAddress ip = _wsServer.remoteIP(client_num);
-        Serial.printf("[%u] Connection from ", client_num);
-        Serial.println(ip.toString());
-      }
-      break;
-
-    // Handle text messages from client
-    case WStype_TEXT:
-
-      // Print out raw message
-      Serial.printf("[%u] Received text: %s\n", client_num, payload);
-      _wsServer.sendTXT(client_num, "{Thank You}");
-
-      // Toggle LED
-/*
-      if ( strcmp((char *)payload, "toggleLED") == 0 ) {
-        led_state = led_state ? 0 : 1;
-        Serial.printf("Toggling LED to %u\n", led_state);
-        digitalWrite(led_pin, led_state);
-
-      // Report the state of the LED
-      } else if ( strcmp((char *)payload, "getLEDState") == 0 ) {
-        sprintf(msg_buf, "%d", led_state);
-        Serial.printf("Sending to [%u]: %s\n", client_num, msg_buf);
-        _wsServer.sendTXT(client_num, msg_buf);
-
-      // Message not recognized
-      } else {
-        Serial.println("[%u] Message not recognized");
-      }
-*/
-      break;
-
-    // For everything else: do nothing
-    case WStype_BIN:
-    case WStype_ERROR:
-    case WStype_FRAGMENT_TEXT_START:
-    case WStype_FRAGMENT_BIN_START:
-    case WStype_FRAGMENT:
-    case WStype_FRAGMENT_FIN:
-    default:
-      break;
-  }
-}
-
-//////////////////////////////////////////////////////////////
-bool isNetworkConnected() {
-//////////////////////////////////////////////////////////////
-  SysTools::addLog("wsEndpoints::isNetworkConnected");
-
-    return _isNetworkConnected;
-}
-
-//////////////////////////////////////////////////////////////
-void acceptHttpClient() {
-//////////////////////////////////////////////////////////////
-    if(!_isApEnabled) return;
-/*
-    WiFiClient client = _httpServer.available();   // listen for incoming clients
-    
-    
-    if(client) {                             // if you get a client,
-        Serial.println("New Client.");           // print a message out the serial port
-        String currentLine = "";                // make a String to hold incoming data from the client
-    
-        while(client.connected()) {            // loop while the client's connected
-            if(client.available()) {             // if there's bytes to read from the client,
-                char c = client.read();             // read a byte, then
-                Serial.write(c);                    // print it out the serial monitor
-                if (c == '\n') {                    // if the byte is a newline character
-
-                    // if the current line is blank, you got two newline characters in a row.
-                    // that's the end of the client HTTP request, so send a response:
-                    if (currentLine.length() == 0) {
-                        // HTTP headers always start with a response code (e.g. HTTP/1.1 200 OK)
-                        // and a content-type so the client knows what's coming, then a blank line:
-                        client.println("HTTP/1.1 200 OK");
-                        client.println("Content-type:text/html");
-                        client.println();
-
-                        // the content of the HTTP response follows the header:
-                        client.print("Click <a href=\"/H\">here</a> to turn ON the LED.<br>");
-                        client.print("Click <a href=\"/L\">here</a> to turn OFF the LED.<br>");
-
-                        // The HTTP response ends with another blank line:
-                        client.println();
-                        // break out of the while loop:
-                        break;
-                    } else {    // if you got a newline, then clear currentLine:
-                        currentLine = "";
-                    }
-                } else if (c != '\r') {  // if you got anything else but a carriage return character,
-                    currentLine += c;      // add it to the end of the currentLine
-                }
-
-                // Check to see if the client request was "GET /H" or "GET /L":
-                if (currentLine.endsWith("GET /H")) {
-                    digitalWrite(LED_BUILTIN, HIGH);               // GET /H turns the LED on
-                }
-                if (currentLine.endsWith("GET /L")) {
-                    digitalWrite(LED_BUILTIN, LOW);                // GET /L turns the LED off
-                }
-            }
-        }
-        
-        // close the connection:
-        client.stop();
-        Serial.println("Client Disconnected.");
-    }
-*/
-}
-
-//////////////////////////////////////////////////////////////
-void refresh() {
-//////////////////////////////////////////////////////////////
-    //if(_isServerEnabled == true) _wsServerServer->loop();
-    //if(_isClientEnabled == true) _wsServerClient->loop();
-  //SysTools::addLog("wsEndpoints::createAP");
-    _wsServer.loop();
-    //acceptHttpClient();
-}
-/*  
-//////////////////////////////////////////////////////////////
-bool connectEndpoint(char* pConnectInfo[], char* pEndpointInfo[], void (*pOnClientPkg)(DynamicJsonDocument& pPkg)) {
+bool connectWsEndpoint(char* pEndpointInfo[], void (*pOnClientPkg)(DynamicJsonDocument& pPkg)) {
 //////////////////////////////////////////////////////////////
   SysTools::addLog("wsEndpoints::connectEndpoint");
 
-    _endpointInfo = pEndpointInfo;
-    //connectAP(pConnectInfo);
-
-    //Connection to Endpoint
-    _onClientPkg = pOnClientPkg;
-    _wsServerClient = new WebSocketsClient();
-
-    // try every 5000 again if connection has failed
-    _wsServerClient->setReconnectInterval(5000);
-
-    // use HTTP Basic Authorization this is optional remove if not needed
-    //_wsServerClient->setAuthorization("user", "Password");
-
-    // event handler
-    _wsServerClient->onEvent(webClientEvent);
+    //_endpointInfo = pEndpointInfo;
     
-    _wsServerClient->begin(pEndpointInfo[CONNECT_ADDRESS], atoi(pEndpointInfo[CONNECT_PORT]), pEndpointInfo[CONNECT_PATH]);
+    //Set Client Options
+    _wsClient.setReconnectInterval(5000); // try every 5000 again if connection has failed    
+    _wsClient.onEvent(onWsClientEvent); // Set event handler
+    //_wsClient.>setAuthorization("user", "Password"); // use HTTP Basic Authorization this is optional remove if not needed
+    _wsClient.begin("192.168.0.102", 8123, "/");
 
-    SysTools::addLog("wsEndpoints::connectEndpoint %s", "wsClientDevice is Open");
+    SysTools::addLog("wsEndpoints::connectEndpoint %s", "wsClient is Connecting to Endpoint");
 
     _isClientEnabled = true;
     return true;
 }
 
-//////////////////////////////////////////////////////////////
-bool awaitEndpoints(char* pConnectInfo[], void (*pOnPkgInput)(DynamicJsonDocument& pObject)) {
-//////////////////////////////////////////////////////////////
-  SysTools::addLog("wsEndpoints::awaitEndpoint");
-   
-    _onServerPkg = pOnPkgInput;
-    _connectInfo = pConnectInfo;
-    //connectAP(pConnectInfo);
-    
-    //Listen for Connections
-    _wsServerServer = new WebSocketsServer(80);
-    _wsServerServer->onEvent(webServerEvent);
-    _wsServerServer->begin();
-    SysTools::addLog("wsEndpoints::awaitEndpoint, Waiting for Device Connection on Port: %s...", pConnectInfo[CONNECT_PORT]);
+// Callback: receiving any WebSocket message
+void onWsServerEvent(
+    uint8_t client_num,
+    WStype_t type,
+    uint8_t *payload,
+    size_t length) {
 
-    _isServerEnabled = true;
-    return true;
+  // Figure out the type of WebSocket event
+  switch(type) {
+    case WStype_CONNECTED:
+        // New client has connected
+      _wsClientAddress = _wsServer.remoteIP(client_num);
+      SysTools::addLog("wsEndpoints::onWsServerEvent[%u], Connected to Endpoint: %s", client_num, _wsClientAddress.toString());
+      break;
+
+    case WStype_DISCONNECTED:
+      // Client has disconnected
+      SysTools::addLog("wsEndpoints::onWsServerEvent[%u], Disconnected!\n", client_num);
+      break;
+
+    // Handle text messages from client
+    case WStype_TEXT:
+      // Print out raw message
+      SysTools::addLog("wsEndpoints::onWsServerEvent[%u], Received text: %s\n", client_num, payload);
+      _wsServer.sendTXT(client_num, "{Thank You}");
+      break;
+
+    // For everything else: do nothing
+    case WStype_BIN:
+      SysTools::addLog("wsEndpoints::onWsServerEvent[%u], ABORT: Unknown Event WStype_BIN");
+    case WStype_ERROR:
+      SysTools::addLog("wsEndpoints::onWsServerEvent[%u], ABORT: Unknown Event WStype_ERROR");
+    case WStype_FRAGMENT_TEXT_START:
+      SysTools::addLog("wsEndpoints::onWsServerEvent[%u], ABORT: Unknown Event WStype_FRAGMENT_TEXT_START");
+    case WStype_FRAGMENT_BIN_START:
+      SysTools::addLog("wsEndpoints::onWsServerEvent[%u], ABORT: Unknown Event WStype_FRAGMENT_BIN_START");
+    case WStype_FRAGMENT:
+      SysTools::addLog("wsEndpoints::onWsServerEvent[%u], ABORT: Unknown Event WStype_FRAGMENT");
+    case WStype_FRAGMENT_FIN:
+    default:
+      SysTools::addLog("wsEndpoints::onWsServerEvent[%u], ABORT: Unknown Event %u", client_num, type);
+      break;
+  }
 }
-*/
+ 
+//////////////////////////////////////////////////////////////
+void onHttpServerEvent(AsyncWebServerRequest *pRequest) {
+//////////////////////////////////////////////////////////////
+  SysTools::addLog("wsEndpoints::onHttpServerEvent");
 
-void getHomePage(AsyncWebServerRequest *request) {
-  SysTools::addLog("wsEndpoints::getHomePage");
-
-    request->send(200, "text/html", "<b>Hello, world</b><script>alert('Hello World!');</script>");
+    _httpRequest = pRequest;
+    _onPkgInput("web", nullptr, &sendHttpEndpointPkg);
+    //request->send(200, "text/html", "<b>Hello, world</b><script>alert('Hello World!');</script>");
 }
 
 //////////////////////////////////////////////////////////////
@@ -366,11 +218,11 @@ bool startServers() {
 //////////////////////////////////////////////////////////////
   SysTools::addLog("wsEndpoints::startServers");
   
-    _httpServer.on("/", HTTP_GET, getHomePage);   
+    _httpServer.on("/", HTTP_GET, onHttpServerEvent);   
     _httpServer.begin();
     
     _wsServer.begin();
-    _wsServer.onEvent(onWebSocketEvent);
+    _wsServer.onEvent(onWsServerEvent);
   
     return true;
 }
@@ -402,7 +254,7 @@ bool connectWifiAP() {
   SysTools::addLog("wsEndpoints::connectWifiAP");
   if(_isNetworkConnected) return true;
 
-  char* ssid = "WAP2Gx-MASTERBEDROOM";
+  char* ssid = "WAP2G-MASTERBEDROOM";
   char* password = "Pin#95833";
   uint32_t startTime = CURRENT_TIME;
     
@@ -437,9 +289,10 @@ bool connectWifiAP() {
 }
 
 //////////////////////////////////////////////////////////////
-bool enable() {
+bool enable(onEndpointPkg pOnPkgInput) {
 //////////////////////////////////////////////////////////////
   SysTools::addLog("wsEndpoints::enable");
+_onPkgInput = pOnPkgInput;
 
     if(_isNetworkConnected) {
         SysTools::addLog("wsEndpoints::enable, Network already connected");       
