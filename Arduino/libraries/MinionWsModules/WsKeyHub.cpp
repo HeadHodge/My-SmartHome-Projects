@@ -75,7 +75,7 @@ void refresh() {
 void open(receivedKeyCallback pReceivedKey)
 {
     receivedKey = pReceivedKey;
-    WsEndpoints::awaitEndpoint(_localEndpointInfo);
+    //WsEndpoints::awaitEndpoint(_localEndpointInfo);
     //(messageReceived);
     
     SysTools::addLog("%s", "WsKeyHub::open Hub is Open");  

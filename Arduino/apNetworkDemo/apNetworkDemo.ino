@@ -15,10 +15,19 @@
 #include <WsEndpoints.h>
 #include <ArduinoJson.h>
 
-void onEndpointPkg(char* pSource, DynamicJsonDocument* pPkgIn, void (*sendEndpointPkg)(DynamicJsonDocument* pEndpointPkg)) {
+//Hassio Endpoint
+char* _remoteEndpointInfo[] = {
+    "WAP2G-MASTERBEDROOM",
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiI1MDI4OWI1NjJlMTU0Mzc4YTU3ZDBiOTkwZTc0NWMyOSIsImlhdCI6MTY3MjQyNDE0MCwiZXhwIjoxOTg3Nzg0MTQwfQ.A5CqydtUIjuhr4Yf9KliXqaxMhzmduaG779ICZSZ6eU",
+    "192.168.0.102",
+    "8123",
+    "/api/websocket"
+};
+
+void onEndpointPkg(char* pSource, DynamicJsonDocument* pPkgIn, bool (*sendEndpointPkg)(DynamicJsonDocument* pEndpointPkg)) {
   Serial.printf("onEndpointPkg Called from: %s\n", pSource);
   char* htmlReply = "{\"homePage\": \"<b>Hello, world</b><script>alert('Hello World!');</script>\"}";
-  DynamicJsonDocument* optionsObj; // = new DynamicJsonDocument(128);
+  DynamicJsonDocument* optionsObj;
 
     optionsObj = SysTools::createPkg(htmlReply);
     
@@ -39,6 +48,14 @@ void setup() {
 
   SysTools::displayHome();
   WsEndpoints::enable(&onEndpointPkg);
+  WsEndpoints::connectWsClientEndpoint(
+      "192.168.0.102",  //IpAddress
+      8123,             //PortNumber
+      "/api/websocket", //Path
+      "admin",          //LoginId
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiI1MDI4OWI1NjJlMTU0Mzc4YTU3ZDBiOTkwZTc0NWMyOSIsImlhdCI6MTY3MjQyNDE0MCwiZXhwIjoxOTg3Nzg0MTQwfQ.A5CqydtUIjuhr4Yf9KliXqaxMhzmduaG779ICZSZ6eU"      
+  );
+ 
   //SysTools::displayConnection();
   return;
 }

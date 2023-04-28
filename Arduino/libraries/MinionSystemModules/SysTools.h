@@ -15,6 +15,7 @@ namespace SysTools
     //void getOptions(const char*, DynamicJsonDocument&);
     void dumpBuffer(const uint8_t* pBuffer, uint32_t pBufferSize, uint32_t pByteCount);
     bool saveOptionsObj(DynamicJsonDocument* pOptionsObject, char* pFileName="system.cfg", char* pDirectory="/cardDisk/system");
+    char* createPkgString(DynamicJsonDocument* pPkg);
     DynamicJsonDocument* createPkg(char* pJsonString);
     DynamicJsonDocument* getOptionsObj(char* pFileName="system.cfg", char* pDirectory="/cardDisk/system");
 }

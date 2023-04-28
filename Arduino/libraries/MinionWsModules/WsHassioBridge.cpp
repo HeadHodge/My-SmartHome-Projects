@@ -51,12 +51,12 @@ DynamicJsonDocument doc(1024);
     SysTools::addLog("WsHassioBridge::receivedMessage messageType: %s", messageType);
  
     if(strcmp(messageType, "auth_required") == 0) {
-      SysTools::addLog("WsHassioBridge::receivedMessage Send accessToken: %s", _remoteEndpointInfo[WsEndpoints::CONNECT_PASSWORD]);
+      SysTools::addLog("WsHassioBridge::receivedMessage Send accessToken");
       char pkg[128];
         
         memset(pkg, 0, sizeof(pkg));
-        sprintf(pkg, "{\"type\": \"auth\", \"access_token\": \"%s\"}", _remoteEndpointInfo[WsEndpoints::CONNECT_PASSWORD]);            
-        WsEndpoints::sendControlPkg(pkg);
+        sprintf(pkg, "{\"type\": \"auth\", \"access_token\": \" \"}");            
+        //WsEndpoints::sendControlPkg(pkg);
         return "";
     }     
 
@@ -96,7 +96,7 @@ void controlDevice(DynamicJsonDocument& pKeyObj) {
     sprintf(controlPkg, "{\"id\": %i, \"type\": \"fire_event\", \"event_type\": \"keyPressed\", \"event_data\": %s}", refNum, keyString);
     
     refNum = refNum + 1;
-    WsEndpoints::sendControlPkg(controlPkg);
+    //WsEndpoints::sendControlPkg(controlPkg);
     
     SysTools::addLog("WsHassioBridge::controlDevice sent controlPkg %s", controlPkg);
 }
@@ -106,7 +106,14 @@ void open(callBack pCallBack)
 {
     receivedKey = pCallBack;
     //WsEndpoint::open(receivedMessage);
-    WsEndpoints::connectEndpoint(_remoteEndpointInfo);
+    WsEndpoints::connectWsClientEndpoint(
+        "192.168.0.102",  //IpAddress
+        8123,             //PortNumber
+        "/api/websocket", //Path
+        "admin",          //LoginId
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiI1MDI4OWI1NjJlMTU0Mzc4YTU3ZDBiOTkwZTc0NWMyOSIsImlhdCI6MTY3MjQyNDE0MCwiZXhwIjoxOTg3Nzg0MTQwfQ.A5CqydtUIjuhr4Yf9KliXqaxMhzmduaG779ICZSZ6eU"      
+    );
+    
     return;
 }
 } //namespace WsHassioBridge

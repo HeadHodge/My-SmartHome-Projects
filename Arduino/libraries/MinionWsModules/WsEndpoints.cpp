@@ -36,32 +36,12 @@ void (*_onServerPkg)(DynamicJsonDocument& pPkg) = nullptr;
 void (*_onClientPkg)(DynamicJsonDocument& pPkg) = nullptr;
 onEndpointPkg _onPkgInput = nullptr;
 
-/////////////////////////////////////////////////////////////
-bool sendReplyPkg(const char *pPkg) {
-/////////////////////////////////////////////////////////////
- SysTools::addLog("wsEndpoints::sendJasonReplyStr: %s", pPkg);
-     //return _wsServerServer->sendTXT(0, pPkg);
-}
 
 /////////////////////////////////////////////////////////////
 bool sendControlPkg(const char *pPkg) {
 /////////////////////////////////////////////////////////////
   SysTools::addLog("wsEndpoints::sendJasonControlStr: %s", pPkg);
     //return _wsServerClient->sendTXT(pPkg);
-}
-
-/////////////////////////////////////////////////////////////
-bool sendControlPkg(DynamicJsonDocument& pPkg) {
-/////////////////////////////////////////////////////////////
-  SysTools::addLog("wsEndpoints::sendControlPkg");
-  char pkg[1024];
-  
-    if(serializeJson(pPkg, pkg) == 0){
-        SysTools::addLog("wsEndpoints::sendControlPkg, ABORT: Serialize Pkg Failed");
-        return false;
-    };
-        
-    return sendControlPkg(pkg);
 }
 
 /////////////////////////////////////////////////////////////
@@ -94,95 +74,106 @@ bool isNetworkConnected() {
     return _isNetworkConnected;
 }
 
-//////////////////////////////////////////////////////////////
-void sendHttpEndpointPkg(DynamicJsonDocument* pEndpointPkg) {
-//////////////////////////////////////////////////////////////
-  if(_httpRequest == nullptr) return;
-  SysTools::addLog("wsEndpoints::sendHttpEndpointPkg, HomePage: %s", (const char*)(*pEndpointPkg)["homePage"]);
+/////////////////////////////////////////////////////////////
+bool sendWsServerPkg(DynamicJsonDocument* pPkg) {
+/////////////////////////////////////////////////////////////
+  char* pkgString = SysTools::createPkgString(pPkg);
+  SysTools::addLog("wsEndpoints::sendJasonReplyStr: %s", pkgString);
+  bool sendStatus;
+  
+    sendStatus = _wsServer.sendTXT(0, pkgString);
+    free(pkgString);
+    return true;
+}
 
-    _httpRequest->send(200, "text/html", (const char*)(*pEndpointPkg)["homePage"]);
+/////////////////////////////////////////////////////////////
+bool sendWsClientPkg(DynamicJsonDocument* pPkg) {
+/////////////////////////////////////////////////////////////
+  SysTools::addLog("wsEndpoints::sendWsClientPkg");
+  char* pkgString = SysTools::createPkgString(pPkg);
+  
+    if(pkgString == nullptr){
+        SysTools::addLog("wsEndpoints::sendWsClientPkg, ABORT: Serialize Pkg Failed");
+        return false;
+    };
+        
+    _wsClient.sendTXT(pkgString);
+    return true;
+}
+
+//////////////////////////////////////////////////////////////
+bool sendHttpServerPkg(DynamicJsonDocument* pPkg) {
+//////////////////////////////////////////////////////////////
+  SysTools::addLog("wsEndpoints::sendHttpEndpointPkg, HomePage: %s", (const char*)(*pPkg)["homePage"]);
+  if(_httpRequest == nullptr) return false;
+
+    _httpRequest->send(200, "text/html", (const char*)(*pPkg)["homePage"]);
     _httpRequest = nullptr;
-}
-
-//////////////////////////////////////////////////////////////
-void refresh() {
-//////////////////////////////////////////////////////////////
-    _wsServer.loop();
+    return true;
 }
 
 /////////////////////////////////////////////////////////////
-void onWsClientEvent(WStype_t type, uint8_t* input, size_t length) {
+void onWsClientEvent(WStype_t pType, uint8_t* pInput, size_t pLength) {
 /////////////////////////////////////////////////////////////
-
-	switch(type) {
+	switch(pType) {
 		case WStype_DISCONNECTED:
 			SysTools::addLog("%s", "wsEndpoints::webClientEvent Disconnected!");
             _isClientConnected = false;
 			break;
 		case WStype_CONNECTED:
-			SysTools::addLog("wsEndpoints::webClientEvent Connected to url: %s", input);
+			SysTools::addLog("wsEndpoints::webClientEvent Connected to url: %s", pInput);
             _isClientConnected = true;
 			break;
-		case WStype_TEXT:
-            onPkgInput(input, length, _onClientPkg);
+		case WStype_TEXT: {
+            DynamicJsonDocument* optionsObj = SysTools::createPkg((char*) pInput);
+    
+            if(optionsObj == nullptr) {
+                SysTools::addLog("ABORT: createPkg failed");
+                return;
+            };
+            
+            _onPkgInput("wsClient", optionsObj, &sendWsClientPkg);
 			break;
+        }
 		case WStype_BIN:
-			SysTools::addLog("wsEndpoints::webClientEvent get binary length: %u", length);
+			SysTools::addLog("wsEndpoints::webClientEvent get binary pLength: %u", pLength);
 			break;
 		case WStype_ERROR:			
 		case WStype_FRAGMENT_TEXT_START:
 		case WStype_FRAGMENT_BIN_START:
 		case WStype_FRAGMENT:
 		case WStype_FRAGMENT_FIN:
-            SysTools::addLog("wsEndpoints::webClientEvent, Received Unknown Event Type(type: %d)", type);
+            SysTools::addLog("wsEndpoints::webClientEvent, Received Unknown Event pType: %d", pType);
 			break;
 	}
 }
 
-//////////////////////////////////////////////////////////////
-bool connectWsEndpoint(char* pEndpointInfo[], void (*pOnClientPkg)(DynamicJsonDocument& pPkg)) {
-//////////////////////////////////////////////////////////////
-  SysTools::addLog("wsEndpoints::connectEndpoint");
-
-    //_endpointInfo = pEndpointInfo;
-    
-    //Set Client Options
-    _wsClient.setReconnectInterval(5000); // try every 5000 again if connection has failed    
-    _wsClient.onEvent(onWsClientEvent); // Set event handler
-    //_wsClient.>setAuthorization("user", "Password"); // use HTTP Basic Authorization this is optional remove if not needed
-    _wsClient.begin("192.168.0.102", 8123, "/");
-
-    SysTools::addLog("wsEndpoints::connectEndpoint %s", "wsClient is Connecting to Endpoint");
-
-    _isClientEnabled = true;
-    return true;
-}
-
 // Callback: receiving any WebSocket message
 void onWsServerEvent(
-    uint8_t client_num,
-    WStype_t type,
-    uint8_t *payload,
-    size_t length) {
+    uint8_t pClientNum,
+    WStype_t pType,
+    uint8_t *pPayload,
+    size_t pLength) {
 
-  // Figure out the type of WebSocket event
-  switch(type) {
+  // Figure out the pType of WebSocket event
+  switch(pType) {
     case WStype_CONNECTED:
         // New client has connected
-      _wsClientAddress = _wsServer.remoteIP(client_num);
-      SysTools::addLog("wsEndpoints::onWsServerEvent[%u], Connected to Endpoint: %s", client_num, _wsClientAddress.toString());
+      _wsClientAddress = _wsServer.remoteIP(pClientNum);
+      SysTools::addLog("wsEndpoints::onWsServerEvent[%u], Connected to Endpoint: %s", pClientNum, _wsClientAddress.toString());
       break;
 
     case WStype_DISCONNECTED:
       // Client has disconnected
-      SysTools::addLog("wsEndpoints::onWsServerEvent[%u], Disconnected!\n", client_num);
+      SysTools::addLog("wsEndpoints::onWsServerEvent[%u], Disconnected!\n", pClientNum);
       break;
 
     // Handle text messages from client
     case WStype_TEXT:
       // Print out raw message
-      SysTools::addLog("wsEndpoints::onWsServerEvent[%u], Received text: %s\n", client_num, payload);
-      _wsServer.sendTXT(client_num, "{Thank You}");
+      SysTools::addLog("wsEndpoints::onWsServerEvent[%u], Received text: %s\n", pClientNum, pPayload);
+      _onPkgInput("wsServer", nullptr, &sendWsServerPkg);
+      //_wsServer.sendTXT(pClientNum, "{Thank You}");
       break;
 
     // For everything else: do nothing
@@ -198,7 +189,7 @@ void onWsServerEvent(
       SysTools::addLog("wsEndpoints::onWsServerEvent[%u], ABORT: Unknown Event WStype_FRAGMENT");
     case WStype_FRAGMENT_FIN:
     default:
-      SysTools::addLog("wsEndpoints::onWsServerEvent[%u], ABORT: Unknown Event %u", client_num, type);
+      SysTools::addLog("wsEndpoints::onWsServerEvent[%u], ABORT: Unknown Event %u", pClientNum, pType);
       break;
   }
 }
@@ -209,7 +200,7 @@ void onHttpServerEvent(AsyncWebServerRequest *pRequest) {
   SysTools::addLog("wsEndpoints::onHttpServerEvent");
 
     _httpRequest = pRequest;
-    _onPkgInput("web", nullptr, &sendHttpEndpointPkg);
+    _onPkgInput("httpServer", nullptr, &sendHttpServerPkg);
     //request->send(200, "text/html", "<b>Hello, world</b><script>alert('Hello World!');</script>");
 }
 
@@ -224,6 +215,23 @@ bool startServers() {
     _wsServer.begin();
     _wsServer.onEvent(onWsServerEvent);
   
+    return true;
+}
+
+//////////////////////////////////////////////////////////////
+bool connectWsClientEndpoint(char* pIpAddress, uint16_t pPort, char* pPath, char* pLoginId, char* pLoginPsw) {
+//////////////////////////////////////////////////////////////
+  SysTools::addLog("wsEndpoints::connectWsClientEndpoint");
+    
+    //Set Client Options
+    _wsClient.setReconnectInterval(5000); // try every 5000 again if connection has failed    
+    _wsClient.onEvent(onWsClientEvent); // Set event handler
+    //_wsClient.>setAuthorization("user", "Password"); // use HTTP Basic Authorization this is optional remove if not needed
+    _wsClient.begin(pIpAddress, pPort, pPath);
+
+    SysTools::addLog("wsEndpoints::connectWsClientEndpoint, Connecting to Endpoint, IP: %s, Port: %lu, Path: %s", pIpAddress, pPort, pPath);
+
+    _isClientEnabled = true;
     return true;
 }
 
@@ -286,6 +294,13 @@ bool connectWifiAP() {
     _isNetworkConnected = true;
     SysTools::displayStationConnection();
     return true;
+}
+
+//////////////////////////////////////////////////////////////
+void refresh() {
+//////////////////////////////////////////////////////////////
+    _wsServer.loop();
+    _wsClient.loop();
 }
 
 //////////////////////////////////////////////////////////////
